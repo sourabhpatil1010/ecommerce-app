@@ -1,6 +1,22 @@
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { RegisterForm } from "@/components/auth";
 
 export function RegisterPage() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-indigo-600" />
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <div className="container-app flex min-h-[60vh] items-center justify-center py-12">
       <div className="w-full max-w-md">
