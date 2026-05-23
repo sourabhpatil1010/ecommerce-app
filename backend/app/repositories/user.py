@@ -1,5 +1,6 @@
 """User repository."""
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
@@ -12,4 +13,9 @@ class UserRepository(BaseRepository[User]):
     def __init__(self, session: AsyncSession):
         super().__init__(User, session)
 
-    # TODO: add domain-specific queries (e.g. get_by_email)
+    async def get_by_email(self, email: str) -> User | None:
+        """Fetch a single user by email."""
+        result = await self.session.execute(
+            select(User).where(User.email == email)
+        )
+        return result.scalars().first()
