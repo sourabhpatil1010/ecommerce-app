@@ -1,0 +1,61 @@
+import { Routes, Route } from "react-router-dom";
+import { Layout } from "@/components/layout";
+import {
+  HomePage,
+  ProductsPage,
+  ProductDetailPage,
+  CartPage,
+  CheckoutPage,
+  LoginPage,
+  RegisterPage,
+  ProfilePage,
+  OrderHistoryPage,
+  NotFoundPage,
+} from "@/pages";
+import { ProtectedRoute } from "./ProtectedRoute";
+
+export function AppRouter() {
+  return (
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="products" element={<ProductsPage />} />
+        <Route path="products/:id" element={<ProductDetailPage />} />
+        <Route path="cart" element={<CartPage />} />
+        
+        {/* Protected Customer Routes */}
+        <Route
+          path="checkout"
+          element={
+            <ProtectedRoute>
+              <CheckoutPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="orders"
+          element={
+            <ProtectedRoute>
+              <OrderHistoryPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Auth Routes */}
+        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
+
+        {/* 404 Route */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
+  );
+}
