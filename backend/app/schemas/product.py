@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from app.schemas.common import BaseSchema, TimestampSchema
+from app.schemas.common import BaseSchema, TimestampSchema, PaginatedResponse
 
 
 class ProductCreate(BaseSchema):
@@ -21,6 +21,7 @@ class ProductUpdate(BaseSchema):
     """Schema for updating a product."""
 
     name: str | None = None
+    slug: str | None = None
     description: str | None = None
     price: float | None = None
     stock: int | None = None
@@ -41,3 +42,10 @@ class ProductRead(TimestampSchema):
     image_url: str | None
     is_active: bool
     category_id: UUID | None
+
+
+class ProductPaginatedResponse(PaginatedResponse):
+    """Paginated list of products."""
+
+    items: list[ProductRead]
+

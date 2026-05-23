@@ -19,6 +19,7 @@ from app.schemas.product import (  # noqa: F401
     ProductCreate,
     ProductUpdate,
     ProductRead,
+    ProductPaginatedResponse,
 )
 from app.schemas.category import (  # noqa: F401
     CategoryCreate,
