@@ -9,6 +9,11 @@ from app.config import settings
 from app.api.v1.router import api_router
 from app.models.base import Base
 from app.database import engine
+from app.core.logging import setup_logging
+from app.core.middleware import RequestLoggingMiddleware
+
+# Initialize logging configuration
+setup_logging()
 
 
 @asynccontextmanager
@@ -30,6 +35,7 @@ app = FastAPI(
 )
 
 # ─── Middleware ────────────────────────────────────────
+app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,
