@@ -24,7 +24,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("access_token");
-      // TODO: redirect to login or trigger auth context logout
+      // Notify AuthContext to clear user state without hard-coding a redirect here
+      window.dispatchEvent(new Event("auth:logout"));
     }
     return Promise.reject(error);
   }

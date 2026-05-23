@@ -4,6 +4,7 @@ export interface User {
   email: string;
   full_name: string | null;
   is_active: boolean;
+  is_superuser: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -19,4 +20,10 @@ export interface UserRegister {
   email: string;
   password: string;
   full_name?: string;
+}
+
+/** JWT token response from the API. */
+export interface AuthToken {
+  access_token: string;
+  token_type: string;
 }

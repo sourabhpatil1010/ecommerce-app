@@ -4,9 +4,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.schemas.user import UserCreate, UserRead, Token
+from app.schemas.user import UserCreate, UserRead, Token, UserLogin
 from app.services.auth import AuthService
 from app.core.security import create_access_token
+from app.api.v1.deps import get_current_active_user
+from app.models.user import User
 
 router = APIRouter()
 
@@ -27,7 +29,7 @@ async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db)
 ) -> Any:
-    """Authenticate and return JWT tokens (supports standard OAuth2 form payload)."""
+    """Authenticate via OAuth2 form (used by Swagger UI). Returns JWT token."""
     auth_service = AuthService(db)
     user = await auth_service.authenticate(
         email=form_data.username,
@@ -38,3 +40,29 @@ async def login(
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+
+@router.post("/token", response_model=Token)
+async def login_json(
+    credentials: UserLogin,
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """Authenticate via JSON body (used by the frontend). Returns JWT token."""
+    auth_service = AuthService(db)
+    user = await auth_service.authenticate(
+        email=credentials.email,
+        password=credentials.password
+    )
+    access_token = create_access_token(subject=str(user.id))
+    return {
+        "access_token": access_token,
+        "token_type": "bearer"
+    }
+
+
+@router.get("/me", response_model=UserRead)
+async def get_me(
+    current_user: User = Depends(get_current_active_user)
+) -> Any:
+    """Return the currently authenticated user's profile."""
+    return current_user

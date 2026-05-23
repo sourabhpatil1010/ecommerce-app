@@ -2,7 +2,7 @@
 
 from uuid import UUID
 
-from pydantic import EmailStr
+from pydantic import EmailStr, Field
 
 from app.schemas.common import BaseSchema, TimestampSchema
 
@@ -11,7 +11,7 @@ class UserCreate(BaseSchema):
     """Schema for creating a new user."""
 
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8, description="Minimum 8 characters")
     full_name: str | None = None
 
 
@@ -29,6 +29,7 @@ class UserRead(TimestampSchema):
     email: str
     full_name: str | None
     is_active: bool
+    is_superuser: bool
 
 
 class UserLogin(BaseSchema):

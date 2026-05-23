@@ -1,14 +1,14 @@
 import { apiClient } from "./client";
-import type { UserLogin, UserRegister } from "@/types";
+import type { UserRegister, AuthToken, User } from "@/types";
 
-/** POST /auth/register */
+/** POST /auth/register — create a new account */
 export const register = (data: UserRegister) =>
-  apiClient.post("/auth/register", data);
+  apiClient.post<User>("/auth/register", data);
 
-/** POST /auth/login */
-export const login = (data: UserLogin) =>
-  apiClient.post("/auth/login", data);
+/** POST /auth/token — JSON-body login, returns JWT */
+export const login = (email: string, password: string) =>
+  apiClient.post<AuthToken>("/auth/token", { email, password });
 
-/** POST /auth/refresh */
-export const refreshToken = () =>
-  apiClient.post("/auth/refresh");
+/** GET /auth/me — fetch the currently authenticated user */
+export const getMe = () =>
+  apiClient.get<User>("/auth/me");
