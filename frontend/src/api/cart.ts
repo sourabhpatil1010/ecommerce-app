@@ -1,7 +1,7 @@
 import { apiClient } from "./client";
 
-/** GET /cart */
-export const getCart = () => apiClient.get("/cart");
+/** GET /cart/ */
+export const getCart = () => apiClient.get("/cart/");
 
 /** POST /cart/items */
 export const addCartItem = (productId: string, quantity: number = 1) =>
@@ -15,5 +15,5 @@ export const updateCartItem = (itemId: string, quantity: number) =>
 export const removeCartItem = (itemId: string) =>
   apiClient.delete(`/cart/items/${itemId}`);
 
-/** DELETE /cart */
-export const clearCart = () => apiClient.delete("/cart");
+/** DELETE /cart/ */
+export const clearCart = () => apiClient.delete("/cart/");

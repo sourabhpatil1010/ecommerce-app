@@ -81,7 +81,7 @@ async def delete_product(
     product_id: uuid.UUID,
     _: User = Depends(get_current_superuser),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> None:
     """Delete a product (admin only)."""
     product_service = ProductService(db)
     await product_service.delete_product(product_id)

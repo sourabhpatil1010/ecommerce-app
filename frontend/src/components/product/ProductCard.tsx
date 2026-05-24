@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import type { Product } from "@/types";
@@ -11,33 +11,37 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
+  const navigate = useNavigate();
   const { addItem, items, updateQuantity } = useCart();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [added, setAdded] = useState(false);
 
   const isOutOfStock = product.stock <= 0;
   const isAdmin = user?.is_superuser === true;
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (isOutOfStock) return;
 
-    const existingItem = items.find((i) => i.product_id === product.id);
-    if (existingItem) {
-      updateQuantity(existingItem.id, existingItem.quantity + 1);
-    } else {
-      addItem({
-        id: Math.random().toString(36).substring(2, 9),
-        product_id: product.id,
-        quantity: 1,
-        unit_price: product.price,
-      });
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
     }
 
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    try {
+      const existingItem = items.find((i) => i.product_id === product.id);
+      if (existingItem) {
+        await updateQuantity(existingItem.id, existingItem.quantity + 1);
+      } else {
+        await addItem(product.id, 1);
+      }
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1500);
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+    }
   };
 
   const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80";

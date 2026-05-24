@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import type { Product } from "@/types";
@@ -9,31 +10,35 @@ interface ProductDetailViewProps {
 }
 
 export function ProductDetailView({ product, onEdit }: ProductDetailViewProps) {
+  const navigate = useNavigate();
   const { addItem, items, updateQuantity } = useCart();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
   const isOutOfStock = product.stock <= 0;
   const isAdmin = user?.is_superuser === true;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (isOutOfStock || quantity < 1) return;
 
-    const existingItem = items.find((i) => i.product_id === product.id);
-    if (existingItem) {
-      updateQuantity(existingItem.id, existingItem.quantity + quantity);
-    } else {
-      addItem({
-        id: Math.random().toString(36).substring(2, 9),
-        product_id: product.id,
-        quantity: quantity,
-        unit_price: product.price,
-      });
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
     }
 
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
+    try {
+      const existingItem = items.find((i) => i.product_id === product.id);
+      if (existingItem) {
+        await updateQuantity(existingItem.id, existingItem.quantity + quantity);
+      } else {
+        await addItem(product.id, quantity);
+      }
+      setAdded(true);
+      setTimeout(() => setAdded(false), 1500);
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+    }
   };
 
   const incrementQty = () => {

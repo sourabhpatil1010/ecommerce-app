@@ -96,7 +96,7 @@ async def delete_category(
     category_id: uuid.UUID,
     _: User = Depends(get_current_superuser),
     db: AsyncSession = Depends(get_db),
-) -> Any:
+) -> None:
     """Delete a category (admin only)."""
     repo = CategoryRepository(db)
     category = await repo.get_by_id(category_id)
