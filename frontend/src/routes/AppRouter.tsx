@@ -10,6 +10,7 @@ import {
   RegisterPage,
   ProfilePage,
   OrderHistoryPage,
+  OrderDetailPage,
   NotFoundPage,
 } from "@/pages";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -45,6 +46,14 @@ export function AppRouter() {
           element={
             <ProtectedRoute>
               <OrderHistoryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="orders/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetailPage />
             </ProtectedRoute>
           }
         />

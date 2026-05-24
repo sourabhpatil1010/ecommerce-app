@@ -7,4 +7,5 @@ export { LoginPage } from "./Login";
 export { RegisterPage } from "./Register";
 export { ProfilePage } from "./Profile";
 export { OrderHistoryPage } from "./OrderHistory";
+export { OrderDetailPage } from "./OrderDetail";
 export { NotFoundPage } from "./NotFound";

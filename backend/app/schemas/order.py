@@ -4,6 +4,7 @@ from uuid import UUID
 from datetime import datetime
 
 from app.schemas.common import BaseSchema
+from app.schemas.product import ProductRead
 
 
 class OrderItemRead(BaseSchema):
@@ -13,6 +14,7 @@ class OrderItemRead(BaseSchema):
     product_id: UUID
     quantity: int
     unit_price: float
+    product: ProductRead | None = None
 
 
 class OrderCreate(BaseSchema):
