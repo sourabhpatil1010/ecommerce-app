@@ -11,6 +11,8 @@ import {
   ProfilePage,
   OrderHistoryPage,
   OrderDetailPage,
+  CheckoutPaymentPage,
+  PaymentSuccessPage,
   NotFoundPage,
 } from "@/pages";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -24,12 +26,27 @@ export function AppRouter() {
         <Route path="products/:id" element={<ProductDetailPage />} />
         <Route path="cart" element={<CartPage />} />
         
-        {/* Protected Customer Routes */}
         <Route
           path="checkout"
           element={
             <ProtectedRoute>
               <CheckoutPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="checkout/payment/:orderId"
+          element={
+            <ProtectedRoute>
+              <CheckoutPaymentPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="checkout/success"
+          element={
+            <ProtectedRoute>
+              <PaymentSuccessPage />
             </ProtectedRoute>
           }
         />

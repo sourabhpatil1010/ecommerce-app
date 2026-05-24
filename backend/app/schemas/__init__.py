@@ -41,4 +41,6 @@ from app.schemas.order import (  # noqa: F401
 from app.schemas.payment import (  # noqa: F401
     PaymentCreate,
     PaymentRead,
+    PaymentIntentCreate,
+    PaymentIntentResponse,
 )

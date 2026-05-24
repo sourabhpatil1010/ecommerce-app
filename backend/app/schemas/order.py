@@ -32,6 +32,7 @@ class OrderRead(BaseSchema):
     total_amount: float
     shipping_address: str | None
     items: list[OrderItemRead] = []
+    payment_status: str | None = None
     created_at: datetime
     updated_at: datetime
 

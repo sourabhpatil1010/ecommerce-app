@@ -6,6 +6,21 @@ from datetime import datetime
 from app.schemas.common import BaseSchema
 
 
+class PaymentIntentCreate(BaseSchema):
+    """Schema for creating a Stripe PaymentIntent."""
+
+    order_id: UUID
+
+
+class PaymentIntentResponse(BaseSchema):
+    """Schema returned after creating a PaymentIntent."""
+
+    payment_id: UUID
+    client_secret: str
+    amount: float
+    currency: str
+
+
 class PaymentCreate(BaseSchema):
     """Schema for initiating a payment."""
 

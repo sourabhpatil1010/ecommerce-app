@@ -37,8 +37,8 @@ export function CheckoutPage() {
       const res = await createOrder(fullShippingAddress);
       // Refresh the cart from backend since it has been cleared
       await fetchCart();
-      // Redirect to Order History or Order Details page
-      navigate(`/orders/${res.data.id}`, { replace: true });
+      // Redirect to secure payment checkout page
+      navigate(`/checkout/payment/${res.data.id}`, { replace: true });
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string } } };
       setError(
