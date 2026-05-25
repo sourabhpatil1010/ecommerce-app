@@ -39,3 +39,11 @@ class UserService:
     async def list_users(self, skip: int = 0, limit: int = 100) -> list[User]:
         """Fetch all users (admin-only function)."""
         return await self.user_repo.get_all(skip=skip, limit=limit)
+
+    async def update_status(self, user_id: uuid.UUID, is_active: bool) -> User:
+        """Update user's active status (admin-only)."""
+        user = await self.user_repo.get_by_id(user_id)
+        if not user:
+            raise NotFoundException(detail="User not found")
+        user.is_active = is_active
+        return await self.user_repo.update(user)

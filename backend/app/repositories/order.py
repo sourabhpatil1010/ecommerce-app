@@ -51,3 +51,17 @@ class OrderRepository(BaseRepository[Order]):
         )
         result = await self.session.execute(stmt)
         return result.scalars().first()
+
+    async def get_all_orders(self, skip: int = 0, limit: int = 100) -> list[Order]:
+        """Fetch all orders (for admin)."""
+        stmt = (
+            select(Order)
+            .order_by(Order.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .options(
+                selectinload(Order.items).selectinload(OrderItem.product)
+            )
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())

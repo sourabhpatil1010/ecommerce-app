@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout } from "@/components/layout";
 import {
   HomePage,
@@ -14,8 +14,15 @@ import {
   CheckoutPaymentPage,
   PaymentSuccessPage,
   NotFoundPage,
+  AdminDashboardPage,
+  AdminProductsPage,
+  AdminCategoriesPage,
+  AdminOrdersPage,
+  AdminUsersPage,
 } from "@/pages";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { AdminRoute } from "./AdminRoute";
+import { AdminLayout } from "@/components/layout/AdminLayout";
 
 export function AppRouter() {
   return (
@@ -81,6 +88,23 @@ export function AppRouter() {
 
         {/* 404 Route */}
         <Route path="*" element={<NotFoundPage />} />
+      </Route>
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        <Route index element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="dashboard" element={<AdminDashboardPage />} />
+        <Route path="products" element={<AdminProductsPage />} />
+        <Route path="categories" element={<AdminCategoriesPage />} />
+        <Route path="orders" element={<AdminOrdersPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
       </Route>
     </Routes>
   );

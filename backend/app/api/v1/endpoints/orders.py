@@ -57,6 +57,24 @@ async def list_orders(
     return result
 
 
+@router.get("/all", response_model=list[OrderRead])
+async def list_all_orders(
+    skip: int = 0,
+    limit: int = 100,
+    _: User = Depends(get_current_superuser),
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """List all orders (admin only)."""
+    order_service = OrderService(db)
+    payment_repo = PaymentRepository(db)
+    orders = await order_service.list_all_orders(skip=skip, limit=limit)
+    result = []
+    for order in orders:
+        payment = await payment_repo.get_by_order_id(order.id)
+        result.append(_enrich_order(order, payment))
+    return result
+
+
 @router.get("/{order_id}", response_model=OrderRead)
 async def get_order(
     order_id: uuid.UUID,

@@ -11,3 +11,4 @@ export { OrderDetailPage } from "./OrderDetail";
 export { CheckoutPaymentPage } from "./CheckoutPayment";
 export { PaymentSuccessPage } from "./PaymentSuccess";
 export { NotFoundPage } from "./NotFound";
+export * from "./admin";

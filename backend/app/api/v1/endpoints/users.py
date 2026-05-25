@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.user import User
-from app.schemas.user import UserRead, UserUpdate
+from app.schemas.user import UserRead, UserUpdate, UserStatusUpdate
 from app.services.user import UserService
 from app.api.v1.deps import get_current_active_user, get_current_superuser
 
@@ -58,3 +58,15 @@ async def get_user(
         from app.core.exceptions import NotFoundException
         raise NotFoundException(detail="User not found")
     return user
+
+
+@router.patch("/{user_id}/status", response_model=UserRead)
+async def update_user_status(
+    user_id: uuid.UUID,
+    status_in: UserStatusUpdate,
+    _: User = Depends(get_current_superuser),
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """Update user status (admin only)."""
+    user_service = UserService(db)
+    return await user_service.update_status(user_id, status_in.is_active)

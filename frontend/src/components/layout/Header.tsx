@@ -115,6 +115,15 @@ export function Header() {
                     >
                       My Orders
                     </Link>
+                    {user?.is_superuser && (
+                      <Link
+                        to="/admin/dashboard"
+                        onClick={() => setIsUserDropdownOpen(false)}
+                        className="block px-4 py-2 text-sm text-primary-600 hover:bg-gray-50 hover:text-primary-700 rounded-md transition-colors font-medium border-t border-gray-50 mt-1 pt-2"
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700 rounded-md transition-colors"
@@ -243,6 +252,15 @@ export function Header() {
                 >
                   My Orders
                 </Link>
+                {user?.is_superuser && (
+                  <Link
+                    to="/admin/dashboard"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block text-base font-medium text-primary-600 hover:text-primary-700 py-2 transition-colors border-t border-gray-50 mt-1 pt-2"
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left text-base font-medium text-red-600 hover:text-red-700 py-2 transition-colors"

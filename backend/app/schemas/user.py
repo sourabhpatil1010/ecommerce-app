@@ -22,6 +22,12 @@ class UserUpdate(BaseSchema):
     email: EmailStr | None = None
 
 
+class UserStatusUpdate(BaseSchema):
+    """Schema for updating user active status (admin only)."""
+
+    is_active: bool
+
+
 class UserRead(TimestampSchema):
     """Schema for reading user data (no password)."""
 

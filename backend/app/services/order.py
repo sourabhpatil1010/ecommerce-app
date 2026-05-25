@@ -90,3 +90,7 @@ class OrderService:
         order.status = status
         await self.order_repo.session.flush()
         return order
+
+    async def list_all_orders(self, skip: int = 0, limit: int = 100) -> list[Order]:
+        """List all orders (admin only)."""
+        return await self.order_repo.get_all_orders(skip=skip, limit=limit)
