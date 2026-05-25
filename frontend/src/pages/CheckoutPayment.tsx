@@ -4,6 +4,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { getOrder } from "@/api/orders";
 import * as paymentsApi from "@/api/payments";
+import { getMe } from "@/api/auth";
+
 
 // Initialize Stripe Promise
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "";
@@ -38,8 +40,10 @@ interface Order {
 export function CheckoutPaymentPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const [order, setOrder] = useState<Order | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay'>('stripe');
   
   // Payment intent state
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -53,6 +57,14 @@ export function CheckoutPaymentPage() {
         // 1. Fetch Order Details
         const orderRes = await getOrder(orderId);
         setOrder(orderRes.data);
+
+        // Fetch User profile details for Razorpay prefill
+        try {
+          const userRes = await getMe();
+          setUser(userRes.data);
+        } catch (userErr) {
+          console.warn("Failed to retrieve user profile for checkout prefill", userErr);
+        }
 
         // 2. Fetch/Create Payment Intent
         if (isRealStripeConfigured) {
@@ -121,28 +133,88 @@ export function CheckoutPaymentPage() {
 
       <div className="grid gap-8 lg:grid-cols-12 items-start">
         {/* Main Payment Section */}
-        <div className="lg:col-span-7 xl:col-span-8">
-          {isSimulatedMode ? (
-            <SimulatedPaymentForm order={order} />
-          ) : (
-            stripePromise && clientSecret ? (
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <RealStripeForm order={order} clientSecret={clientSecret} />
-              </Elements>
-            ) : (
-              <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-250 dark:border-yellow-900/50 p-6 rounded-2xl">
-                <h3 className="font-bold text-yellow-800 dark:text-yellow-400">Stripe Initialization Error</h3>
-                <p className="text-sm text-yellow-700 dark:text-yellow-500 mt-2">
-                  Stripe failed to initialize. We are automatically switching you to Simulated Payment Mode.
-                </p>
-                <button
-                  onClick={() => setIsSimulatedMode(true)}
-                  className="mt-4 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl text-sm transition-all"
-                >
-                  Proceed with Simulated Payment
-                </button>
+        <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+          {/* Payment Method Tabs */}
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('stripe')}
+              className={`flex flex-col items-start gap-2.5 rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
+                paymentMethod === 'stripe'
+                  ? 'border-primary-600 bg-primary-50/20 dark:bg-primary-950/10'
+                  : 'border-gray-250 bg-white hover:border-gray-305 dark:border-gray-800 dark:bg-gray-900'
+              }`}
+            >
+              <div className="flex w-full items-center justify-between">
+                <div className={`rounded-xl p-2 ${paymentMethod === 'stripe' ? 'bg-primary-100 text-primary-650 dark:bg-primary-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'}`}>
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                </div>
+                <div className="flex gap-1">
+                  <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded dark:bg-gray-800 dark:text-gray-500">CARD</span>
+                  <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded dark:bg-gray-800 dark:text-gray-500">STRIPE</span>
+                </div>
               </div>
+              <div>
+                <span className="font-bold text-sm text-gray-900 dark:text-white">Credit / Debit Card</span>
+                <p className="text-xxs text-gray-500 dark:text-gray-400 mt-0.5">Secure payment via Stripe</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('razorpay')}
+              className={`flex flex-col items-start gap-2.5 rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
+                paymentMethod === 'razorpay'
+                  ? 'border-primary-600 bg-primary-50/20 dark:bg-primary-950/10'
+                  : 'border-gray-250 bg-white hover:border-gray-305 dark:border-gray-800 dark:bg-gray-900'
+              }`}
+            >
+              <div className="flex w-full items-center justify-between">
+                <div className={`rounded-xl p-2 ${paymentMethod === 'razorpay' ? 'bg-primary-100 text-primary-650 dark:bg-primary-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'}`}>
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="flex gap-1">
+                  <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded dark:bg-blue-950/20 dark:text-blue-400">UPI</span>
+                  <span className="text-[9px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded dark:bg-green-950/20 dark:text-green-400">GPAY</span>
+                  <span className="text-[9px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded dark:bg-purple-950/20 dark:text-purple-400">PHONEPE</span>
+                </div>
+              </div>
+              <div>
+                <span className="font-bold text-sm text-gray-900 dark:text-white">UPI & Netbanking</span>
+                <p className="text-xxs text-gray-500 dark:text-gray-400 mt-0.5">Pay via GPay, PhonePe, UPI</p>
+              </div>
+            </button>
+          </div>
+
+          {paymentMethod === 'stripe' ? (
+            isSimulatedMode ? (
+              <SimulatedPaymentForm order={order} />
+            ) : (
+              stripePromise && clientSecret ? (
+                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                  <RealStripeForm order={order} clientSecret={clientSecret} />
+                </Elements>
+              ) : (
+                <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-250 dark:border-yellow-900/50 p-6 rounded-2xl">
+                  <h3 className="font-bold text-yellow-800 dark:text-yellow-400">Stripe Initialization Error</h3>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-500 mt-2">
+                    Stripe failed to initialize. We are automatically switching you to Simulated Payment Mode.
+                  </p>
+                  <button
+                    onClick={() => setIsSimulatedMode(true)}
+                    className="mt-4 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-xl text-sm transition-all"
+                  >
+                    Proceed with Simulated Payment
+                  </button>
+                </div>
+              )
             )
+          ) : (
+            <RazorpayPaymentForm order={order} user={user} />
           )}
         </div>
 
@@ -565,3 +637,203 @@ async function pollStatus(orderId: string, maxAttempts = 8, intervalMs = 1200): 
   }
   return false;
 }
+
+/** -------------------------------------------------------------
+ * 3. RAZORPAY PAYMENT FORM (UPI, Netbanking, GPay, PhonePe)
+ * ------------------------------------------------------------- */
+function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }) {
+  const navigate = useNavigate();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  
+  const conversionRate = 80.0;
+  const amountInr = order.total_amount * conversionRate;
+
+  // Helper to load Razorpay Checkout SDK script dynamically
+  const loadRazorpaySDK = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleRazorpayPayment = async () => {
+    setError(null);
+    setIsProcessing(true);
+    setStatusMessage("Initializing payment with Razorpay...");
+
+    try {
+      // 1. Create Razorpay order on backend
+      const res = await paymentsApi.createRazorpayOrder(order.id);
+      const data = res.data;
+
+      // 2. Real Razorpay Integration
+      setStatusMessage("Connecting to secure Razorpay server...");
+      const sdkLoaded = await loadRazorpaySDK();
+      if (!sdkLoaded) {
+        setError("Failed to load Razorpay payment gateway. Please check your internet connection.");
+        setIsProcessing(false);
+        return;
+      }
+
+      const options = {
+        key: data.razorpay_key_id,
+        amount: data.amount,
+        currency: data.currency,
+        name: "E-Commerce Premium Store",
+        description: `Payment for Order #${order.id.substring(0, 8)}`,
+        order_id: data.razorpay_order_id,
+        handler: async function (response: any) {
+          setIsProcessing(true);
+          setStatusMessage("Verifying secure transaction signature...");
+          try {
+            await paymentsApi.verifyRazorpayPayment({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+            setStatusMessage("Signature verified! Updating order status...");
+            const isVerified = await pollStatus(order.id);
+            if (isVerified) {
+              navigate(`/checkout/success?order_id=${order.id}`, { replace: true });
+            } else {
+              setError("Payment was successful but order status verification timed out. Please check the orders tab.");
+              setIsProcessing(false);
+            }
+          } catch (err: any) {
+            setError(err.response?.data?.detail || "Transaction verification failed.");
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          name: user?.full_name || "",
+          email: user?.email || "",
+          contact: "9999999999" // Default mock/demo number
+        },
+        theme: {
+          color: "#4f46e5" // Indigo theme matching our brand
+        },
+        modal: {
+          ondismiss: async function () {
+            setIsProcessing(true);
+            setStatusMessage("Cancelling checkout session...");
+            try {
+              await paymentsApi.failRazorpayPayment({
+                razorpay_order_id: data.razorpay_order_id
+              });
+            } catch (err) {
+              console.warn("Could not cancel Razorpay payment record: ", err);
+            }
+            setError("Payment checkout was cancelled by the user.");
+            setIsProcessing(false);
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on("payment.failed", async function (response: any) {
+        setIsProcessing(true);
+        setStatusMessage("Logging checkout failure...");
+        try {
+          await paymentsApi.failRazorpayPayment({
+            razorpay_order_id: data.razorpay_order_id,
+            error_code: response.error?.code,
+            error_description: response.error?.description,
+          });
+        } catch (err) {
+          console.warn("Error logging payment failure: ", err);
+        }
+        setError(response.error?.description || "Transaction failed.");
+        setIsProcessing(false);
+      });
+      
+      setIsProcessing(false);
+      rzp.open();
+
+    } catch (err: any) {
+      console.error(err);
+      setError(err.response?.data?.detail || "Could not connect to payment gateway. Please try again.");
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6 relative">
+      <div className="flex items-center gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="h-10 w-10 bg-primary-50 dark:bg-primary-950/20 text-primary-655 rounded-xl flex items-center justify-center">
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Razorpay Secure UPI</h2>
+          <p className="text-xs text-gray-500">Pay directly using GPay, PhonePe, Paytm, or Netbanking.</p>
+        </div>
+      </div>
+
+      {error && (
+        <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-sm text-red-700 dark:bg-red-950/20 dark:border-red-900/50 dark:text-red-400">
+          {error}
+        </div>
+      )}
+
+      {isProcessing && (
+        <div className="flex flex-col items-center justify-center p-6 bg-primary-50/50 dark:bg-primary-950/10 border border-primary-100 dark:border-primary-900/30 rounded-xl gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-3 border-primary-200 border-t-primary-600" />
+          <p className="text-sm font-semibold text-primary-800 dark:text-primary-400">{statusMessage}</p>
+        </div>
+      )}
+
+      <div className="space-y-4" style={{ display: isProcessing ? "none" : "block" }}>
+        {/* Currency Conversion Card */}
+        <div className="bg-gray-50 dark:bg-gray-950/40 rounded-xl p-4 border border-gray-150 dark:border-gray-800 space-y-2.5">
+          <div className="flex justify-between text-sm text-gray-650 dark:text-gray-400">
+            <span>Order Total (USD)</span>
+            <span className="font-bold text-gray-900 dark:text-white">${order.total_amount.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-sm text-gray-650 dark:text-gray-400 items-center">
+            <span>Exchange Rate</span>
+            <span className="text-[11px] bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-600 dark:text-gray-300 font-mono border border-gray-200 dark:border-gray-700">
+              1 USD = ₹{conversionRate.toFixed(2)} INR
+            </span>
+          </div>
+          <div className="border-t border-gray-200 dark:border-gray-850 pt-2.5 flex justify-between text-base font-extrabold text-primary-600 dark:text-primary-400">
+            <span>Amount Due (INR)</span>
+            <span>₹{amountInr.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* Branding banner */}
+        <div className="border border-indigo-100 dark:border-indigo-950 bg-indigo-50/30 dark:bg-indigo-950/10 rounded-xl p-4 flex items-start gap-3">
+          <div className="text-indigo-650 pt-0.5">
+            <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <p className="text-xxs text-indigo-700 dark:text-indigo-400 leading-relaxed">
+            Razorpay supports instant verification of UPI applications like Google Pay, PhonePe, BHIM, and Paytm. Netbanking is available for 50+ major Indian banks.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleRazorpayPayment}
+          className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary-600 hover:bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-primary-200/50 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all"
+        >
+          Pay with Razorpay (₹{amountInr.toFixed(2)})
+        </button>
+      </div>
+    </div>
+  );
+}
+
+

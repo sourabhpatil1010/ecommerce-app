@@ -1,9 +1,11 @@
-"""Payment service — Stripe integration."""
+"""Payment service — Stripe and Razorpay integrations."""
 
 import uuid
 import logging
+import json
 
 import stripe
+import razorpay
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
@@ -225,3 +227,169 @@ class PaymentService:
                 order.status = "payment_failed"
         
         await self.payment_repo.session.flush()
+
+    async def create_razorpay_order(
+        self, order_id: uuid.UUID, user_id: uuid.UUID
+    ) -> dict:
+        """Create a Razorpay order for the given local order."""
+        # 1. Fetch order and validate ownership
+        order = await self.order_repo.get_order_by_id_and_user_id(order_id, user_id)
+        if not order:
+            raise NotFoundException(detail="Order not found")
+
+        # 2. Check order is in a payable state
+        if order.status not in ("pending", "pending_payment"):
+            raise BadRequestException(
+                detail=f"Order is not eligible for payment (status: {order.status})"
+            )
+
+        # 3. Check for existing payment
+        existing_payment = await self.payment_repo.get_by_order_id(order_id)
+        if existing_payment:
+            if existing_payment.status == "succeeded":
+                raise BadRequestException(detail="Order is already paid")
+            # Delete old payment record to avoid unique constraints or duplicate states
+            await self.payment_repo.delete(existing_payment)
+
+        # 4. Convert amount to INR (with subunits/paise)
+        conversion_rate = settings.RAZORPAY_CURRENCY_CONVERSION_RATE
+        amount_inr = float(order.total_amount) * conversion_rate
+        amount_paise = int(round(amount_inr * 100))
+
+        # 5. Create Razorpay Order
+        try:
+            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+            razorpay_order = client.order.create({
+                "amount": amount_paise,
+                "currency": "INR",
+                "receipt": str(order_id),
+                "notes": {
+                    "order_id": str(order_id),
+                    "user_id": str(user_id)
+                }
+            })
+            razorpay_order_id = razorpay_order["id"]
+        except Exception as e:
+            logger.error("Razorpay order creation failed: %s", e)
+            raise BadRequestException(
+                detail="Razorpay payment initialization failed. Please try again."
+            )
+
+        # 6. Store local Payment record
+        payment = Payment(
+            order_id=order_id,
+            amount=amount_inr,
+            currency="INR",
+            status="pending",
+            provider="razorpay",
+            provider_payment_id=razorpay_order_id,
+        )
+        await self.payment_repo.create(payment)
+
+        # 7. Update order status to pending_payment
+        order.status = "pending_payment"
+        await self.order_repo.session.flush()
+
+        return {
+            "payment_id": payment.id,
+            "razorpay_order_id": razorpay_order_id,
+            "amount": amount_paise,
+            "currency": "INR",
+            "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+        }
+
+    async def verify_razorpay_payment(
+        self,
+        razorpay_payment_id: str,
+        razorpay_order_id: str,
+        razorpay_signature: str,
+    ) -> bool:
+        """Verify the signature returned by Razorpay checkout modal."""
+        payment = await self.payment_repo.get_by_provider_payment_id(razorpay_order_id)
+        if not payment:
+            raise NotFoundException(detail="Payment record not found")
+
+        order = await self.order_repo.get_by_id(payment.order_id)
+        if not order:
+            raise NotFoundException(detail="Order not found")
+
+        if payment.status == "succeeded":
+            return True
+
+        try:
+            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+            client.utility.verify_payment_signature({
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': razorpay_payment_id,
+                'razorpay_signature': razorpay_signature
+            })
+        except Exception as e:
+            logger.warning("Razorpay payment verification failed: %s", e)
+            raise BadRequestException(detail="Payment signature verification failed")
+
+        payment.status = "succeeded"
+        order.status = "pending"
+        await self.payment_repo.session.flush()
+        logger.info("Razorpay payment verified successfully for order %s", order.id)
+        return True
+
+    async def fail_razorpay_payment(self, razorpay_order_id: str) -> None:
+        """Mark Razorpay payment and order as failed."""
+        payment = await self.payment_repo.get_by_provider_payment_id(razorpay_order_id)
+        if not payment:
+            logger.warning("Fail checkout: no payment found for order ID %s", razorpay_order_id)
+            return
+
+        payment.status = "failed"
+        order = await self.order_repo.get_by_id(payment.order_id)
+        if order:
+            order.status = "payment_failed"
+        await self.payment_repo.session.flush()
+        logger.info("Razorpay payment marked as failed for order %s", payment.order_id)
+
+    async def handle_razorpay_webhook_event(self, payload: bytes, sig_header: str) -> None:
+        """Process an incoming Razorpay webhook event."""
+        try:
+            client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+            client.utility.verify_webhook_signature(
+                payload.decode("utf-8"),
+                sig_header,
+                settings.RAZORPAY_WEBHOOK_SECRET
+            )
+        except Exception as e:
+            logger.warning("Razorpay webhook signature verification failed: %s", e)
+            raise BadRequestException(detail="Invalid webhook signature")
+
+        try:
+            data = json.loads(payload.decode("utf-8"))
+        except Exception:
+            raise BadRequestException(detail="Invalid JSON payload")
+
+        event = data.get("event")
+        payment_entity = data.get("payload", {}).get("payment", {}).get("entity", {})
+        razorpay_order_id = payment_entity.get("order_id")
+
+        if not razorpay_order_id:
+            logger.info("Razorpay webhook: Event %s contains no order_id", event)
+            return
+
+        logger.info("Razorpay webhook received: %s for order %s", event, razorpay_order_id)
+
+        payment = await self.payment_repo.get_by_provider_payment_id(razorpay_order_id)
+        if not payment:
+            logger.warning("Razorpay webhook: no payment record found for order %s", razorpay_order_id)
+            return
+
+        order = await self.order_repo.get_by_id(payment.order_id)
+
+        if event in ("payment.captured", "order.paid"):
+            payment.status = "succeeded"
+            if order:
+                order.status = "pending"
+        elif event == "payment.failed":
+            payment.status = "failed"
+            if order:
+                order.status = "payment_failed"
+
+        await self.payment_repo.session.flush()
+

@@ -41,3 +41,37 @@ class PaymentRead(BaseSchema):
     provider: str | None
     provider_payment_id: str | None
     created_at: datetime
+
+
+class RazorpayOrderCreate(BaseSchema):
+    """Schema for initiating Razorpay payment."""
+
+    order_id: UUID
+
+
+class RazorpayOrderResponse(BaseSchema):
+    """Schema returned after creating a Razorpay order."""
+
+    payment_id: UUID
+    razorpay_order_id: str
+    amount: int
+    currency: str
+    razorpay_key_id: str
+
+
+
+class RazorpayPaymentVerify(BaseSchema):
+    """Schema for verifying a Razorpay payment signature."""
+
+    razorpay_payment_id: str
+    razorpay_order_id: str
+    razorpay_signature: str
+
+
+class RazorpayPaymentFail(BaseSchema):
+    """Schema for recording a failed Razorpay payment."""
+
+    razorpay_order_id: str
+    error_code: str | None = None
+    error_description: str | None = None
+

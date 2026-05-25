@@ -28,6 +28,12 @@ class Settings(BaseSettings):
     STRIPE_PUBLISHABLE_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""
 
+    # ─── Razorpay Payments ──────────────────────────────
+    RAZORPAY_KEY_ID: str = ""
+    RAZORPAY_KEY_SECRET: str = ""
+    RAZORPAY_WEBHOOK_SECRET: str = ""
+    RAZORPAY_CURRENCY_CONVERSION_RATE: float = 80.0
+
     # ─── CORS ──────────────────────────────────────────
     BACKEND_CORS_ORIGINS: list[str] = ["http://localhost:5173"]
 

@@ -11,3 +11,24 @@ export const getPaymentStatus = (orderId: string) =>
 /** POST /payments/:orderId/simulate-webhook */
 export const simulatePaymentWebhook = (orderId: string, success: boolean = true) =>
   apiClient.post(`/payments/${orderId}/simulate-webhook?success=${success}`);
+
+/** POST /payments/razorpay/create-order */
+export const createRazorpayOrder = (orderId: string) =>
+  apiClient.post("/payments/razorpay/create-order", { order_id: orderId });
+
+/** POST /payments/razorpay/verify */
+export const verifyRazorpayPayment = (payload: {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}) => apiClient.post("/payments/razorpay/verify", payload);
+
+/** POST /payments/razorpay/fail */
+export const failRazorpayPayment = (payload: {
+  razorpay_order_id: string;
+  error_code?: string;
+  error_description?: string;
+}) => apiClient.post("/payments/razorpay/fail", payload);
+
+
+
