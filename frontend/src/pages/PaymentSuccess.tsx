@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { getOrder } from "@/api/orders";
+import { formatCurrency } from "@/utils/currency";
 
 interface Order {
   id: string;
@@ -92,7 +93,7 @@ export function PaymentSuccessPage() {
               <div className="flex justify-between items-center">
                 <span className="text-gray-500 dark:text-gray-400 font-medium">Total Paid</span>
                 <span className="font-extrabold text-gray-950 dark:text-white">
-                  ${order.total_amount.toFixed(2)}
+                  {formatCurrency(order.total_amount)}
                 </span>
               </div>
 

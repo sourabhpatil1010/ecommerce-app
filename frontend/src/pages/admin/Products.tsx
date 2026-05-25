@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { productsApi } from "@/api";
 import { Product } from "@/types";
+import { formatCurrency } from "@/utils/currency";
 import { AlertCircle, Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -92,7 +93,7 @@ export function AdminProductsPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    ${product.price.toFixed(2)}
+                    {formatCurrency(product.price)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {product.stock}

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import type { Product } from "@/types";
+import { formatCurrency } from "@/utils/currency";
 
 interface ProductDetailViewProps {
   product: Product;
@@ -104,7 +105,7 @@ export function ProductDetailView({ product, onEdit }: ProductDetailViewProps) {
         </h1>
 
         <p className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
-          ${product.price.toFixed(2)}
+          {formatCurrency(product.price)}
         </p>
 
         <div className="mt-6 border-t border-gray-150 pt-6 dark:border-gray-800">

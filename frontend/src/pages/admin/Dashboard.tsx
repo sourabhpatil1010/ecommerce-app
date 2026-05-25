@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { dashboardApi } from "@/api";
+import { formatCurrency } from "@/utils/currency";
 import { 
   Users, 
   ShoppingCart, 
@@ -64,7 +65,7 @@ export function AdminDashboardPage() {
           <div className="relative z-10 flex items-center justify-between">
             <div>
               <p className="text-indigo-100 text-sm font-medium">Total Revenue</p>
-              <p className="mt-2 text-3xl font-bold">${stats?.total_revenue?.toFixed(2) || "0.00"}</p>
+              <p className="mt-2 text-3xl font-bold">{formatCurrency(stats?.total_revenue || 0)}</p>
             </div>
             <div className="rounded-full bg-white/20 p-3">
               <DollarSign className="h-6 w-6" />

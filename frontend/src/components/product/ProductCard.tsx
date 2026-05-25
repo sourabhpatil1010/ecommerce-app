@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
 import type { Product } from "@/types";
+import { formatCurrency } from "@/utils/currency";
 
 interface ProductCardProps {
   product: Product;
@@ -117,7 +118,7 @@ export function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
         {/* Pricing & Add to Cart action */}
         <div className="mt-5 flex items-center justify-between">
           <span className="text-xl font-bold text-gray-900 dark:text-white">
-            ${product.price.toFixed(2)}
+            {formatCurrency(product.price)}
           </span>
 
           <button

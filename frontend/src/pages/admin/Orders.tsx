@@ -3,6 +3,7 @@ import { ordersApi } from "@/api";
 import { Order } from "@/types";
 import { AlertCircle, Clock, CheckCircle, Truck, Package } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { formatCurrency } from "@/utils/currency";
 
 export function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -98,7 +99,7 @@ export function AdminOrdersPage() {
                     {new Date(order.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                    ${order.total_amount.toFixed(2)}
+                    {formatCurrency(order.total_amount)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>

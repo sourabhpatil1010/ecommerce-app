@@ -141,7 +141,7 @@ export function ProductDetailPage() {
       {/* Main Content Pane */}
       {loading ? (
         <div className="flex min-h-[50vh] items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-primary-600" />
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-800 border-t-primary-600 dark:border-t-primary-500" />
         </div>
       ) : error ? (
         <div className="mx-auto max-w-lg rounded-2xl border border-red-200 bg-red-50 p-6 text-center text-red-700 dark:border-red-950/40 dark:bg-red-950/10 dark:text-red-400">
@@ -222,7 +222,7 @@ export function ProductDetailPage() {
               <div className="grid grid-cols-2 gap-4">
                 {/* Price */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Price ($)</label>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Price (₹)</label>
                   <input
                     type="number"
                     step="0.01"

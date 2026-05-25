@@ -276,8 +276,8 @@ export function ProductsPage() {
               Price Range
             </h3>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-gray-400">Min ($)</label>
+              <div className="space-y-3">
+                <label className="text-xs text-gray-400">Min (₹)</label>
                 <input
                   type="number"
                   value={minPrice}
@@ -289,8 +289,8 @@ export function ProductsPage() {
                   className="mt-1 w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
-              <div>
-                <label className="text-xs text-gray-400">Max ($)</label>
+              <div className="space-y-3">
+                <label className="text-xs text-gray-400">Max (₹)</label>
                 <input
                   type="number"
                   value={maxPrice}

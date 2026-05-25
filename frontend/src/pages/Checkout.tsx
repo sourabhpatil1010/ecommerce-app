@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth, useCart } from "@/hooks";
 import { createOrder } from "@/api/orders";
+import { formatCurrency } from "@/utils/currency";
 
 export function CheckoutPage() {
   const navigate = useNavigate();
@@ -19,8 +20,8 @@ export function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const shippingThreshold = 50;
-  const shippingCost = total >= shippingThreshold || total === 0 ? 0 : 5.99;
+  const shippingThreshold = 4000;
+  const shippingCost = total >= shippingThreshold || total === 0 ? 0 : 500;
   const taxCost = total * 0.08;
   const orderTotal = total + shippingCost + taxCost;
 
@@ -72,7 +73,7 @@ export function CheckoutPage() {
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
           Your cart is empty
         </h2>
-        <p className="text-gray-500 mb-8 max-w-md">
+        <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md">
           You must add items to your cart before proceeding to checkout.
         </p>
         <Link
@@ -122,7 +123,7 @@ export function CheckoutPage() {
             <div className="grid gap-6 sm:grid-cols-2">
               {/* Full Name */}
               <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label htmlFor="fullName" className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+                <label htmlFor="fullName" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
                   Full Name
                 </label>
                 <input
@@ -139,7 +140,7 @@ export function CheckoutPage() {
 
               {/* Address */}
               <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label htmlFor="address" className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+                <label htmlFor="address" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
                   Street Address
                 </label>
                 <input
@@ -156,7 +157,7 @@ export function CheckoutPage() {
 
               {/* City */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="city" className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+                <label htmlFor="city" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
                   City
                 </label>
                 <input
@@ -173,7 +174,7 @@ export function CheckoutPage() {
 
               {/* State */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="state" className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+                <label htmlFor="state" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
                   State / Province
                 </label>
                 <input
@@ -190,7 +191,7 @@ export function CheckoutPage() {
 
               {/* Zip Code */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="zipCode" className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+                <label htmlFor="zipCode" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
                   ZIP / Postal Code
                 </label>
                 <input
@@ -207,7 +208,7 @@ export function CheckoutPage() {
 
               {/* Country */}
               <div className="flex flex-col gap-1.5">
-                <label htmlFor="country" className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+                <label htmlFor="country" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
                   Country
                 </label>
                 <input
@@ -286,11 +287,11 @@ export function CheckoutPage() {
                       {item.product?.name}
                     </h3>
                     <p className="text-xs text-gray-550 dark:text-gray-400 mt-0.5">
-                      Qty: {item.quantity} · ${item.unit_price.toFixed(2)}
+                      Qty: {item.quantity} · {formatCurrency(item.unit_price)}
                     </p>
                   </div>
                   <span className="text-sm font-bold text-gray-900 dark:text-white whitespace-nowrap">
-                    ${(item.unit_price * item.quantity).toFixed(2)}
+                    {formatCurrency(item.unit_price * item.quantity)}
                   </span>
                 </div>
               ))}
@@ -300,7 +301,7 @@ export function CheckoutPage() {
             <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                 <span>Subtotal</span>
-                <span className="font-semibold text-gray-900 dark:text-white">${total.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(total)}</span>
               </div>
 
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
@@ -308,18 +309,18 @@ export function CheckoutPage() {
                 {shippingCost === 0 ? (
                   <span className="font-semibold text-green-600 dark:text-green-400">Free</span>
                 ) : (
-                  <span className="font-semibold text-gray-900 dark:text-white">${shippingCost.toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(shippingCost)}</span>
                 )}
               </div>
 
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                 <span>Estimated Tax (8%)</span>
-                <span className="font-semibold text-gray-900 dark:text-white">${taxCost.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(taxCost)}</span>
               </div>
 
               <div className="border-t border-gray-150 dark:border-gray-800 pt-4 mt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
                 <span>Total</span>
-                <span>${orderTotal.toFixed(2)}</span>
+                <span>{formatCurrency(orderTotal)}</span>
               </div>
             </div>
           </div>

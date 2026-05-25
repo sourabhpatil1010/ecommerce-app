@@ -56,30 +56,30 @@ export function ProfilePage() {
   return (
     <div className="container-app py-12">
       <div className="mx-auto max-w-2xl">
-        <h1 className="mb-8 text-3xl font-bold text-gray-900">My Profile</h1>
+        <h1 className="mb-8 text-3xl font-bold text-gray-900 dark:text-white">My Profile</h1>
 
         {/* Account card */}
-        <div className="mb-8 flex items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-2xl font-bold text-indigo-700">
+        <div className="mb-8 flex items-center gap-5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-2xl font-bold text-indigo-700 dark:text-indigo-300">
             {initials}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-lg font-semibold text-gray-900">
+            <p className="truncate text-lg font-semibold text-gray-900 dark:text-white">
               {user.full_name || user.email}
             </p>
-            <p className="truncate text-sm text-gray-500">{user.email}</p>
+            <p className="truncate text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
             <div className="mt-2 flex items-center gap-2">
               <span
                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
                   user.is_active
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                 }`}
               >
                 {user.is_active ? "Active" : "Inactive"}
               </span>
               {user.is_superuser && (
-                <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-700">
+                <span className="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-2.5 py-0.5 text-xs font-medium text-purple-700 dark:text-purple-400">
                   Admin
                 </span>
               )}
@@ -88,8 +88,8 @@ export function ProfilePage() {
         </div>
 
         {/* Edit form */}
-        <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 text-lg font-semibold text-gray-900">
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shadow-sm">
+          <h2 className="mb-5 text-lg font-semibold text-gray-900 dark:text-white">
             Edit Profile
           </h2>
 
@@ -98,7 +98,7 @@ export function ProfilePage() {
             {saveSuccess && (
               <div
                 role="status"
-                className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700"
+                className="flex items-center gap-3 rounded-lg border border-green-200 dark:border-green-900/50 bg-green-50 dark:bg-green-900/20 px-4 py-3 text-sm text-green-700 dark:text-green-400"
               >
                 <svg className="h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -115,7 +115,7 @@ export function ProfilePage() {
             {saveError && (
               <div
                 role="alert"
-                className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                className="flex items-start gap-3 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-700 dark:text-red-400"
               >
                 <svg className="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -132,7 +132,7 @@ export function ProfilePage() {
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="profile-name"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Full Name
               </label>
@@ -144,7 +144,7 @@ export function ProfilePage() {
                 autoComplete="name"
                 placeholder="Jane Doe"
                 disabled={isSaving}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
               />
             </div>
 
@@ -152,7 +152,7 @@ export function ProfilePage() {
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="profile-email"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Email address
               </label>
@@ -164,16 +164,16 @@ export function ProfilePage() {
                 required
                 autoComplete="email"
                 disabled={isSaving}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder-gray-400 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
               />
             </div>
 
             {/* Member since */}
             <div className="flex flex-col gap-1.5">
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Member since
               </span>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {new Date(user.created_at).toLocaleDateString(undefined, {
                   year: "numeric",
                   month: "long",

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getOrder } from "@/api/orders";
+import { formatCurrency } from "@/utils/currency";
 
 interface Product {
   id: string;
@@ -92,7 +93,7 @@ export function OrderDetailPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-primary-600" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-800 border-t-primary-600 dark:border-t-primary-500" />
       </div>
     );
   }
@@ -133,8 +134,8 @@ export function OrderDetailPage() {
   }
 
   const subtotal = order.items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
-  const shippingThreshold = 50;
-  const shippingCost = subtotal >= shippingThreshold || subtotal === 0 ? 0 : 5.99;
+  const shippingThreshold = 4000;
+  const shippingCost = subtotal >= shippingThreshold || subtotal === 0 ? 0 : 500;
   const taxCost = subtotal * 0.08;
   const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80";
 
@@ -273,11 +274,11 @@ export function OrderDetailPage() {
                       {item.product?.name || "Unknown Product"}
                     </Link>
                     <p className="text-xs text-gray-500 mt-1">
-                      Qty: {item.quantity} · ${item.unit_price.toFixed(2)}
+                      Qty: {item.quantity} · {formatCurrency(item.unit_price)}
                     </p>
                   </div>
                   <span className="font-bold text-gray-900 dark:text-white text-sm self-center">
-                    ${(item.unit_price * item.quantity).toFixed(2)}
+                    {formatCurrency(item.unit_price * item.quantity)}
                   </span>
                 </div>
               ))}
@@ -314,7 +315,7 @@ export function OrderDetailPage() {
             </h3>
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
               <span>Subtotal</span>
-              <span className="font-semibold text-gray-900 dark:text-white">${subtotal.toFixed(2)}</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(subtotal)}</span>
             </div>
 
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
@@ -322,18 +323,18 @@ export function OrderDetailPage() {
               {shippingCost === 0 ? (
                 <span className="font-semibold text-green-600 dark:text-green-400">Free</span>
               ) : (
-                <span className="font-semibold text-gray-900 dark:text-white">${shippingCost.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(shippingCost)}</span>
               )}
             </div>
 
             <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
               <span>Estimated Tax (8%)</span>
-              <span className="font-semibold text-gray-900 dark:text-white">${taxCost.toFixed(2)}</span>
+              <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(taxCost)}</span>
             </div>
 
             <div className="border-t border-gray-150 dark:border-gray-800 pt-3 flex justify-between text-sm font-bold text-gray-950 dark:text-white">
               <span>Order Total</span>
-              <span>${order.total_amount.toFixed(2)}</span>
+              <span>{formatCurrency(order.total_amount)}</span>
             </div>
           </div>
         </div>

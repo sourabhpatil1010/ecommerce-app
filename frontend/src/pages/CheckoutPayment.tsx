@@ -5,6 +5,7 @@ import { Elements, CardElement, useStripe, useElements } from "@stripe/react-str
 import { getOrder } from "@/api/orders";
 import * as paymentsApi from "@/api/payments";
 import { getMe } from "@/api/auth";
+import { formatCurrency } from "@/utils/currency";
 
 
 // Initialize Stripe Promise
@@ -244,11 +245,11 @@ export function CheckoutPaymentPage() {
                       {item.product?.name}
                     </h4>
                     <p className="text-xxs text-gray-500 mt-0.5">
-                      Qty: {item.quantity} · ${item.unit_price.toFixed(2)}
+                      Qty: {item.quantity} · {formatCurrency(item.unit_price)}
                     </p>
                   </div>
                   <span className="text-xs font-bold text-gray-900 dark:text-white">
-                    ${(item.unit_price * item.quantity).toFixed(2)}
+                    {formatCurrency(item.unit_price * item.quantity)}
                   </span>
                 </div>
               ))}
@@ -267,7 +268,7 @@ export function CheckoutPaymentPage() {
             {/* Pricing Total */}
             <div className="border-t border-gray-150 dark:border-gray-800 pt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
               <span>Amount Due</span>
-              <span>${order.total_amount.toFixed(2)}</span>
+              <span>{formatCurrency(order.total_amount)}</span>
             </div>
           </div>
         </div>
@@ -372,7 +373,7 @@ function RealStripeForm({ order, clientSecret }: { order: Order; clientSecret: s
       <div className="space-y-4" style={{ display: isProcessing ? "none" : "block" }}>
         {/* Billing Name */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="cardName" className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+          <label htmlFor="cardName" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
             Cardholder Name
           </label>
           <input
@@ -388,7 +389,7 @@ function RealStripeForm({ order, clientSecret }: { order: Order; clientSecret: s
 
         {/* Stripe Elements Credit Card Input */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
             Credit Card Details
           </label>
           <div className="p-3.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
@@ -418,7 +419,7 @@ function RealStripeForm({ order, clientSecret }: { order: Order; clientSecret: s
         disabled={isProcessing || !stripe}
         className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary-600 hover:bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-primary-200/50 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
       >
-        Pay Now (${order.total_amount.toFixed(2)})
+        Pay Now ({formatCurrency(order.total_amount)})
       </button>
     </form>
   );
@@ -539,7 +540,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
         {/* Inputs */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <label className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
               Cardholder Name
             </label>
             <input
@@ -553,7 +554,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
           </div>
 
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <label className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
               Card Number
             </label>
             <input
@@ -567,7 +568,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
               Expiration Date
             </label>
             <input
@@ -581,7 +582,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-650 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
               CVV
             </label>
             <input
@@ -647,8 +648,8 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
   const [statusMessage, setStatusMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   
-  const conversionRate = 80.0;
-  const amountInr = order.total_amount * conversionRate;
+  const conversionRate = 1.0;
+  const amountInr = order.total_amount;
 
   // Helper to load Razorpay Checkout SDK script dynamically
   const loadRazorpaySDK = (): Promise<boolean> => {
@@ -796,19 +797,9 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
       <div className="space-y-4" style={{ display: isProcessing ? "none" : "block" }}>
         {/* Currency Conversion Card */}
         <div className="bg-gray-50 dark:bg-gray-950/40 rounded-xl p-4 border border-gray-150 dark:border-gray-800 space-y-2.5">
-          <div className="flex justify-between text-sm text-gray-650 dark:text-gray-400">
-            <span>Order Total (USD)</span>
-            <span className="font-bold text-gray-900 dark:text-white">${order.total_amount.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between text-sm text-gray-650 dark:text-gray-400 items-center">
-            <span>Exchange Rate</span>
-            <span className="text-[11px] bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded text-gray-600 dark:text-gray-300 font-mono border border-gray-200 dark:border-gray-700">
-              1 USD = ₹{conversionRate.toFixed(2)} INR
-            </span>
-          </div>
           <div className="border-t border-gray-200 dark:border-gray-850 pt-2.5 flex justify-between text-base font-extrabold text-primary-600 dark:text-primary-400">
-            <span>Amount Due (INR)</span>
-            <span>₹{amountInr.toFixed(2)}</span>
+            <span>Amount Due</span>
+            <span>{formatCurrency(amountInr)}</span>
           </div>
         </div>
 
@@ -829,7 +820,7 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
           onClick={handleRazorpayPayment}
           className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary-600 hover:bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-primary-200/50 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all"
         >
-          Pay with Razorpay (₹{amountInr.toFixed(2)})
+          Pay with Razorpay ({formatCurrency(amountInr)})
         </button>
       </div>
     </div>

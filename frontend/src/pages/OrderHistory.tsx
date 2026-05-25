@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getOrders } from "@/api/orders";
+import { getMyOrders } from "@/api/orders";
+import { formatCurrency } from "@/utils/currency";
 
 interface OrderItem {
   id: string;
@@ -64,7 +65,7 @@ export function OrderHistoryPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-primary-600" />
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-800 border-t-primary-600 dark:border-t-primary-500" />
       </div>
     );
   }
@@ -143,7 +144,7 @@ export function OrderHistoryPage() {
                 <div className="text-left md:text-right">
                   <p className="text-xs text-gray-405 font-medium uppercase tracking-wider">Total Amount</p>
                   <p className="text-lg font-black text-gray-950 dark:text-white mt-0.5">
-                    ${order.total_amount.toFixed(2)}
+                    {formatCurrency(order.total_amount)}
                   </p>
                 </div>
                 <Link

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useAuth, useCart } from "@/hooks";
+import { formatCurrency } from "@/utils/currency";
 
 export function CartPage() {
   const navigate = useNavigate();
@@ -24,13 +25,13 @@ export function CartPage() {
   if (authLoading || !isAuthenticated) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-primary-600" />
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-800 border-t-primary-600 dark:border-t-primary-500" />
       </div>
     );
   }
 
-  const shippingThreshold = 50;
-  const shippingCost = total >= shippingThreshold || total === 0 ? 0 : 5.99;
+  const shippingThreshold = 4000;
+  const shippingCost = total >= shippingThreshold || total === 0 ? 0 : 500;
   const taxCost = total * 0.08; // 8% estimated tax
   const orderTotal = total + shippingCost + taxCost;
 
@@ -44,7 +45,7 @@ export function CartPage() {
 
       {cartLoading && items.length === 0 ? (
         <div className="flex min-h-[40vh] items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-primary-600" />
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-800 border-t-primary-600 dark:border-t-primary-500" />
         </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center min-h-[40vh] text-center p-8 bg-gray-50 dark:bg-gray-950/20 border border-gray-150 dark:border-gray-800 rounded-2xl">
@@ -109,7 +110,7 @@ export function CartPage() {
                         {item.product?.name}
                       </Link>
                       <span className="font-bold text-gray-900 dark:text-white text-base sm:hidden">
-                        ${(item.unit_price * item.quantity).toFixed(2)}
+                        {formatCurrency(item.unit_price * item.quantity)}
                       </span>
                     </div>
                     {item.product && item.product.stock < 5 && (
@@ -118,7 +119,7 @@ export function CartPage() {
                       </p>
                     )}
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      Unit Price: ${item.unit_price.toFixed(2)}
+                      Unit Price: {formatCurrency(item.unit_price)}
                     </p>
                   </div>
 
@@ -202,7 +203,7 @@ export function CartPage() {
                 {/* Subtotal Desktop */}
                 <div className="hidden sm:flex flex-col items-end justify-between py-1 pr-1 pl-4 min-w-[80px]">
                   <span className="font-bold text-gray-950 dark:text-white text-base">
-                    ${(item.unit_price * item.quantity).toFixed(2)}
+                    {formatCurrency(item.unit_price * item.quantity)}
                   </span>
                 </div>
               </div>
@@ -252,7 +253,7 @@ export function CartPage() {
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                   <span>Subtotal</span>
                   <span className="font-semibold text-gray-900 dark:text-white">
-                    ${total.toFixed(2)}
+                    {formatCurrency(total)}
                   </span>
                 </div>
 
@@ -264,27 +265,27 @@ export function CartPage() {
                     </span>
                   ) : (
                     <span className="font-semibold text-gray-900 dark:text-white">
-                      ${shippingCost.toFixed(2)}
+                      {formatCurrency(shippingCost)}
                     </span>
                   )}
                 </div>
 
                 {shippingCost > 0 && (
                   <div className="bg-primary-50 dark:bg-primary-950/20 text-primary-700 dark:text-primary-400 p-2.5 rounded-lg text-xs font-medium">
-                    Add ${(shippingThreshold - total).toFixed(2)} more to qualify for Free Shipping!
+                    Add {formatCurrency(shippingThreshold - total)} more to qualify for Free Shipping!
                   </div>
                 )}
 
                 <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                   <span>Estimated Tax (8%)</span>
                   <span className="font-semibold text-gray-900 dark:text-white">
-                    ${taxCost.toFixed(2)}
+                    {formatCurrency(taxCost)}
                   </span>
                 </div>
 
                 <div className="border-t border-gray-150 dark:border-gray-800 pt-4 mt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
                   <span>Total</span>
-                  <span>${orderTotal.toFixed(2)}</span>
+                  <span>{formatCurrency(orderTotal)}</span>
                 </div>
               </div>
 
@@ -329,7 +330,7 @@ export function CartPage() {
                       d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm3 0h1.875a1.125 1.125 0 0 1 1.12 1.243l-1.264 12a1.125 1.125 0 0 1-1.12 1.243H18.75m-6 0h6"
                     />
                   </svg>
-                  <span>Free shipping for orders over $50.</span>
+                  <span>Free shipping for orders over ₹4,000.</span>
                 </div>
               </div>
             </div>
