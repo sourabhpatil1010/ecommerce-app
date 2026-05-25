@@ -1,4 +1,5 @@
 import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -11,6 +12,7 @@ function App() {
         <AuthProvider>
           <CartProvider>
             <AppRouter />
+            <Toaster position="top-center" />
           </CartProvider>
         </AuthProvider>
       </ThemeProvider>

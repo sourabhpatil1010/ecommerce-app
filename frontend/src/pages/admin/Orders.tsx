@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { ordersApi } from "@/api";
 import { Order } from "@/types";
 import { AlertCircle, Clock, CheckCircle, Truck, Package } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -28,8 +29,9 @@ export function AdminOrdersPage() {
     try {
       await ordersApi.updateOrderStatus(orderId, status);
       setOrders(orders.map(o => o.id === orderId ? { ...o, status } : o));
+      toast.success("Order status updated");
     } catch (err: any) {
-      alert("Failed to update status: " + (err.response?.data?.detail || "Unknown error"));
+      toast.error("Failed to update status: " + (err.response?.data?.detail || "Unknown error"));
     }
   };
 

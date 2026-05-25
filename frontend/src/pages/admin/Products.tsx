@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { productsApi } from "@/api";
 import { Product } from "@/types";
 import { AlertCircle, Plus, Edit, Trash2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -32,8 +33,9 @@ export function AdminProductsPage() {
     try {
       await productsApi.deleteProduct(id);
       setProducts(products.filter(p => p.id !== id));
+      toast.success("Product deleted successfully");
     } catch (err: any) {
-      alert("Failed to delete product: " + (err.response?.data?.detail || "Unknown error"));
+      toast.error("Failed to delete product: " + (err.response?.data?.detail || "Unknown error"));
     }
   };
 

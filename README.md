@@ -81,6 +81,14 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
+## Features
+
+- **Full E-Commerce Flow**: Product browsing, cart management, checkout with Stripe/Razorpay.
+- **Admin Dashboard**: Manage users, products, categories, and orders.
+- **Production Polished UI**: Graceful error boundaries, toast notifications, responsive design, and loading states.
+- **Dockerized**: Easy setup with Docker Compose.
+- **Clean Architecture**: Backend organized into models, schemas, repositories, and services.
+
 ## Architecture
 
 This project follows **Clean Architecture** principles:

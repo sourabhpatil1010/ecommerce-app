@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { usersApi } from "@/api";
 import { User } from "@/types";
 import { Check, X, Shield, ShieldAlert, AlertCircle } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -29,8 +30,9 @@ export function AdminUsersPage() {
       await usersApi.updateUserStatus(userId, !currentStatus);
       // Optimistic update
       setUsers(users.map(u => u.id === userId ? { ...u, is_active: !currentStatus } : u));
+      toast.success(currentStatus ? "User deactivated" : "User activated");
     } catch (err: any) {
-      alert("Failed to update user status: " + (err.response?.data?.detail || "Unknown error"));
+      toast.error("Failed to update user status: " + (err.response?.data?.detail || "Unknown error"));
     }
   };
 

@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ProductGrid } from "@/components/product";
 import { categoriesApi, productsApi } from "@/api";
 import type { Product } from "@/types";
+import { toast } from "react-hot-toast";
 
 interface Category {
   id: string;
@@ -152,9 +153,10 @@ export function ProductsPage() {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         await productsApi.deleteProduct(productId);
+        toast.success("Product deleted successfully");
         refetch();
       } catch (err: any) {
-        alert(err.response?.data?.detail || "Failed to delete product.");
+        toast.error(err.response?.data?.detail || "Failed to delete product.");
       }
     }
   };

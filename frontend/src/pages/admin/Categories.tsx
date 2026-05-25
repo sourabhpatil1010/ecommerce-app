@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { categoriesApi } from "@/api";
 import { Category } from "@/types";
 import { AlertCircle, Plus, Edit, Trash2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -29,8 +30,9 @@ export function AdminCategoriesPage() {
     try {
       await categoriesApi.deleteCategory(id);
       setCategories(categories.filter(c => c.id !== id));
+      toast.success("Category deleted successfully");
     } catch (err: any) {
-      alert("Failed to delete category: " + (err.response?.data?.detail || "Unknown error"));
+      toast.error("Failed to delete category: " + (err.response?.data?.detail || "Unknown error"));
     }
   };
 
