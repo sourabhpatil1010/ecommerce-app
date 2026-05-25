@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { 
   LayoutDashboard, 
@@ -21,6 +21,12 @@ const navItems = [
 export function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -65,7 +71,7 @@ export function AdminLayout() {
             Back to Store
           </Link>
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
           >
             <LogOut className="h-4 w-4 mr-3" />

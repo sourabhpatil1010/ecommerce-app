@@ -29,7 +29,11 @@ export function LoginForm() {
       const userRes = await getMe();
 
       authLogin(access_token, userRes.data);
-      navigate(from, { replace: true });
+      if (userRes.data.is_superuser) {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string } } };
       setError(

@@ -12,6 +12,7 @@ export const apiClient = axios.create({
 // ─── Request Interceptor: attach JWT ───────────────────
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
+    
   if (token) {
     if (config.headers && typeof config.headers.set === "function") {
       config.headers.set("Authorization", `Bearer ${token}`);
@@ -29,7 +30,6 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("access_token");
-      // Notify AuthContext to clear user state without hard-coding a redirect here
       window.dispatchEvent(new Event("auth:logout"));
     }
     return Promise.reject(error);

@@ -22,6 +22,11 @@ export interface UserRegister {
   full_name?: string;
 }
 
+/** Payload for admin registration. */
+export interface AdminUserRegister extends UserRegister {
+  admin_secret: string;
+}
+
 /** JWT token response from the API. */
 export interface AuthToken {
   access_token: string;

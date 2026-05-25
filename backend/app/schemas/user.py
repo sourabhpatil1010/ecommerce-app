@@ -15,6 +15,12 @@ class UserCreate(BaseSchema):
     full_name: str | None = None
 
 
+class AdminUserCreate(UserCreate):
+    """Schema for creating a new admin user."""
+
+    admin_secret: str
+
+
 class UserUpdate(BaseSchema):
     """Schema for updating user profile."""
 

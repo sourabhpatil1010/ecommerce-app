@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.schemas.user import UserCreate, UserRead, Token, UserLogin
+from app.schemas.user import UserCreate, UserRead, Token, UserLogin, AdminUserCreate
 from app.services.auth import AuthService
 from app.core.security import create_access_token
 from app.api.v1.deps import get_current_active_user
@@ -21,6 +21,17 @@ async def register(
     """Register a new user."""
     auth_service = AuthService(db)
     user = await auth_service.register(user_in)
+    return user
+
+
+@router.post("/admin-register", response_model=UserRead, status_code=201)
+async def admin_register(
+    user_in: AdminUserCreate,
+    db: AsyncSession = Depends(get_db)
+) -> Any:
+    """Register a new admin user."""
+    auth_service = AuthService(db)
+    user = await auth_service.register_admin(user_in)
     return user
 
 
