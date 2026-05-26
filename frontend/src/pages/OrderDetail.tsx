@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { getOrder } from "@/api/orders";
+import { getOrder, cancelOrder } from "@/api/orders";
 import { formatCurrency } from "@/utils/currency";
 
 interface Product {
@@ -36,11 +36,122 @@ const normalizeStatus = (status: string) => {
   return s;
 };
 
+/* ─────────────────────── Toast Component ─────────────────────── */
+function Toast({
+  message,
+  type,
+  onClose,
+}: {
+  message: string;
+  type: "success" | "error";
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 4000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div
+      className={`fixed bottom-6 right-6 z-[9999] flex items-center gap-3 rounded-xl px-5 py-3.5 shadow-2xl text-sm font-semibold transition-all animate-slide-up ${
+        type === "success"
+          ? "bg-green-600 text-white"
+          : "bg-red-600 text-white"
+      }`}
+      style={{ animation: "slideUp 0.35s cubic-bezier(.21,1.02,.73,1)" }}
+    >
+      {type === "success" ? (
+        <svg className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+        </svg>
+      ) : (
+        <svg className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+        </svg>
+      )}
+      <span>{message}</span>
+      <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100 transition-opacity">
+        <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+        </svg>
+      </button>
+    </div>
+  );
+}
+
+/* ──────────────── Cancel Confirmation Modal ──────────────── */
+function CancelModal({
+  onConfirm,
+  onClose,
+  isLoading,
+}: {
+  onConfirm: () => void;
+  onClose: () => void;
+  isLoading: boolean;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      style={{ animation: "fadeIn 0.2s ease-out" }}
+      onClick={(e) => { if (e.target === e.currentTarget && !isLoading) onClose(); }}
+    >
+      <div
+        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 w-full max-w-md mx-4 overflow-hidden"
+        style={{ animation: "scaleIn 0.25s cubic-bezier(.21,1.02,.73,1)" }}
+      >
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 text-center">
+          <div className="mx-auto h-14 w-14 rounded-full bg-red-50 dark:bg-red-950/30 flex items-center justify-center mb-4">
+            <svg className="h-7 w-7 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+            Cancel Order
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
+            Are you sure you want to cancel this order? This action cannot be undone.
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div className="px-6 pb-6 flex gap-3">
+          <button
+            onClick={onClose}
+            disabled={isLoading}
+            className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          >
+            No
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-red-700 transition-colors shadow-md shadow-red-200/50 dark:shadow-red-900/30 disabled:opacity-70 flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                <span>Cancelling…</span>
+              </>
+            ) : (
+              "Yes, Cancel Order"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────── Main Page ─────────────────────── */
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -56,6 +167,25 @@ export function OrderDetailPage() {
         setIsLoading(false);
       });
   }, [id]);
+
+  const handleCancelOrder = useCallback(async () => {
+    if (!id || !order) return;
+    setIsCancelling(true);
+    try {
+      const res = await cancelOrder(id);
+      setOrder(res.data);
+      setShowCancelModal(false);
+      setToast({ message: "Order has been cancelled successfully.", type: "success" });
+    } catch (err: unknown) {
+      setShowCancelModal(false);
+      const errorDetail =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail ||
+        "Failed to cancel the order. Please try again.";
+      setToast({ message: errorDetail, type: "error" });
+    } finally {
+      setIsCancelling(false);
+    }
+  }, [id, order]);
 
   const formatDate = (dateStr: string) => {
     try {
@@ -104,6 +234,9 @@ export function OrderDetailPage() {
     }
     return "bg-gray-200 dark:bg-gray-700";
   };
+
+  const isCancellable = order ? normalizeStatus(order.status) === "ORDER_CONFIRMED" : false;
+  const isCancelled = order ? normalizeStatus(order.status) === "CANCELLED" : false;
 
   if (isLoading) {
     return (
@@ -171,6 +304,36 @@ export function OrderDetailPage() {
 
   return (
     <div className="container-app py-12 space-y-8">
+      {/* Toast notification */}
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
+      )}
+
+      {/* Cancel confirmation modal */}
+      {showCancelModal && (
+        <CancelModal
+          onConfirm={handleCancelOrder}
+          onClose={() => !isCancelling && setShowCancelModal(false)}
+          isLoading={isCancelling}
+        />
+      )}
+
+      {/* Inline animation styles */}
+      <style>{`
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.92); }
+          to { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
+
       {/* Header and Back navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -200,15 +363,40 @@ export function OrderDetailPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Order ID: <span className="font-semibold text-gray-800 dark:text-gray-200">{order.id}</span>
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Estimated Delivery: <span className="font-semibold text-gray-800 dark:text-gray-200">{estimatedDeliveryDate}</span>
-          </p>
+          {!isCancelled && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              Estimated Delivery: <span className="font-semibold text-gray-800 dark:text-gray-200">{estimatedDeliveryDate}</span>
+            </p>
+          )}
         </div>
-        <div className="text-left sm:text-right bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-4 rounded-xl shadow-inner min-w-[200px]">
-          <p className="text-xs text-gray-405 font-medium uppercase tracking-wider">Status</p>
-          <p className="text-lg font-black mt-1 text-primary-600 dark:text-primary-400 uppercase tracking-wide">
-            {formatStatus(order.status)}
-          </p>
+        <div className="flex flex-col items-start sm:items-end gap-3">
+          <div className={`text-left sm:text-right p-4 rounded-xl shadow-inner min-w-[200px] border ${
+            isCancelled
+              ? "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30"
+              : "bg-gray-50 dark:bg-gray-900 border-gray-100 dark:border-gray-800"
+          }`}>
+            <p className="text-xs text-gray-405 font-medium uppercase tracking-wider">Status</p>
+            <p className={`text-lg font-black mt-1 uppercase tracking-wide ${
+              isCancelled
+                ? "text-red-600 dark:text-red-400"
+                : "text-primary-600 dark:text-primary-400"
+            }`}>
+              {formatStatus(order.status)}
+            </p>
+          </div>
+          {/* Cancel Order Button — only visible when ORDER_CONFIRMED */}
+          {isCancellable && (
+            <button
+              id="cancel-order-btn"
+              onClick={() => setShowCancelModal(true)}
+              className="inline-flex items-center gap-2 rounded-xl border border-red-300 dark:border-red-800 bg-white dark:bg-gray-900 px-5 py-2.5 text-sm font-bold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all shadow-sm hover:shadow-md hover:border-red-400 dark:hover:border-red-700"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+              </svg>
+              Cancel Order
+            </button>
+          )}
         </div>
       </div>
 

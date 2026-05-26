@@ -101,6 +101,7 @@ class OrderService:
         """Cancel an order if it belongs to the user and is in a cancellable state."""
         from app.core.exceptions import ForbiddenException
         from app.models.order import OrderStatus
+        from app.api.v1.endpoints.orders import calculate_order_status
 
         order = await self.order_repo.get_order_with_items(order_id)
         if not order:
@@ -110,11 +111,15 @@ class OrderService:
         if order.user_id != user_id:
             raise ForbiddenException(detail="You do not have permission to cancel this order")
 
-        # Only allow cancellation for ORDER_CONFIRMED status
-        cancellable_statuses = {OrderStatus.ORDER_CONFIRMED.value}
-        if order.status not in cancellable_statuses:
+        # Compute the effective status (respecting time-based auto-progression)
+        effective_status = order.status
+        if effective_status in [OrderStatus.PAYMENT_SUCCESS.value, OrderStatus.ORDER_CONFIRMED.value]:
+            effective_status = calculate_order_status(order.created_at)
+
+        # Only allow cancellation when effective status is ORDER_CONFIRMED
+        if effective_status != OrderStatus.ORDER_CONFIRMED.value:
             raise BadRequestException(
-                detail=f"Order cannot be cancelled. Current status: {order.status}"
+                detail=f"Order cannot be cancelled. Current status: {effective_status.replace('_', ' ')}"
             )
 
         order.status = OrderStatus.CANCELLED.value
