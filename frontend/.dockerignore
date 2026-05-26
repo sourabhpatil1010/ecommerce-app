@@ -1,0 +1,34 @@
+# Dependencies (installed fresh in Docker)
+node_modules/
+
+# Build output (rebuilt in Docker)
+dist/
+
+# Environment files
+.env
+.env.*
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# One-off scripts
+fix_styles.js
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# Coverage / logs
+coverage/
+*.log

@@ -1,0 +1,47 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+
+# Local SQLite databases
+*.db
+*.sqlite3
+
+# Environment files (injected via docker-compose)
+.env
+.env.*
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# Test files
+test_*.py
+tests/
+
+# One-off scripts
+fix_db.py
+
+# Docker files (no need to copy into image)
+Dockerfile
+.dockerignore
+
+# Coverage / logs
+htmlcov/
+.coverage
+coverage/
+*.log

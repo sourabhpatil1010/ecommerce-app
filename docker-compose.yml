@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   # ─── PostgreSQL Database ──────────────────────────────
   db:
@@ -14,10 +12,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecommerce_user}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecommerce_user} -d ${POSTGRES_DB:-ecommerce_db}" ]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - ecommerce-net
 
   # ─── FastAPI Backend ──────────────────────────────────
   backend:
@@ -29,11 +29,20 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-ecommerce_user}:${POSTGRES_PASSWORD:-changeme}@db:5432/${POSTGRES_DB:-ecommerce_db}
+      - BACKEND_CORS_ORIGINS=["http://localhost:5173","http://localhost:${BACKEND_PORT:-8000}"]
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')" ]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    networks:
+      - ecommerce-net
 
   # ─── React Frontend ──────────────────────────────────
   frontend:
@@ -48,7 +57,14 @@ services:
     ports:
       - "5173:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    networks:
+      - ecommerce-net
 
 volumes:
   postgres_data:
+
+networks:
+  ecommerce-net:
+    driver: bridge

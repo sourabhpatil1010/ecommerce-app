@@ -1,7 +1,10 @@
 """Product service."""
 
+import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.product import Product
+from app.schemas.product import ProductCreate, ProductUpdate
 from app.repositories.product import ProductRepository
 
 
