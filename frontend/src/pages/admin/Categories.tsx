@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { categoriesApi } from "@/api";
 import { Category } from "@/types";
 import { AlertCircle, Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export function AdminCategoriesPage() {
+  const navigate = useNavigate();
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +50,10 @@ export function AdminCategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Category Management</h1>
-        <button className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+        <button
+          onClick={() => navigate("/admin/categories/new")}
+          className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+        >
           <Plus className="h-5 w-5 mr-2" /> Add Category
         </button>
       </div>
@@ -84,7 +89,10 @@ export function AdminCategoriesPage() {
                     {category.description || "N/A"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4">
+                    <button
+                      onClick={() => navigate(`/admin/categories/edit/${category.id}`)}
+                      className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4"
+                    >
                       <Edit className="h-5 w-5 inline" />
                     </button>
                     <button onClick={() => handleDelete(category.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
@@ -107,3 +115,4 @@ export function AdminCategoriesPage() {
     </div>
   );
 }
+

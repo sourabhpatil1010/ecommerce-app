@@ -19,6 +19,7 @@ import {
   AdminProductsPage,
   AdminProductFormPage,
   AdminCategoriesPage,
+  AdminCategoryFormPage,
   AdminUsersPage,
 } from "@/pages";
 import { ProtectedRoute } from "./ProtectedRoute";
@@ -114,6 +115,8 @@ export function AppRouter() {
         <Route path="products/new" element={<AdminProductFormPage />} />
         <Route path="products/edit/:id" element={<AdminProductFormPage />} />
         <Route path="categories" element={<AdminCategoriesPage />} />
+        <Route path="categories/new" element={<AdminCategoryFormPage />} />
+        <Route path="categories/edit/:id" element={<AdminCategoryFormPage />} />
         <Route path="users" element={<AdminUsersPage />} />
       </Route>
     </Routes>
