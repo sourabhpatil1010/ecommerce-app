@@ -53,10 +53,10 @@ class RazorpayOrderResponse(BaseSchema):
     """Schema returned after creating a Razorpay order."""
 
     payment_id: UUID
-    razorpay_order_id: str
+    order_id: str
     amount: int
     currency: str
-    razorpay_key_id: str
+    key: str
 
 
 

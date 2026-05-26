@@ -1,6 +1,7 @@
 """Order service."""
 
 import uuid
+import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.order import OrderRepository
@@ -47,11 +48,12 @@ class OrderService:
             order_items.append(order_item)
             total_amount += float(item.unit_price) * item.quantity
 
+        from app.models.order import OrderStatus
         # 4. Create Order entity
         order = Order(
             user_id=user_id,
             shipping_address=shipping_address,
-            status="pending",
+            status=OrderStatus.CHECKOUT_CREATED.value,
             total_amount=total_amount,
             items=order_items
         )
@@ -94,3 +96,27 @@ class OrderService:
     async def list_all_orders(self, skip: int = 0, limit: int = 100) -> list[Order]:
         """List all orders (admin only)."""
         return await self.order_repo.get_all_orders(skip=skip, limit=limit)
+
+    async def cancel_order(self, order_id: uuid.UUID, user_id: uuid.UUID) -> Order:
+        """Cancel an order if it belongs to the user and is in a cancellable state."""
+        from app.core.exceptions import ForbiddenException
+        from app.models.order import OrderStatus
+
+        order = await self.order_repo.get_order_with_items(order_id)
+        if not order:
+            raise NotFoundException(detail="Order not found")
+
+        # Validate ownership
+        if order.user_id != user_id:
+            raise ForbiddenException(detail="You do not have permission to cancel this order")
+
+        # Only allow cancellation for ORDER_CONFIRMED status
+        cancellable_statuses = {OrderStatus.ORDER_CONFIRMED.value}
+        if order.status not in cancellable_statuses:
+            raise BadRequestException(
+                detail=f"Order cannot be cancelled. Current status: {order.status}"
+            )
+
+        order.status = OrderStatus.CANCELLED.value
+        await self.order_repo.session.flush()
+        return order

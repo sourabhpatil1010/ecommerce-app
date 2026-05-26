@@ -75,6 +75,8 @@ def run():
         print("WARNING: No products with stock >= 5 available. Using first product in catalog.")
         product = products[0]
     else:
+        # Sort by price to avoid Razorpay "Amount exceeds maximum amount allowed" limit
+        available_products.sort(key=lambda p: float(p.get("price", 999999)))
         product = available_products[0]
         
     print(f"Selected product: '{product['name']}' (${product['price']}) (stock left: {product.get('stock')})")
@@ -95,7 +97,7 @@ def run():
     order = r_order.json()
     order_id = order["id"]
     print(f"Order created! ID: {order_id}, Initial Status: {order['status']}, Payment Status: {order['payment_status']}")
-    assert order["status"] == "pending", f"Expected status 'pending', got: {order['status']}"
+    assert order["status"] == "CHECKOUT_CREATED", f"Expected status 'CHECKOUT_CREATED', got: {order['status']}"
     assert order["payment_status"] is None, f"Expected payment_status None, got: {order['payment_status']}"
 
     # 5. Create Razorpay Payment Order
@@ -106,7 +108,7 @@ def run():
     assert r_rzp_order.status_code == 201, f"Razorpay order creation failed: {r_rzp_order.text}"
     rzp_data = r_rzp_order.json()
     print(f"Razorpay Order response: {rzp_data}")
-    assert "razorpay_order_id" in rzp_data, "No razorpay_order_id in response"
+    assert "order_id" in rzp_data, "No order_id in response"
     assert "payment_id" in rzp_data, "No payment_id in response"
     assert rzp_data["currency"] == "INR", f"Expected currency INR, got: {rzp_data['currency']}"
     
@@ -126,11 +128,11 @@ def run():
 
     # Verify order is updated to pending_payment
     r_order_check = httpx.get(f"http://localhost:8000/api/v1/orders/{order_id}", headers=headers)
-    assert r_order_check.json()["status"] == "pending_payment", "Order status should be pending_payment"
+    assert r_order_check.json()["status"] == "PAYMENT_PENDING", "Order status should be PAYMENT_PENDING"
 
     # 7. Simulate Webhook success using a valid webhook signature
     print("7. Simulating webhook success callback...")
-    rzp_order_id = rzp_data["razorpay_order_id"]
+    rzp_order_id = rzp_data["order_id"]
     webhook_payload = {
         "event": "payment.captured",
         "payload": {
@@ -162,7 +164,7 @@ def run():
     r_order_paid = httpx.get(f"http://localhost:8000/api/v1/orders/{order_id}", headers=headers)
     order_paid = r_order_paid.json()
     print(f"Order status after success: {order_paid['status']}, Payment status: {order_paid['payment_status']}")
-    assert order_paid["status"] == "pending", f"Expected order status 'pending', got: {order_paid['status']}"
+    assert order_paid["status"] == "PAYMENT_SUCCESS", f"Expected order status 'PAYMENT_SUCCESS', got: {order_paid['status']}"
     assert order_paid["payment_status"] == "succeeded", f"Expected payment_status 'succeeded', got: {order_paid['payment_status']}"
 
     # 8. Simulate Webhook failure using a valid webhook signature
@@ -217,7 +219,7 @@ def run():
     r_rzp_order2 = httpx.post("http://localhost:8000/api/v1/payments/razorpay/create-order", headers=headers, json={
         "order_id": order2_id
     })
-    rzp_order2_id = r_rzp_order2.json()["razorpay_order_id"]
+    rzp_order2_id = r_rzp_order2.json()["order_id"]
     
     # Calculate valid payment signature
     pay_id = "pay_test_verify_888"
@@ -239,7 +241,7 @@ def run():
     # Check order is marked as paid
     r_order2_check = httpx.get(f"http://localhost:8000/api/v1/orders/{order2_id}", headers=headers)
     order2_check = r_order2_check.json()
-    assert order2_check["status"] == "pending", f"Expected pending order status, got: {order2_check['status']}"
+    assert order2_check["status"] == "PAYMENT_SUCCESS", f"Expected PAYMENT_SUCCESS order status, got: {order2_check['status']}"
     assert order2_check["payment_status"] == "succeeded", f"Expected succeeded payment status, got: {order2_check['payment_status']}"
     print("Direct signature verification correctly updated order status to Paid!")
 
@@ -258,7 +260,7 @@ def run():
     r_rzp_order3 = httpx.post("http://localhost:8000/api/v1/payments/razorpay/create-order", headers=headers, json={
         "order_id": order3_id
     })
-    rzp_order3_id = r_rzp_order3.json()["razorpay_order_id"]
+    rzp_order3_id = r_rzp_order3.json()["order_id"]
     
     r_fail = httpx.post("http://localhost:8000/api/v1/payments/razorpay/fail", headers=headers, json={
         "razorpay_order_id": rzp_order3_id,

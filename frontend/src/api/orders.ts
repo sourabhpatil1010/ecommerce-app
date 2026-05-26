@@ -15,5 +15,3 @@ export const getAllOrders = (params?: Record<string, unknown>) =>
   apiClient.get("/orders/all", { params });
 
 /** PATCH /orders/:id/status (Admin) */
-export const updateOrderStatus = (id: string, status: string) =>
-  apiClient.patch(`/orders/${id}/status`, { status });

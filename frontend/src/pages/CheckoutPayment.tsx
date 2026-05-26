@@ -702,6 +702,7 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
       // 1. Create Razorpay order on backend
       const res = await paymentsApi.createRazorpayOrder(order.id);
       const data = res.data;
+      console.log("Razorpay API response data:", data);
 
       // 2. Real Razorpay Integration
       setStatusMessage("Connecting to secure Razorpay server...");
@@ -713,12 +714,12 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
       }
 
       const options = {
-        key: data.razorpay_key_id,
+        key: data.key,
         amount: data.amount,
         currency: data.currency,
         name: "E-Commerce Premium Store",
         description: `Payment for Order #${order.id.substring(0, 8)}`,
-        order_id: data.razorpay_order_id,
+        order_id: data.order_id,
         handler: async function (response: any) {
           setIsProcessing(true);
           setStatusMessage("Verifying secure transaction signature...");
@@ -753,9 +754,10 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
           ondismiss: async function () {
             setIsProcessing(true);
             setStatusMessage("Cancelling checkout session...");
+            console.log("Razorpay checkout modal dismissed.");
             try {
               await paymentsApi.failRazorpayPayment({
-                razorpay_order_id: data.razorpay_order_id
+                razorpay_order_id: data.order_id
               });
             } catch (err) {
               console.warn("Could not cancel Razorpay payment record: ", err);
@@ -770,9 +772,10 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
       rzp.on("payment.failed", async function (response: any) {
         setIsProcessing(true);
         setStatusMessage("Logging checkout failure...");
+        console.error("Razorpay checkout failed:", response.error);
         try {
           await paymentsApi.failRazorpayPayment({
-            razorpay_order_id: data.razorpay_order_id,
+            razorpay_order_id: data.order_id,
             error_code: response.error?.code,
             error_description: response.error?.description,
           });

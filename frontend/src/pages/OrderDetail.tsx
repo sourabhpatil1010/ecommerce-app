@@ -29,6 +29,13 @@ interface Order {
   updated_at: string;
 }
 
+const normalizeStatus = (status: string) => {
+  if (!status) return "UNKNOWN";
+  const s = status.toUpperCase();
+  if (s === "PENDING" || s === "PROCESSING") return "ORDER_CONFIRMED";
+  return s;
+};
+
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
@@ -51,21 +58,28 @@ export function OrderDetailPage() {
   }, [id]);
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "Invalid Date";
+      return d.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "Invalid Date";
+    }
   };
 
   const getStatusStepClass = (step: string, currentStatus: string) => {
-    const statuses = ["pending", "processing", "shipped", "delivered"];
+    const statuses = ["ORDER_CONFIRMED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"];
     const stepIdx = statuses.indexOf(step);
-    const currentIdx = statuses.indexOf(currentStatus.toLowerCase());
+    const normalized = normalizeStatus(currentStatus);
+    const currentIdx = statuses.indexOf(normalized);
 
-    if (currentStatus.toLowerCase() === "cancelled") {
+    if (normalized === "CANCELLED") {
       return "text-red-500 border-red-500 bg-red-50 dark:bg-red-950/20";
     }
 
@@ -76,11 +90,12 @@ export function OrderDetailPage() {
   };
 
   const getStatusLineClass = (step: string, currentStatus: string) => {
-    const statuses = ["pending", "processing", "shipped", "delivered"];
+    const statuses = ["ORDER_CONFIRMED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"];
     const stepIdx = statuses.indexOf(step);
-    const currentIdx = statuses.indexOf(currentStatus.toLowerCase());
+    const normalized = normalizeStatus(currentStatus);
+    const currentIdx = statuses.indexOf(normalized);
 
-    if (currentStatus.toLowerCase() === "cancelled") {
+    if (normalized === "CANCELLED") {
       return "bg-red-200 dark:bg-red-900";
     }
 
@@ -139,6 +154,21 @@ export function OrderDetailPage() {
   const taxCost = subtotal * 0.08;
   const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80";
 
+  const formatStatus = (status: string) => {
+    return normalizeStatus(status).replace(/_/g, " ");
+  };
+
+  let estimatedDeliveryDate = "Invalid Date";
+  try {
+    const estimatedDelivery = new Date(order.created_at);
+    if (!isNaN(estimatedDelivery.getTime())) {
+      estimatedDelivery.setDate(estimatedDelivery.getDate() + 3);
+      estimatedDeliveryDate = estimatedDelivery.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    }
+  } catch (e) {
+    // Ignore error, fallback used
+  }
+
   return (
     <div className="container-app py-12 space-y-8">
       {/* Header and Back navigation */}
@@ -170,11 +200,14 @@ export function OrderDetailPage() {
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Order ID: <span className="font-semibold text-gray-800 dark:text-gray-200">{order.id}</span>
           </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Estimated Delivery: <span className="font-semibold text-gray-800 dark:text-gray-200">{estimatedDeliveryDate}</span>
+          </p>
         </div>
         <div className="text-left sm:text-right bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-4 rounded-xl shadow-inner min-w-[200px]">
           <p className="text-xs text-gray-405 font-medium uppercase tracking-wider">Status</p>
           <p className="text-lg font-black mt-1 text-primary-600 dark:text-primary-400 uppercase tracking-wide">
-            {order.status}
+            {formatStatus(order.status)}
           </p>
         </div>
       </div>
@@ -184,7 +217,7 @@ export function OrderDetailPage() {
         <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">
           Order Status Tracking
         </h2>
-        {order.status.toLowerCase() === "cancelled" ? (
+        {normalizeStatus(order.status) === "CANCELLED" ? (
           <div className="flex items-center gap-3 text-red-600 font-bold bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-200/50">
             <svg
               className="h-5 w-5"
@@ -201,42 +234,42 @@ export function OrderDetailPage() {
           </div>
         ) : (
           <div className="relative flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-2">
-            {/* Step: Pending */}
+            {/* Step: Order Confirmed */}
             <div className="flex flex-col items-center text-center z-10 w-full sm:w-auto">
-              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("pending", order.status)}`}>
+              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("ORDER_CONFIRMED", order.status)}`}>
                 1
               </div>
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Pending</span>
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Confirmed</span>
             </div>
 
-            {/* Line: Pending -> Processing */}
-            <div className={`hidden sm:block h-0.5 flex-grow ${getStatusLineClass("pending", order.status)}`} />
-
-            {/* Step: Processing */}
-            <div className="flex flex-col items-center text-center z-10 w-full sm:w-auto">
-              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("processing", order.status)}`}>
-                2
-              </div>
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Processing</span>
-            </div>
-
-            {/* Line: Processing -> Shipped */}
-            <div className={`hidden sm:block h-0.5 flex-grow ${getStatusLineClass("processing", order.status)}`} />
+            {/* Line: Confirmed -> Shipped */}
+            <div className={`hidden sm:block h-0.5 flex-grow ${getStatusLineClass("ORDER_CONFIRMED", order.status)}`} />
 
             {/* Step: Shipped */}
             <div className="flex flex-col items-center text-center z-10 w-full sm:w-auto">
-              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("shipped", order.status)}`}>
-                3
+              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("SHIPPED", order.status)}`}>
+                2
               </div>
               <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Shipped</span>
             </div>
 
-            {/* Line: Shipped -> Delivered */}
-            <div className={`hidden sm:block h-0.5 flex-grow ${getStatusLineClass("shipped", order.status)}`} />
+            {/* Line: Shipped -> Out For Delivery */}
+            <div className={`hidden sm:block h-0.5 flex-grow ${getStatusLineClass("SHIPPED", order.status)}`} />
+
+            {/* Step: Out For Delivery */}
+            <div className="flex flex-col items-center text-center z-10 w-full sm:w-auto">
+              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("OUT_FOR_DELIVERY", order.status)}`}>
+                3
+              </div>
+              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Out for Delivery</span>
+            </div>
+
+            {/* Line: Out For Delivery -> Delivered */}
+            <div className={`hidden sm:block h-0.5 flex-grow ${getStatusLineClass("OUT_FOR_DELIVERY", order.status)}`} />
 
             {/* Step: Delivered */}
             <div className="flex flex-col items-center text-center z-10 w-full sm:w-auto">
-              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("delivered", order.status)}`}>
+              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("DELIVERED", order.status)}`}>
                 4
               </div>
               <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Delivered</span>

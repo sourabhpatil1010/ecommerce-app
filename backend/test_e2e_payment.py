@@ -60,7 +60,7 @@ def run():
     order = r_order.json()
     order_id = order["id"]
     print(f"Order created! ID: {order_id}, Initial Status: {order['status']}, Payment Status: {order['payment_status']}")
-    assert order["status"] == "pending", f"Expected status 'pending', got: {order['status']}"
+    assert order["status"] == "CHECKOUT_CREATED", f"Expected status 'CHECKOUT_CREATED', got: {order['status']}"
     assert order["payment_status"] is None, f"Expected payment_status None, got: {order['payment_status']}"
 
     # 5. Create payment intent
@@ -74,12 +74,12 @@ def run():
         intent_data = r_intent.json()
         print(f"Stripe Payment Intent created! Client Secret: {intent_data['client_secret'][:20]}...")
         
-        # Verify order status updated to pending_payment
+        # Verify order status
         print("6. Checking order status update...")
         r_order_check = httpx.get(f"http://localhost:8000/api/v1/orders/{order_id}", headers=headers)
         order_check = r_order_check.json()
         print(f"Order status: {order_check['status']}, Payment status: {order_check['payment_status']}")
-        assert order_check["status"] == "pending_payment", f"Expected 'pending_payment', got: {order_check['status']}"
+        assert order_check["status"] == "PAYMENT_PENDING", f"Expected 'PAYMENT_PENDING', got: {order_check['status']}"
         assert order_check["payment_status"] == "pending", f"Expected payment_status 'pending', got: {order_check['payment_status']}"
     else:
         print("Stripe is not configured (returned 400). Testing webhook simulation flow directly...")
@@ -95,7 +95,7 @@ def run():
     r_order_paid = httpx.get(f"http://localhost:8000/api/v1/orders/{order_id}", headers=headers)
     order_paid = r_order_paid.json()
     print(f"Order status after success: {order_paid['status']}, Payment status: {order_paid['payment_status']}")
-    assert order_paid["status"] == "pending", f"Expected order status 'pending' (confirmed/paid), got: {order_paid['status']}"
+    assert order_paid["status"] == "PAYMENT_SUCCESS", f"Expected order status 'PAYMENT_SUCCESS', got: {order_paid['status']}"
     assert order_paid["payment_status"] == "succeeded", f"Expected payment_status 'succeeded', got: {order_paid['payment_status']}"
 
     # 9. Simulate Webhook FAILURE
@@ -104,7 +104,7 @@ def run():
     assert r_webhook_fail.status_code == 200, f"Webhook simulation failed: {r_webhook_fail.text}"
     print("Webhook simulation reported failure.")
 
-    # 10. Verify order status updated to payment_failed
+    # 10. Verifying order status after failure
     print("10. Verifying order status after failure...")
     r_order_failed = httpx.get(f"http://localhost:8000/api/v1/orders/{order_id}", headers=headers)
     order_failed = r_order_failed.json()

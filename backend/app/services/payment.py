@@ -38,7 +38,9 @@ class PaymentService:
             raise NotFoundException(detail="Order not found")
 
         # 2. Check order is in a payable state
-        if order.status not in ("pending", "pending_payment"):
+        logger.info("Checking payment eligibility for order %s. Current status: %s", order_id, order.status)
+        if order.status not in ("CHECKOUT_CREATED", "PAYMENT_PENDING", "PAYMENT_FAILED"):
+            logger.error("Order %s is not eligible for payment. Status: %s", order_id, order.status)
             raise BadRequestException(
                 detail=f"Order is not eligible for payment (status: {order.status})"
             )
@@ -100,8 +102,9 @@ class PaymentService:
         )
         await self.payment_repo.create(payment)
 
-        # 7. Update order status to pending_payment
-        order.status = "pending_payment"
+        # 7. Log payment creation and update order status
+        logger.info("Created Stripe PaymentIntent %s for order %s", intent.id, order_id)
+        order.status = "PAYMENT_PENDING"
         await self.order_repo.session.flush()
 
         return {
@@ -165,10 +168,11 @@ class PaymentService:
 
         payment.status = "succeeded"
 
-        # Update order status
+        # Log processing
+        logger.info("Processing successful payment for order %s", payment.order_id)
         order = await self.order_repo.get_by_id(payment.order_id)
         if order:
-            order.status = "pending"  # Confirmed — ready for processing
+            order.status = "PAYMENT_SUCCESS"
         await self.payment_repo.session.flush()
 
         logger.info(
@@ -185,7 +189,8 @@ class PaymentService:
 
         payment.status = "failed"
 
-        # Update order status
+        # Log processing
+        logger.info("Processing failed payment for order %s", payment.order_id)
         order = await self.order_repo.get_by_id(payment.order_id)
         if order:
             order.status = "payment_failed"
@@ -211,18 +216,20 @@ class PaymentService:
                 provider="stripe_simulated",
                 provider_payment_id="pi_simulated_" + str(uuid.uuid4())[:8],
             )
+            logger.info("Simulating payment creation for order %s", order_id)
             await self.payment_repo.create(payment)
-            order.status = "pending_payment"
             await self.order_repo.session.flush()
 
         if success:
+            logger.info("Simulating payment success for order %s", order_id)
             payment.status = "succeeded"
-            order = await self.order_repo.get_by_id(payment.order_id)
+            order = await self.order_repo.get_by_id(order_id)
             if order:
-                order.status = "pending"
+                order.status = "PAYMENT_SUCCESS"
         else:
+            logger.info("Simulating payment failure for order %s", order_id)
             payment.status = "failed"
-            order = await self.order_repo.get_by_id(payment.order_id)
+            order = await self.order_repo.get_by_id(order_id)
             if order:
                 order.status = "payment_failed"
         
@@ -238,7 +245,9 @@ class PaymentService:
             raise NotFoundException(detail="Order not found")
 
         # 2. Check order is in a payable state
-        if order.status not in ("pending", "pending_payment"):
+        logger.info("Checking Razorpay eligibility for order %s. Current status: %s", order_id, order.status)
+        if order.status not in ("CHECKOUT_CREATED", "PAYMENT_PENDING", "PAYMENT_FAILED"):
+            logger.error("Order %s is not eligible for Razorpay. Status: %s", order_id, order.status)
             raise BadRequestException(
                 detail=f"Order is not eligible for payment (status: {order.status})"
             )
@@ -270,7 +279,7 @@ class PaymentService:
             })
             razorpay_order_id = razorpay_order["id"]
         except Exception as e:
-            logger.error("Razorpay order creation failed: %s", e)
+            logger.error("Razorpay order creation failed: %s, payload amount: %s", e, amount_paise)
             raise BadRequestException(
                 detail="Razorpay payment initialization failed. Please try again."
             )
@@ -286,16 +295,19 @@ class PaymentService:
         )
         await self.payment_repo.create(payment)
 
-        # 7. Update order status to pending_payment
-        order.status = "pending_payment"
+        # 7. Log payment creation and update order status
+        logger.info("Created Razorpay order %s for local order %s", razorpay_order_id, order_id)
+        order.status = "PAYMENT_PENDING"
         await self.order_repo.session.flush()
+
+        logger.info("Razorpay order API response: order_id=%s, amount=%s, currency=INR", razorpay_order_id, amount_paise)
 
         return {
             "payment_id": payment.id,
-            "razorpay_order_id": razorpay_order_id,
+            "order_id": razorpay_order_id,
             "amount": amount_paise,
             "currency": "INR",
-            "razorpay_key_id": settings.RAZORPAY_KEY_ID,
+            "key": settings.RAZORPAY_KEY_ID,
         }
 
     async def verify_razorpay_payment(
@@ -328,8 +340,10 @@ class PaymentService:
             raise BadRequestException(detail="Payment signature verification failed")
 
         payment.status = "succeeded"
-        order.status = "pending"
+        logger.info("Processing successful Razorpay payment for order %s", order.id)
+        order.status = "PAYMENT_SUCCESS"
         await self.payment_repo.session.flush()
+        
         logger.info("Razorpay payment verified successfully for order %s", order.id)
         return True
 
@@ -341,6 +355,7 @@ class PaymentService:
             return
 
         payment.status = "failed"
+        logger.info("Processing failed Razorpay payment for order %s", payment.order_id)
         order = await self.order_repo.get_by_id(payment.order_id)
         if order:
             order.status = "payment_failed"
@@ -383,10 +398,12 @@ class PaymentService:
         order = await self.order_repo.get_by_id(payment.order_id)
 
         if event in ("payment.captured", "order.paid"):
+            logger.info("Razorpay webhook success for order %s", razorpay_order_id)
             payment.status = "succeeded"
             if order:
-                order.status = "pending"
+                order.status = "PAYMENT_SUCCESS"
         elif event == "payment.failed":
+            logger.info("Razorpay webhook failure for order %s", razorpay_order_id)
             payment.status = "failed"
             if order:
                 order.status = "payment_failed"
@@ -403,7 +420,9 @@ class PaymentService:
             raise NotFoundException(detail="Order not found")
 
         # 2. Check order is in a payable state
-        if order.status not in ("pending", "pending_payment"):
+        logger.info("Checking COD eligibility for order %s. Current status: %s", order_id, order.status)
+        if order.status not in ("CHECKOUT_CREATED", "PAYMENT_PENDING", "PAYMENT_FAILED"):
+            logger.error("Order %s is not eligible for COD. Status: %s", order_id, order.status)
             raise BadRequestException(
                 detail=f"Order is not eligible for payment (status: {order.status})"
             )
@@ -427,8 +446,9 @@ class PaymentService:
         )
         await self.payment_repo.create(payment)
 
-        # 5. Update order status to pending (which means confirmed/ready for processing)
-        order.status = "pending"
+        # 5. Log COD payment and trigger progression
+        logger.info("Created COD payment %s for order %s", payment.id, order_id)
+        order.status = "ORDER_CONFIRMED"
         await self.order_repo.session.flush()
 
         return {

@@ -81,12 +81,12 @@ def run():
             assert status_data["provider"] == "stripe", f"Expected 'stripe', got: {status_data['provider']}"
             print(f"Payment status: {status_data['status']} (provider: {status_data['provider']})")
 
-            # 7. Verify order status is updated to pending_payment
-            print("7. Verifying order status is pending_payment...")
+            # 7. Verify order status is updated to PAYMENT_PENDING
+            print("7. Verifying order status is PAYMENT_PENDING...")
             r_order_check = httpx.get(f"http://localhost:8000/api/v1/orders/{order_id}", headers=headers)
             assert r_order_check.status_code == 200
             order_check = r_order_check.json()
-            assert order_check["status"] == "pending_payment", f"Expected 'pending_payment', got: {order_check['status']}"
+            assert order_check["status"] == "PAYMENT_PENDING", f"Expected 'PAYMENT_PENDING', got: {order_check['status']}"
             assert order_check["payment_status"] == "pending", f"Expected payment_status 'pending', got: {order_check['payment_status']}"
             print(f"Order status: {order_check['status']}, Payment status: {order_check['payment_status']}")
 
