@@ -48,8 +48,8 @@ export function CartPage() {
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-800 border-t-primary-600 dark:border-t-primary-500" />
         </div>
       ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] text-center p-8 bg-gray-50 dark:bg-gray-950/20 border border-gray-150 dark:border-gray-800 rounded-2xl">
-          <div className="h-16 w-16 text-gray-400 dark:text-gray-600 mb-4 bg-gray-100 dark:bg-gray-850 rounded-full flex items-center justify-center shadow-inner">
+        <div className="flex flex-col items-center justify-center min-h-[40vh] text-center p-8 bg-gray-50 dark:bg-gray-950/20 border border-gray-100 dark:border-gray-800 rounded-2xl">
+          <div className="h-16 w-16 text-gray-400 dark:text-gray-600 mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center shadow-inner">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -90,7 +90,7 @@ export function CartPage() {
                 {/* Product Image */}
                 <Link
                   to={`/products/${item.product_id}`}
-                  className="relative aspect-square w-full sm:w-24 overflow-hidden rounded-lg bg-gray-50 border border-gray-100 dark:border-gray-800 self-center sm:self-auto"
+                  className="relative aspect-square w-full sm:w-24 overflow-hidden rounded-lg bg-gray-50 border border-gray-100 dark:border-gray-800 self-center sm:self-auto dark:bg-slate-800"
                 >
                   <img
                     src={item.product?.image_url || placeholderImage}
@@ -179,7 +179,7 @@ export function CartPage() {
                       type="button"
                       onClick={() => removeItem(item.id)}
                       disabled={cartLoading}
-                      className="text-sm font-semibold text-gray-450 hover:text-red-600 transition-colors flex items-center gap-1.5"
+                      className="text-sm font-semibold text-gray-500 hover:text-red-600 transition-colors flex items-center gap-1.5 dark:text-gray-400"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -283,7 +283,7 @@ export function CartPage() {
                   </span>
                 </div>
 
-                <div className="border-t border-gray-150 dark:border-gray-800 pt-4 mt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
+                <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
                   <span>Total</span>
                   <span>{formatCurrency(orderTotal)}</span>
                 </div>
@@ -297,7 +297,7 @@ export function CartPage() {
               </Link>
 
               {/* Guarantees */}
-              <div className="mt-6 flex flex-col gap-3 pt-6 border-t border-gray-100 dark:border-gray-850">
+              <div className="mt-6 flex flex-col gap-3 pt-6 border-t border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

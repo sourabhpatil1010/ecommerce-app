@@ -31,4 +31,6 @@ export const failRazorpayPayment = (payload: {
 }) => apiClient.post("/payments/razorpay/fail", payload);
 
 
-
+/** POST /payments/cod/create-order */
+export const createCodPayment = (orderId: string) =>
+  apiClient.post("/payments/cod/create-order", { order_id: orderId });

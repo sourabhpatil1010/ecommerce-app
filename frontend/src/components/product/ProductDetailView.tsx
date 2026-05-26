@@ -108,14 +108,14 @@ export function ProductDetailView({ product, onEdit }: ProductDetailViewProps) {
           {formatCurrency(product.price)}
         </p>
 
-        <div className="mt-6 border-t border-gray-150 pt-6 dark:border-gray-800">
+        <div className="mt-6 border-t border-gray-100 pt-6 dark:border-gray-800">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Description</h3>
           <p className="mt-3 text-base leading-relaxed text-gray-600 dark:text-gray-300 whitespace-pre-line">
             {product.description || "No description has been detailed for this product yet. Rest assured, it is made of top quality components."}
           </p>
         </div>
 
-        <div className="mt-8 border-t border-gray-150 pt-6 dark:border-gray-800">
+        <div className="mt-8 border-t border-gray-100 pt-6 dark:border-gray-800">
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Availability</span>
             {isOutOfStock ? (

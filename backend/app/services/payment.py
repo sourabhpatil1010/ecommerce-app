@@ -393,3 +393,48 @@ class PaymentService:
 
         await self.payment_repo.session.flush()
 
+    async def create_cod_payment(
+        self, order_id: uuid.UUID, user_id: uuid.UUID
+    ) -> dict:
+        """Create a Cash on Delivery payment for the given order."""
+        # 1. Fetch order and validate ownership
+        order = await self.order_repo.get_order_by_id_and_user_id(order_id, user_id)
+        if not order:
+            raise NotFoundException(detail="Order not found")
+
+        # 2. Check order is in a payable state
+        if order.status not in ("pending", "pending_payment"):
+            raise BadRequestException(
+                detail=f"Order is not eligible for payment (status: {order.status})"
+            )
+
+        # 3. Check for existing payment
+        existing_payment = await self.payment_repo.get_by_order_id(order_id)
+        if existing_payment:
+            if existing_payment.status == "succeeded":
+                raise BadRequestException(detail="Order is already paid")
+            # Delete old payment record to avoid unique constraints or duplicate states
+            await self.payment_repo.delete(existing_payment)
+
+        # 4. Store local Payment record for COD
+        payment = Payment(
+            order_id=order_id,
+            amount=float(order.total_amount),
+            currency="USD",
+            status="pending",
+            provider="cod",
+            provider_payment_id=f"cod_{order_id}",
+        )
+        await self.payment_repo.create(payment)
+
+        # 5. Update order status to pending (which means confirmed/ready for processing)
+        order.status = "pending"
+        await self.order_repo.session.flush()
+
+        return {
+            "payment_id": payment.id,
+            "provider": "cod",
+            "status": payment.status,
+            "amount": float(payment.amount),
+        }
+

@@ -75,3 +75,18 @@ class RazorpayPaymentFail(BaseSchema):
     error_code: str | None = None
     error_description: str | None = None
 
+
+class CodOrderCreate(BaseSchema):
+    """Schema for initiating COD payment."""
+
+    order_id: UUID
+
+
+class CodOrderResponse(BaseSchema):
+    """Schema returned after creating a COD payment."""
+
+    payment_id: UUID
+    provider: str
+    status: str
+    amount: float
+

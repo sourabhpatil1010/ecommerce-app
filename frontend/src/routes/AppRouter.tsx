@@ -11,11 +11,13 @@ import {
   ProfilePage,
   OrderHistoryPage,
   OrderDetailPage,
+  AddressesPage,
   CheckoutPaymentPage,
   PaymentSuccessPage,
   NotFoundPage,
   AdminDashboardPage,
   AdminProductsPage,
+  AdminProductFormPage,
   AdminCategoriesPage,
   AdminOrdersPage,
   AdminUsersPage,
@@ -66,6 +68,14 @@ export function AppRouter() {
           }
         />
         <Route
+          path="profile/addresses"
+          element={
+            <ProtectedRoute>
+              <AddressesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="orders"
           element={
             <ProtectedRoute>
@@ -102,6 +112,8 @@ export function AppRouter() {
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboardPage />} />
         <Route path="products" element={<AdminProductsPage />} />
+        <Route path="products/new" element={<AdminProductFormPage />} />
+        <Route path="products/edit/:id" element={<AdminProductFormPage />} />
         <Route path="categories" element={<AdminCategoriesPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />
         <Route path="users" element={<AdminUsersPage />} />

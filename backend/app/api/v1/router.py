@@ -11,6 +11,7 @@ from app.api.v1.endpoints import (
     orders,
     payments,
     dashboard,
+    addresses,
 )
 
 api_router = APIRouter()
@@ -23,3 +24,4 @@ api_router.include_router(cart.router, prefix="/cart", tags=["Cart"])
 api_router.include_router(orders.router, prefix="/orders", tags=["Orders"])
 api_router.include_router(payments.router, prefix="/payments", tags=["Payments"])
 api_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
+api_router.include_router(addresses.router, prefix="/addresses", tags=["Addresses"])

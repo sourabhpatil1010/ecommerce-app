@@ -95,7 +95,7 @@ export function AdminCategoriesPage() {
               ))}
               {categories.length === 0 && !isLoading && (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                     No categories found.
                   </td>
                 </tr>

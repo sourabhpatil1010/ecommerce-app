@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { productsApi } from "@/api";
 import { Product } from "@/types";
 import { formatCurrency } from "@/utils/currency";
@@ -52,9 +53,12 @@ export function AdminProductsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Product Management</h1>
-        <button className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+        <Link 
+          to="/admin/products/new"
+          className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+        >
           <Plus className="h-5 w-5 mr-2" /> Add Product
-        </button>
+        </Link>
       </div>
 
       {error && (
@@ -108,9 +112,9 @@ export function AdminProductsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4">
+                    <Link to={`/admin/products/edit/${product.id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4 inline-block">
                       <Edit className="h-5 w-5 inline" />
-                    </button>
+                    </Link>
                     <button onClick={() => handleDelete(product.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                       <Trash2 className="h-5 w-5 inline" />
                     </button>
@@ -119,7 +123,7 @@ export function AdminProductsPage() {
               ))}
               {products.length === 0 && !isLoading && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
                     No products found.
                   </td>
                 </tr>

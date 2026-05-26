@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getMyOrders } from "@/api/orders";
+import { getOrders } from "@/api/orders";
 import { formatCurrency } from "@/utils/currency";
 
 interface OrderItem {
@@ -43,14 +43,14 @@ export function OrderHistoryPage() {
   const getStatusBadgeClass = (status: string) => {
     switch (status.toLowerCase()) {
       case "pending":
-        return "bg-amber-50 text-amber-700 border-amber-250 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30";
+        return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30";
       case "completed":
       case "delivered":
-        return "bg-green-50 text-green-700 border-green-250 dark:bg-green-950/20 dark:text-green-400 dark:border-green-900/30";
+        return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400 dark:border-green-900/30";
       case "cancelled":
-        return "bg-red-50 text-red-700 border-red-250 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30";
+        return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30";
       default:
-        return "bg-blue-50 text-blue-700 border-blue-250 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30";
+        return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30";
     }
   };
 
@@ -86,8 +86,8 @@ export function OrderHistoryPage() {
       )}
 
       {orders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] text-center p-8 bg-gray-50 dark:bg-gray-950/20 border border-gray-150 dark:border-gray-800 rounded-2xl">
-          <div className="h-16 w-16 text-gray-400 mb-4 bg-gray-100 dark:bg-gray-850 rounded-full flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center min-h-[40vh] text-center p-8 bg-gray-50 dark:bg-gray-950/20 border border-gray-100 dark:border-gray-800 rounded-2xl">
+          <div className="h-16 w-16 text-gray-400 mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -106,7 +106,7 @@ export function OrderHistoryPage() {
           <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
             No orders found
           </h2>
-          <p className="text-sm text-gray-500 max-w-sm mb-6">
+          <p className="text-sm text-gray-500 max-w-sm mb-6 dark:text-gray-400">
             You haven't placed any orders yet. Browse our selection and find something you love!
           </p>
           <Link
@@ -149,7 +149,7 @@ export function OrderHistoryPage() {
                 </div>
                 <Link
                   to={`/orders/${order.id}`}
-                  className="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-bold text-gray-700 dark:text-gray-250 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors shadow-sm"
+                  className="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
                 >
                   View Details
                 </Link>

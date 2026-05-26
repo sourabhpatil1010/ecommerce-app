@@ -72,7 +72,7 @@ export function OrderDetailPage() {
     if (stepIdx <= currentIdx) {
       return "text-primary-600 border-primary-600 bg-primary-50 dark:bg-primary-950/20 dark:text-primary-400 dark:border-primary-400";
     }
-    return "text-gray-400 border-gray-200 bg-white dark:bg-gray-850 dark:border-gray-700";
+    return "text-gray-400 border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700";
   };
 
   const getStatusLineClass = (step: string, currentStatus: string) => {
@@ -117,15 +117,15 @@ export function OrderDetailPage() {
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <h2 className="text-2xl font-bold text-gray-800 mb-2 dark:text-gray-100">
           {error || "Order not found"}
         </h2>
-        <p className="text-gray-550 mb-8">
+        <p className="text-gray-500 mb-8 dark:text-gray-400">
           The order details page you requested could not be retrieved.
         </p>
         <Link
           to="/orders"
-          className="rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+          className="rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm dark:text-gray-200 dark:bg-slate-900"
         >
           Back to Orders
         </Link>
@@ -168,10 +168,10 @@ export function OrderDetailPage() {
             Order Details
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Order ID: <span className="font-semibold text-gray-800 dark:text-gray-250">{order.id}</span>
+            Order ID: <span className="font-semibold text-gray-800 dark:text-gray-200">{order.id}</span>
           </p>
         </div>
-        <div className="text-left sm:text-right bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-800 p-4 rounded-xl shadow-inner min-w-[200px]">
+        <div className="text-left sm:text-right bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800 p-4 rounded-xl shadow-inner min-w-[200px]">
           <p className="text-xs text-gray-405 font-medium uppercase tracking-wider">Status</p>
           <p className="text-lg font-black mt-1 text-primary-600 dark:text-primary-400 uppercase tracking-wide">
             {order.status}
@@ -185,7 +185,7 @@ export function OrderDetailPage() {
           Order Status Tracking
         </h2>
         {order.status.toLowerCase() === "cancelled" ? (
-          <div className="flex items-center gap-3 text-red-650 font-bold bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-200/50">
+          <div className="flex items-center gap-3 text-red-600 font-bold bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-200/50">
             <svg
               className="h-5 w-5"
               viewBox="0 0 20 20"
@@ -259,7 +259,7 @@ export function OrderDetailPage() {
                   key={item.id}
                   className="flex gap-4 py-4 first:pt-0 last:pb-0"
                 >
-                  <div className="relative aspect-square h-16 w-16 overflow-hidden rounded-lg bg-gray-50 border border-gray-100 dark:border-gray-800">
+                  <div className="relative aspect-square h-16 w-16 overflow-hidden rounded-lg bg-gray-50 border border-gray-100 dark:border-gray-800 dark:bg-slate-800">
                     <img
                       src={item.product?.image_url || placeholderImage}
                       alt={item.product?.name || "Product"}
@@ -273,7 +273,7 @@ export function OrderDetailPage() {
                     >
                       {item.product?.name || "Unknown Product"}
                     </Link>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
                       Qty: {item.quantity} · {formatCurrency(item.unit_price)}
                     </p>
                   </div>
@@ -293,7 +293,7 @@ export function OrderDetailPage() {
             <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-50 dark:border-gray-800">
               Shipping Address
             </h3>
-            <p className="text-sm text-gray-650 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
               {order.shipping_address}
             </p>
           </div>
@@ -303,7 +303,7 @@ export function OrderDetailPage() {
             <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-50 dark:border-gray-800">
               Order Date & Time
             </h3>
-            <p className="text-sm text-gray-650 dark:text-gray-300">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               {formatDate(order.created_at)}
             </p>
           </div>
@@ -332,7 +332,7 @@ export function OrderDetailPage() {
               <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(taxCost)}</span>
             </div>
 
-            <div className="border-t border-gray-150 dark:border-gray-800 pt-3 flex justify-between text-sm font-bold text-gray-950 dark:text-white">
+            <div className="border-t border-gray-100 dark:border-gray-800 pt-3 flex justify-between text-sm font-bold text-gray-950 dark:text-white">
               <span>Order Total</span>
               <span>{formatCurrency(order.total_amount)}</span>
             </div>

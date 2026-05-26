@@ -153,13 +153,13 @@ export function ProductDetailPage() {
           <div className="mt-6 flex justify-center gap-4">
             <button
               onClick={() => fetchProductDetails()}
-              className="rounded-lg bg-red-650 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-red-755"
+              className="rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-red-700"
             >
               Try Again
             </button>
             <button
               onClick={() => navigate("/products")}
-              className="rounded-lg border border-red-300 bg-white px-4 py-2 text-xs font-bold text-red-700 transition-colors hover:bg-red-100"
+              className="rounded-lg border border-red-300 bg-white px-4 py-2 text-xs font-bold text-red-700 transition-colors hover:bg-red-100 dark:bg-slate-900"
             >
               Back to Catalog
             </button>
@@ -172,7 +172,7 @@ export function ProductDetailPage() {
       {/* ─── Admin Edit Modal ───────────────────────────────── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900 border border-gray-250 dark:border-gray-800">
+          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-800">
@@ -203,7 +203,7 @@ export function ProductDetailPage() {
                   required
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
@@ -215,7 +215,7 @@ export function ProductDetailPage() {
                   required
                   value={formSlug}
                   onChange={(e) => setFormSlug(generateSlug(e.target.value))}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
@@ -229,7 +229,7 @@ export function ProductDetailPage() {
                     required
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
 
@@ -241,7 +241,7 @@ export function ProductDetailPage() {
                     required
                     value={formStock}
                     onChange={(e) => setFormStock(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
               </div>
@@ -252,7 +252,7 @@ export function ProductDetailPage() {
                 <select
                   value={formCategoryId}
                   onChange={(e) => setFormCategoryId(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 >
                   <option value="">No Category</option>
                   {categories.map((cat) => (
@@ -271,7 +271,7 @@ export function ProductDetailPage() {
                   value={formImageUrl}
                   onChange={(e) => setFormImageUrl(e.target.value)}
                   placeholder="https://images.unsplash.com/..."
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
@@ -282,7 +282,7 @@ export function ProductDetailPage() {
                   rows={3}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
@@ -301,11 +301,11 @@ export function ProductDetailPage() {
               </div>
 
               {/* Form Actions */}
-              <div className="flex justify-end gap-3 border-t border-gray-150 pt-4 dark:border-gray-800">
+              <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-gray-800">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-750 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
+                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>

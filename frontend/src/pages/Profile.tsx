@@ -1,4 +1,5 @@
 import { useState, useEffect, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/api/client";
 import type { User } from "@/types";
@@ -85,6 +86,30 @@ export function ProfilePage() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Addresses Link */}
+        <div className="mb-8">
+          <Link
+            to="/profile/addresses"
+            className="flex items-center justify-between rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm hover:border-primary-300 dark:hover:border-primary-700 transition-colors group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Manage Addresses</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">View and update your saved addresses</p>
+              </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-gray-400 group-hover:text-primary-500 transition-colors">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            </svg>
+          </Link>
         </div>
 
         {/* Edit form */}

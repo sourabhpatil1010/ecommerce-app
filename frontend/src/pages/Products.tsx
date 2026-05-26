@@ -308,7 +308,7 @@ export function ProductsPage() {
           {/* Reset Filters */}
           <button
             onClick={handleResetFilters}
-            className="w-full rounded-lg border border-gray-350 bg-white py-2.5 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
+            className="w-full rounded-lg border border-gray-300 bg-white py-2.5 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
           >
             Clear Filters
           </button>
@@ -384,7 +384,7 @@ export function ProductsPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
+                className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -399,7 +399,7 @@ export function ProductsPage() {
                   className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
                     page === p
                       ? "bg-primary-600 text-white"
-                      : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
+                      : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                   }`}
                 >
                   {p}
@@ -409,7 +409,7 @@ export function ProductsPage() {
               <button
                 onClick={() => setPage((p) => Math.min(pages, p + 1))}
                 disabled={page === pages}
-                className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
+                className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
               >
                 <span>Next</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
@@ -424,7 +424,7 @@ export function ProductsPage() {
       {/* ─── Admin Product Management Modal (Create/Edit Form) ── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900 border border-gray-250 dark:border-gray-800">
+          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-800">
@@ -463,7 +463,7 @@ export function ProductsPage() {
                     }
                   }}
                   placeholder="e.g. Mechanical Gaming Keyboard"
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
@@ -476,7 +476,7 @@ export function ProductsPage() {
                   value={formSlug}
                   onChange={(e) => setFormSlug(generateSlug(e.target.value))}
                   placeholder="e.g. mechanical-gaming-keyboard"
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
@@ -491,7 +491,7 @@ export function ProductsPage() {
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
                     placeholder="99.99"
-                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
 
@@ -504,7 +504,7 @@ export function ProductsPage() {
                     value={formStock}
                     onChange={(e) => setFormStock(e.target.value)}
                     placeholder="20"
-                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
               </div>
@@ -515,7 +515,7 @@ export function ProductsPage() {
                 <select
                   value={formCategoryId}
                   onChange={(e) => setFormCategoryId(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 >
                   <option value="">No Category</option>
                   {categories.map((cat) => (
@@ -534,7 +534,7 @@ export function ProductsPage() {
                   value={formImageUrl}
                   onChange={(e) => setFormImageUrl(e.target.value)}
                   placeholder="https://images.unsplash.com/..."
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
@@ -546,7 +546,7 @@ export function ProductsPage() {
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="Enter detailed description of the product..."
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-850 dark:text-white"
+                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
 
@@ -565,11 +565,11 @@ export function ProductsPage() {
               </div>
 
               {/* Form Actions */}
-              <div className="flex justify-end gap-3 border-t border-gray-150 pt-4 dark:border-gray-800">
+              <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-gray-800">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-750 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
+                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>

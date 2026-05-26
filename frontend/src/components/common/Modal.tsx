@@ -23,7 +23,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       {/* Content */}
-      <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+      <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-slate-900">
         {title && <h2 className="mb-4 text-lg font-semibold">{title}</h2>}
         {children}
       </div>

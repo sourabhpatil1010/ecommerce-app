@@ -44,7 +44,7 @@ export function CheckoutPaymentPage() {
   const [user, setUser] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay'>('stripe');
+  const [paymentMethod, setPaymentMethod] = useState<'stripe' | 'razorpay' | 'cod'>('stripe');
   
   // Payment intent state
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -125,9 +125,9 @@ export function CheckoutPaymentPage() {
           <span className="text-primary-600 dark:text-primary-400">2. Payment</span>
           <span>3. Confirmed</span>
         </div>
-        <div className="mt-2 flex h-2 gap-1 overflow-hidden rounded-full bg-gray-150 dark:bg-gray-800">
-          <div className="w-1/3 rounded-full bg-primary-650" />
-          <div className="w-1/3 rounded-full bg-primary-650 animate-pulse" />
+        <div className="mt-2 flex h-2 gap-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+          <div className="w-1/3 rounded-full bg-primary-600" />
+          <div className="w-1/3 rounded-full bg-primary-600 animate-pulse" />
           <div className="w-1/3 rounded-full bg-transparent" />
         </div>
       </div>
@@ -136,18 +136,18 @@ export function CheckoutPaymentPage() {
         {/* Main Payment Section */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-6">
           {/* Payment Method Tabs */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <button
               type="button"
               onClick={() => setPaymentMethod('stripe')}
               className={`flex flex-col items-start gap-2.5 rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
                 paymentMethod === 'stripe'
                   ? 'border-primary-600 bg-primary-50/20 dark:bg-primary-950/10'
-                  : 'border-gray-250 bg-white hover:border-gray-305 dark:border-gray-800 dark:bg-gray-900'
+                  : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900'
               }`}
             >
               <div className="flex w-full items-center justify-between">
-                <div className={`rounded-xl p-2 ${paymentMethod === 'stripe' ? 'bg-primary-100 text-primary-650 dark:bg-primary-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'}`}>
+                <div className={`rounded-xl p-2 ${paymentMethod === 'stripe' ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'}`}>
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                   </svg>
@@ -169,11 +169,11 @@ export function CheckoutPaymentPage() {
               className={`flex flex-col items-start gap-2.5 rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
                 paymentMethod === 'razorpay'
                   ? 'border-primary-600 bg-primary-50/20 dark:bg-primary-950/10'
-                  : 'border-gray-250 bg-white hover:border-gray-305 dark:border-gray-800 dark:bg-gray-900'
+                  : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900'
               }`}
             >
               <div className="flex w-full items-center justify-between">
-                <div className={`rounded-xl p-2 ${paymentMethod === 'razorpay' ? 'bg-primary-100 text-primary-650 dark:bg-primary-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'}`}>
+                <div className={`rounded-xl p-2 ${paymentMethod === 'razorpay' ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'}`}>
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
@@ -189,6 +189,31 @@ export function CheckoutPaymentPage() {
                 <p className="text-xxs text-gray-500 dark:text-gray-400 mt-0.5">Pay via GPay, PhonePe, UPI</p>
               </div>
             </button>
+
+            <button
+              type="button"
+              onClick={() => setPaymentMethod('cod')}
+              className={`flex flex-col items-start gap-2.5 rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
+                paymentMethod === 'cod'
+                  ? 'border-primary-600 bg-primary-50/20 dark:bg-primary-950/10'
+                  : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-800 dark:bg-gray-900'
+              }`}
+            >
+              <div className="flex w-full items-center justify-between">
+                <div className={`rounded-xl p-2 ${paymentMethod === 'cod' ? 'bg-primary-100 text-primary-600 dark:bg-primary-900/30' : 'bg-gray-100 text-gray-500 dark:bg-gray-800'}`}>
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex gap-1">
+                  <span className="text-[10px] font-bold text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded dark:bg-gray-800 dark:text-gray-500">CASH</span>
+                </div>
+              </div>
+              <div>
+                <span className="font-bold text-sm text-gray-900 dark:text-white">Cash on Delivery</span>
+                <p className="text-xxs text-gray-500 dark:text-gray-400 mt-0.5">Pay when you receive</p>
+              </div>
+            </button>
           </div>
 
           {paymentMethod === 'stripe' ? (
@@ -200,7 +225,7 @@ export function CheckoutPaymentPage() {
                   <RealStripeForm order={order} clientSecret={clientSecret} />
                 </Elements>
               ) : (
-                <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-250 dark:border-yellow-900/50 p-6 rounded-2xl">
+                <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900/50 p-6 rounded-2xl">
                   <h3 className="font-bold text-yellow-800 dark:text-yellow-400">Stripe Initialization Error</h3>
                   <p className="text-sm text-yellow-700 dark:text-yellow-500 mt-2">
                     Stripe failed to initialize. We are automatically switching you to Simulated Payment Mode.
@@ -214,8 +239,10 @@ export function CheckoutPaymentPage() {
                 </div>
               )
             )
-          ) : (
+          ) : paymentMethod === 'razorpay' ? (
             <RazorpayPaymentForm order={order} user={user} />
+          ) : (
+            <CodPaymentForm order={order} />
           )}
         </div>
 
@@ -233,7 +260,7 @@ export function CheckoutPaymentPage() {
             <div className="divide-y divide-gray-100 dark:divide-gray-800 max-h-[30vh] overflow-y-auto pr-1">
               {order.items.map((item) => (
                 <div key={item.id} className="flex gap-3 py-3 first:pt-0 last:pb-0">
-                  <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-150 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
+                  <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
                     <img
                       src={item.product?.image_url || "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80"}
                       alt={item.product?.name || "Product"}
@@ -244,7 +271,7 @@ export function CheckoutPaymentPage() {
                     <h4 className="text-xs font-semibold text-gray-900 dark:text-white truncate">
                       {item.product?.name}
                     </h4>
-                    <p className="text-xxs text-gray-500 mt-0.5">
+                    <p className="text-xxs text-gray-500 mt-0.5 dark:text-gray-400">
                       Qty: {item.quantity} · {formatCurrency(item.unit_price)}
                     </p>
                   </div>
@@ -260,13 +287,13 @@ export function CheckoutPaymentPage() {
               <span className="block font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-xxs mb-1">
                 Shipping Address
               </span>
-              <p className="text-gray-550 dark:text-gray-400 font-medium leading-relaxed">
+              <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
                 {order.shipping_address}
               </p>
             </div>
 
             {/* Pricing Total */}
-            <div className="border-t border-gray-150 dark:border-gray-800 pt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
+            <div className="border-t border-gray-100 dark:border-gray-800 pt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
               <span>Amount Due</span>
               <span>{formatCurrency(order.total_amount)}</span>
             </div>
@@ -353,7 +380,7 @@ function RealStripeForm({ order, clientSecret }: { order: Order; clientSecret: s
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Secure Stripe Checkout</h2>
-          <p className="text-xs text-gray-500">Your transaction is encrypted and secured via Stripe.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Your transaction is encrypted and secured via Stripe.</p>
         </div>
       </div>
 
@@ -373,7 +400,7 @@ function RealStripeForm({ order, clientSecret }: { order: Order; clientSecret: s
       <div className="space-y-4" style={{ display: isProcessing ? "none" : "block" }}>
         {/* Billing Name */}
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="cardName" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+          <label htmlFor="cardName" className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
             Cardholder Name
           </label>
           <input
@@ -389,7 +416,7 @@ function RealStripeForm({ order, clientSecret }: { order: Order; clientSecret: s
 
         {/* Stripe Elements Credit Card Input */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
             Credit Card Details
           </label>
           <div className="p-3.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg">
@@ -478,12 +505,12 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
   return (
     <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
       <div className="pb-4 border-b border-gray-100 dark:border-gray-800">
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-750 dark:bg-blue-950/30 dark:text-blue-400 mb-2">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400 mb-2">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-600 animate-pulse" />
           Mock Payment Mode
         </span>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Simulated Stripe Checkout</h2>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 mt-1 dark:text-gray-400">
           No valid Stripe Publishable Key found in environment. Simulated payment will execute a mock webhook sequence.
         </p>
       </div>
@@ -540,7 +567,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
         {/* Inputs */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
               Cardholder Name
             </label>
             <input
@@ -554,7 +581,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
           </div>
 
           <div className="flex flex-col gap-1.5 sm:col-span-2">
-            <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
               Card Number
             </label>
             <input
@@ -568,7 +595,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
               Expiration Date
             </label>
             <input
@@ -582,7 +609,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+            <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
               CVV
             </label>
             <input
@@ -608,7 +635,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
           <button
             type="button"
             onClick={() => handleSimulatePayment(false)}
-            className="flex items-center justify-center gap-2 rounded-xl bg-red-650 hover:bg-red-700 px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-red-200/50 hover:shadow-lg transition-all"
+            className="flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-red-200/50 hover:shadow-lg transition-all"
           >
             Simulate Failure Payment
           </button>
@@ -648,7 +675,6 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
   const [statusMessage, setStatusMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   
-  const conversionRate = 1.0;
   const amountInr = order.total_amount;
 
   // Helper to load Razorpay Checkout SDK script dynamically
@@ -777,7 +803,7 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
         </div>
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Razorpay Secure UPI</h2>
-          <p className="text-xs text-gray-500">Pay directly using GPay, PhonePe, Paytm, or Netbanking.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Pay directly using GPay, PhonePe, Paytm, or Netbanking.</p>
         </div>
       </div>
 
@@ -796,8 +822,8 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
 
       <div className="space-y-4" style={{ display: isProcessing ? "none" : "block" }}>
         {/* Currency Conversion Card */}
-        <div className="bg-gray-50 dark:bg-gray-950/40 rounded-xl p-4 border border-gray-150 dark:border-gray-800 space-y-2.5">
-          <div className="border-t border-gray-200 dark:border-gray-850 pt-2.5 flex justify-between text-base font-extrabold text-primary-600 dark:text-primary-400">
+        <div className="bg-gray-50 dark:bg-gray-950/40 rounded-xl p-4 border border-gray-100 dark:border-gray-800 space-y-2.5">
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-2.5 flex justify-between text-base font-extrabold text-primary-600 dark:text-primary-400">
             <span>Amount Due</span>
             <span>{formatCurrency(amountInr)}</span>
           </div>
@@ -805,7 +831,7 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
 
         {/* Branding banner */}
         <div className="border border-indigo-100 dark:border-indigo-950 bg-indigo-50/30 dark:bg-indigo-950/10 rounded-xl p-4 flex items-start gap-3">
-          <div className="text-indigo-650 pt-0.5">
+          <div className="text-indigo-600 pt-0.5">
             <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
@@ -827,4 +853,72 @@ function RazorpayPaymentForm({ order, user }: { order: Order; user: any | null }
   );
 }
 
+/** -------------------------------------------------------------
+ * 4. COD PAYMENT FORM
+ * ------------------------------------------------------------- */
+function CodPaymentForm({ order }: { order: Order }) {
+  const navigate = useNavigate();
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  const handleCodSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsProcessing(true);
+
+    try {
+      await paymentsApi.createCodPayment(order.id);
+      navigate(`/checkout/success?order_id=${order.id}`, { replace: true });
+    } catch (err: any) {
+      console.error(err);
+      setError(err.response?.data?.detail || "Could not process Cash on Delivery. Please try again.");
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleCodSubmit} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div className="flex items-center gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="h-10 w-10 bg-primary-50 dark:bg-primary-950/20 text-primary-600 dark:text-primary-400 rounded-xl flex items-center justify-center">
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Cash on Delivery</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Pay conveniently at your doorstep when your order arrives.</p>
+        </div>
+      </div>
+
+      {error && (
+        <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-sm text-red-700 dark:bg-red-950/20 dark:border-red-900/50 dark:text-red-400">
+          {error}
+        </div>
+      )}
+
+      <div className="bg-blue-50/50 dark:bg-blue-950/10 border border-blue-100 dark:border-blue-900/30 rounded-xl p-4 flex gap-3">
+        <svg className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p className="text-sm text-blue-800 dark:text-blue-300">
+          By choosing Cash on Delivery, you agree to pay the total amount of <span className="font-bold">{formatCurrency(order.total_amount)}</span> to the delivery agent. Please keep exact change ready for a smooth delivery experience.
+        </p>
+      </div>
+
+      <button
+        type="submit"
+        disabled={isProcessing}
+        className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary-600 hover:bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-primary-200/50 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+      >
+        {isProcessing ? (
+          <>
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            Confirming Order...
+          </>
+        ) : (
+          `Confirm COD Order (${formatCurrency(order.total_amount)})`
+        )}
+      </button>
+    </form>
+  );
+}

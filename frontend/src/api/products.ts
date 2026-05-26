@@ -2,7 +2,7 @@ import { apiClient } from "./client";
 
 /** GET /products */
 export const getProducts = (params?: Record<string, unknown>) =>
-  apiClient.get("/products", { params });
+  apiClient.get("/products/", { params });
 
 /** GET /products/:id */
 export const getProduct = (id: string) =>
@@ -10,7 +10,7 @@ export const getProduct = (id: string) =>
 
 /** POST /products */
 export const createProduct = (data: Record<string, unknown>) =>
-  apiClient.post("/products", data);
+  apiClient.post("/products/", data);
 
 /** PUT /products/:id */
 export const updateProduct = (id: string, data: Record<string, unknown>) =>

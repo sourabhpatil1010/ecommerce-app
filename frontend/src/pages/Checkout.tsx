@@ -1,22 +1,24 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth, useCart } from "@/hooks";
+import { useCart } from "@/hooks";
 import { createOrder } from "@/api/orders";
 import { formatCurrency } from "@/utils/currency";
+import { Address, AddressCreate } from "@/types/address";
+import { getAddresses, createAddress } from "@/api/addresses";
+import { AddressCard } from "@/components/address/AddressCard";
+import { AddressForm } from "@/components/address/AddressForm";
+import toast from "react-hot-toast";
 
 export function CheckoutPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { items, total, loading: cartLoading, fetchCart } = useCart();
 
-  // Form states
-  const [fullName, setFullName] = useState(user?.full_name || "");
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [country, setCountry] = useState("United States");
-  
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [loadingAddresses, setLoadingAddresses] = useState(true);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,12 +29,55 @@ export function CheckoutPage() {
 
   const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80";
 
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
+
+  const fetchAddresses = async () => {
+    try {
+      setLoadingAddresses(true);
+      const res = await getAddresses();
+      setAddresses(res.data);
+      if (res.data.length > 0) {
+        const defaultAddr = res.data.find((a: Address) => a.is_default) || res.data[0];
+        setSelectedAddress(defaultAddr);
+      } else {
+        setShowAddressForm(true);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load addresses.");
+    } finally {
+      setLoadingAddresses(false);
+    }
+  };
+
+  const handleAddNewAddress = async (data: AddressCreate) => {
+    setIsSubmittingForm(true);
+    try {
+      const res = await createAddress(data);
+      toast.success("Address added successfully");
+      await fetchAddresses();
+      setSelectedAddress(res.data);
+      setShowAddressForm(false);
+    } catch (err) {
+      toast.error("Failed to add address");
+    } finally {
+      setIsSubmittingForm(false);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!selectedAddress) {
+      setError("Please select a delivery address.");
+      return;
+    }
+    
     setError(null);
     setIsSubmitting(true);
 
-    const fullShippingAddress = `${fullName}, ${address}, ${city}, ${state} ${zipCode}, ${country}`;
+    const fullShippingAddress = `${selectedAddress.full_name}, ${selectedAddress.address_line}, ${selectedAddress.locality}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}, Phone: ${selectedAddress.phone}`;
 
     try {
       const res = await createOrder(fullShippingAddress);
@@ -113,116 +158,57 @@ export function CheckoutPage() {
       )}
 
       <div className="grid gap-8 lg:grid-cols-3 items-start">
-        {/* Shipping Form */}
+        {/* Shipping Form / Selection */}
         <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white pb-4 border-b border-gray-100 dark:border-gray-800">
-              Shipping Information
+              Delivery Address
             </h2>
 
-            <div className="grid gap-6 sm:grid-cols-2">
-              {/* Full Name */}
-              <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label htmlFor="fullName" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
-                  Full Name
-                </label>
-                <input
-                  id="fullName"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                  placeholder="Jane Doe"
-                  disabled={isSubmitting}
-                  className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50"
-                />
+            {loadingAddresses ? (
+              <div className="py-8 flex justify-center">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600"></div>
               </div>
+            ) : (
+              <div className="space-y-6">
+                {addresses.length > 0 && !showAddressForm && (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    {addresses.map((addr) => (
+                      <AddressCard
+                        key={addr.id}
+                        address={addr}
+                        selectable
+                        selected={selectedAddress?.id === addr.id}
+                        onSelect={setSelectedAddress}
+                      />
+                    ))}
+                  </div>
+                )}
 
-              {/* Address */}
-              <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label htmlFor="address" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
-                  Street Address
-                </label>
-                <input
-                  id="address"
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  required
-                  placeholder="123 Main St, Apt 4B"
-                  disabled={isSubmitting}
-                  className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50"
-                />
-              </div>
+                {addresses.length > 0 && !showAddressForm && (
+                  <button
+                    onClick={() => setShowAddressForm(true)}
+                    className="flex items-center gap-2 text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    Add a new address
+                  </button>
+                )}
 
-              {/* City */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="city" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
-                  City
-                </label>
-                <input
-                  id="city"
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  required
-                  placeholder="San Francisco"
-                  disabled={isSubmitting}
-                  className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50"
-                />
+                {showAddressForm && (
+                  <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-100 dark:border-gray-700">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Add New Address</h3>
+                    <AddressForm
+                      onSubmit={handleAddNewAddress}
+                      onCancel={() => setShowAddressForm(false)}
+                      isLoading={isSubmittingForm}
+                    />
+                  </div>
+                )}
               </div>
-
-              {/* State */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="state" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
-                  State / Province
-                </label>
-                <input
-                  id="state"
-                  type="text"
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  required
-                  placeholder="CA"
-                  disabled={isSubmitting}
-                  className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50"
-                />
-              </div>
-
-              {/* Zip Code */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="zipCode" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
-                  ZIP / Postal Code
-                </label>
-                <input
-                  id="zipCode"
-                  type="text"
-                  value={zipCode}
-                  onChange={(e) => setZipCode(e.target.value)}
-                  required
-                  placeholder="94107"
-                  disabled={isSubmitting}
-                  className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50"
-                />
-              </div>
-
-              {/* Country */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="country" className="text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
-                  Country
-                </label>
-                <input
-                  id="country"
-                  type="text"
-                  value={country}
-                  onChange={(e) => setCountry(e.target.value)}
-                  required
-                  placeholder="United States"
-                  disabled={isSubmitting}
-                  className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50"
-                />
-              </div>
-            </div>
+            )}
 
             <div className="pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
               <Link
@@ -247,8 +233,9 @@ export function CheckoutPage() {
               </Link>
 
               <button
-                type="submit"
-                disabled={isSubmitting || cartLoading}
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting || cartLoading || !selectedAddress || showAddressForm}
                 className="flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-primary-200/50 hover:bg-primary-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
               >
                 {isSubmitting ? (
@@ -257,11 +244,11 @@ export function CheckoutPage() {
                     Placing Order…
                   </>
                 ) : (
-                  "Place Order"
+                  "Deliver Here & Place Order"
                 )}
               </button>
             </div>
-          </form>
+          </div>
         </div>
 
         {/* Order Summary */}
@@ -275,7 +262,7 @@ export function CheckoutPage() {
             <div className="divide-y divide-gray-100 dark:divide-gray-800 max-h-[30vh] overflow-y-auto pr-1">
               {items.map((item) => (
                 <div key={item.id} className="flex gap-3 py-3 first:pt-0 last:pb-0">
-                  <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50">
+                  <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-slate-800">
                     <img
                       src={item.product?.image_url || placeholderImage}
                       alt={item.product?.name || "Product"}
@@ -286,7 +273,7 @@ export function CheckoutPage() {
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                       {item.product?.name}
                     </h3>
-                    <p className="text-xs text-gray-550 dark:text-gray-400 mt-0.5">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                       Qty: {item.quantity} · {formatCurrency(item.unit_price)}
                     </p>
                   </div>
@@ -318,7 +305,7 @@ export function CheckoutPage() {
                 <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(taxCost)}</span>
               </div>
 
-              <div className="border-t border-gray-150 dark:border-gray-800 pt-4 mt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
+              <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
                 <span>Total</span>
                 <span>{formatCurrency(orderTotal)}</span>
               </div>

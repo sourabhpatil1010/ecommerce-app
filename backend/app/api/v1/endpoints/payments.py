@@ -17,6 +17,8 @@ from app.schemas.payment import (
     RazorpayOrderResponse,
     RazorpayPaymentVerify,
     RazorpayPaymentFail,
+    CodOrderCreate,
+    CodOrderResponse,
 )
 from app.services.payment import PaymentService
 
@@ -156,5 +158,21 @@ async def razorpay_webhook(
     await service.handle_razorpay_webhook_event(payload, sig_header)
 
     return {"status": "ok"}
+
+
+@router.post(
+    "/cod/create-order",
+    response_model=CodOrderResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_cod_payment(
+    payload: CodOrderCreate,
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """Create a Cash on Delivery payment for the given order."""
+    service = PaymentService(db)
+    result = await service.create_cod_payment(payload.order_id, current_user.id)
+    return result
 
 
