@@ -24,6 +24,23 @@ class AdminUserCreate(UserCreate):
     department: Department | None = None
 
 
+class SuperAdminCreateAdmin(BaseSchema):
+    """Schema for super admin to create new admins (bypasses secret)."""
+
+    email: EmailStr
+    password: str = Field(..., min_length=8, description="Minimum 8 characters")
+    full_name: str | None = None
+    role: UserRole
+    department: Department | None = None
+
+
+class AdminUserUpdate(BaseSchema):
+    """Schema for updating an admin's role and department."""
+
+    role: UserRole | None = None
+    department: Department | None = None
+
+
 class UserUpdate(BaseSchema):
     """Schema for updating user profile."""
 

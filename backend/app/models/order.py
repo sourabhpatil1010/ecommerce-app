@@ -19,6 +19,7 @@ class OrderStatus(str, enum.Enum):
     DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"
     # New Phase 1 Statuses
+    PLACED = "PLACED"
     PENDING = "PENDING"
     CONFIRMED = "CONFIRMED"
     PACKED = "PACKED"

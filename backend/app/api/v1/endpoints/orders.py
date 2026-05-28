@@ -15,31 +15,9 @@ router = APIRouter()
 
 from datetime import datetime, timezone
 
-def calculate_order_status(created_at: datetime) -> str:
-    """Calculate the progressive status of an order based on elapsed time."""
-    now = datetime.now(timezone.utc)
-    if created_at.tzinfo is None:
-        created_at = created_at.replace(tzinfo=timezone.utc)
-        
-    elapsed = (now - created_at).total_seconds()
-    
-    if elapsed < 30:
-        return "ORDER_CONFIRMED"
-    elif elapsed < 60:
-        return "SHIPPED"
-    elif elapsed < 90:
-        return "OUT_FOR_DELIVERY"
-    else:
-        return "DELIVERED"
-
-
 def _enrich_order(order: Any, payment: Any = None) -> dict:
     """Convert an Order ORM object to a dict with payment_status attached."""
     computed_status = order.status
-
-    # Do NOT auto-progress cancelled orders
-    if computed_status in ["PAYMENT_SUCCESS", "ORDER_CONFIRMED"]:
-        computed_status = calculate_order_status(order.created_at)
 
     data = {
         "id": order.id,
@@ -101,7 +79,9 @@ async def list_all_orders(
     payment_repo = PaymentRepository(db)
     
     department = None
-    if not current_user.is_superuser and current_user.role != "SUPER_ADMIN":
+    role_val = getattr(current_user.role, "value", current_user.role) if hasattr(current_user, "role") else ""
+    role_str = str(role_val).strip().upper() if role_val else ""
+    if not current_user.is_superuser and role_str == "PRODUCT_ADMIN":
         department = current_user.department
 
     orders = await order_service.list_all_orders(skip=skip, limit=limit, department=department, statuses=statuses)

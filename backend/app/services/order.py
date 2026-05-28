@@ -116,11 +116,18 @@ class OrderService:
         # Validate transitions based on role
         if not user.is_superuser and role != UserRole.SUPER_ADMIN.value:
             if role == UserRole.PRODUCT_ADMIN.value:
-                if status not in ["CONFIRMED", "ORDER_CONFIRMED"]:
-                    raise ForbiddenException(detail="PRODUCT_ADMIN can only confirm orders")
+                if status not in ["CONFIRMED", "PACKED", "CANCELLED"]:
+                    raise ForbiddenException(detail="PRODUCT_ADMIN can only transition to CONFIRMED or PACKED")
+                # Department check: Order must contain at least one product from their department
+                has_department_product = any(
+                    item.product and item.product.category and item.product.category.department == user.department
+                    for item in order.items
+                )
+                if not has_department_product:
+                    raise ForbiddenException(detail="Cannot update an order that has no products from your department")
             elif role == UserRole.SHIPPING_ADMIN.value:
-                if status not in ["PACKED", "SHIPPED"]:
-                    raise ForbiddenException(detail="SHIPPING_ADMIN can only pack or ship orders")
+                if status not in ["SHIPPED"]:
+                    raise ForbiddenException(detail="SHIPPING_ADMIN can only transition to SHIPPED")
             elif role == UserRole.DELIVERY_ADMIN.value:
                 if status not in ["OUT_FOR_DELIVERY", "DELIVERED", "FAILED", "RETURNED"]:
                     raise ForbiddenException(detail="DELIVERY_ADMIN can only update delivery statuses")
@@ -155,7 +162,6 @@ class OrderService:
         """Cancel an order if it belongs to the user and is in a cancellable state."""
         from app.core.exceptions import ForbiddenException
         from app.models.order import OrderStatus
-        from app.api.v1.endpoints.orders import calculate_order_status
 
         order = await self.order_repo.get_order_with_items(order_id)
         if not order:
@@ -165,15 +171,10 @@ class OrderService:
         if order.user_id != user_id:
             raise ForbiddenException(detail="You do not have permission to cancel this order")
 
-        # Compute the effective status (respecting time-based auto-progression)
-        effective_status = order.status
-        if effective_status in [OrderStatus.PAYMENT_SUCCESS.value, OrderStatus.ORDER_CONFIRMED.value]:
-            effective_status = calculate_order_status(order.created_at)
-
-        # Only allow cancellation when effective status is ORDER_CONFIRMED
-        if effective_status != OrderStatus.ORDER_CONFIRMED.value:
+        # Only allow cancellation when status is PLACED or CONFIRMED
+        if order.status not in [OrderStatus.PLACED.value, OrderStatus.CONFIRMED.value, OrderStatus.CHECKOUT_CREATED.value, OrderStatus.PAYMENT_PENDING.value]:
             raise BadRequestException(
-                detail=f"Order cannot be cancelled. Current status: {effective_status.replace('_', ' ')}"
+                detail=f"Order cannot be cancelled. Current status: {order.status.replace('_', ' ')}"
             )
 
         order.status = OrderStatus.CANCELLED.value

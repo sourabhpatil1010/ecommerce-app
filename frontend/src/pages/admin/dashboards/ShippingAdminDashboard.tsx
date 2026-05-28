@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getAllOrders, updateOrderStatus } from "@/api/orders";
 import { Order } from "@/types/order";
 import { formatCurrency } from "@/utils/currency";
-import { Truck, PackageCheck, Send } from "lucide-react";
+import { Truck, Send } from "lucide-react";
 
 export function ShippingAdminDashboardPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -14,8 +14,8 @@ export function ShippingAdminDashboardPage() {
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
-      // Fetch confirmed and packed orders
-      const response = await getAllOrders({ statuses: ["ORDER_CONFIRMED", "CONFIRMED", "PACKED"] });
+      // Fetch packed orders
+      const response = await getAllOrders({ statuses: ["PACKED"] });
       setOrders(response.data);
     } catch (err: any) {
       setError(err.response?.data?.detail || "Failed to load orders.");
@@ -28,16 +28,6 @@ export function ShippingAdminDashboardPage() {
     fetchOrders();
   }, []);
 
-  const handlePack = async (orderId: string) => {
-    try {
-      await updateOrderStatus(orderId, { status: "PACKED" });
-      setOrders((prev) => 
-        prev.map((o) => (o.id === orderId ? { ...o, status: "PACKED" } : o))
-      );
-    } catch (err: any) {
-      alert(err.response?.data?.detail || "Failed to pack order");
-    }
-  };
 
   const handleShip = async (orderId: string) => {
     const data = shippingData[orderId];
@@ -46,7 +36,7 @@ export function ShippingAdminDashboardPage() {
       return;
     }
     try {
-      await updateOrderStatus(orderId, { 
+      await updateOrderStatus(orderId, {
         status: "SHIPPED",
         tracking_id: data.tracking_id,
         courier: data.courier
@@ -70,7 +60,7 @@ export function ShippingAdminDashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Shipping Admin Dashboard</h1>
       </div>
-      
+
       {error && (
         <div className="rounded-xl bg-red-50 dark:bg-red-900/20 p-6 text-center text-red-600 dark:text-red-400">
           <p>{error}</p>
@@ -104,16 +94,13 @@ export function ShippingAdminDashboardPage() {
                 </tr>
               ) : (
                 orders.map((order) => {
-                  const isPacked = order.status === "PACKED";
                   return (
                     <tr key={order.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                         {order.id.split("-")[0]}...
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          isPacked ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800'
-                        }`}>
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
                           {order.status}
                         </span>
                       </td>
@@ -121,51 +108,37 @@ export function ShippingAdminDashboardPage() {
                         {formatCurrency(order.total_amount)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {isPacked ? (
-                          <div className="flex flex-col space-y-2">
-                            <input 
-                              type="text" 
-                              placeholder="Tracking ID"
-                              className="text-xs border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600"
-                              value={shippingData[order.id]?.tracking_id || ""}
-                              onChange={(e) => setShippingData({
-                                ...shippingData, 
-                                [order.id]: { ...shippingData[order.id], tracking_id: e.target.value }
-                              })}
-                            />
-                            <input 
-                              type="text" 
-                              placeholder="Courier"
-                              className="text-xs border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600"
-                              value={shippingData[order.id]?.courier || ""}
-                              onChange={(e) => setShippingData({
-                                ...shippingData, 
-                                [order.id]: { ...shippingData[order.id], courier: e.target.value }
-                              })}
-                            />
-                          </div>
-                        ) : (
-                          <span className="text-xs text-gray-400">Needs Packing</span>
-                        )}
+                        <div className="flex flex-col space-y-2">
+                          <input
+                            type="text"
+                            placeholder="Tracking ID"
+                            className="text-xs border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600"
+                            value={shippingData[order.id]?.tracking_id || ""}
+                            onChange={(e) => setShippingData({
+                              ...shippingData,
+                              [order.id]: { ...shippingData[order.id], tracking_id: e.target.value }
+                            })}
+                          />
+                          <input
+                            type="text"
+                            placeholder="Courier"
+                            className="text-xs border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600"
+                            value={shippingData[order.id]?.courier || ""}
+                            onChange={(e) => setShippingData({
+                              ...shippingData,
+                              [order.id]: { ...shippingData[order.id], courier: e.target.value }
+                            })}
+                          />
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        {!isPacked ? (
-                          <button
-                            onClick={() => handlePack(order.id)}
-                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700"
-                          >
-                            <PackageCheck className="w-4 h-4 mr-1" />
-                            Pack
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleShip(order.id)}
-                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700"
-                          >
-                            <Send className="w-4 h-4 mr-1" />
-                            Ship
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleShip(order.id)}
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700"
+                        >
+                          <Send className="w-4 h-4 mr-1" />
+                          Ship
+                        </button>
                       </td>
                     </tr>
                   );

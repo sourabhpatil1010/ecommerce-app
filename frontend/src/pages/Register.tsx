@@ -1,9 +1,10 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { RegisterForm } from "@/components/auth";
 
 export function RegisterPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -14,7 +15,18 @@ export function RegisterPage() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
+    
+    if (user?.is_superuser && (!from || from === "/")) {
+      const role = user.role;
+      if (role === "PRODUCT_ADMIN") return <Navigate to="/admin/product/dashboard" replace />;
+      if (role === "SHIPPING_ADMIN") return <Navigate to="/admin/shipping/dashboard" replace />;
+      if (role === "DELIVERY_ADMIN") return <Navigate to="/admin/delivery/dashboard" replace />;
+      if (role === "SUPER_ADMIN") return <Navigate to="/admin/super/dashboard" replace />;
+      return <Navigate to="/admin" replace />;
+    }
+    
+    return <Navigate to={from || "/"} replace />;
   }
 
   return (

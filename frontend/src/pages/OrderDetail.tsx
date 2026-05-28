@@ -24,7 +24,15 @@ interface Order {
   status: string;
   total_amount: number;
   shipping_address: string;
+  tracking_id: string | null;
+  courier: string | null;
   items: OrderItem[];
+  status_history: {
+    id: string;
+    new_status: string;
+    created_at: string;
+    notes: string | null;
+  }[];
   created_at: string;
   updated_at: string;
 }
@@ -203,36 +211,8 @@ export function OrderDetailPage() {
     }
   };
 
-  const getStatusStepClass = (step: string, currentStatus: string) => {
-    const statuses = ["ORDER_CONFIRMED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"];
-    const stepIdx = statuses.indexOf(step);
-    const normalized = normalizeStatus(currentStatus);
-    const currentIdx = statuses.indexOf(normalized);
-
-    if (normalized === "CANCELLED") {
-      return "text-red-500 border-red-500 bg-red-50 dark:bg-red-950/20";
-    }
-
-    if (stepIdx <= currentIdx) {
-      return "text-primary-600 border-primary-600 bg-primary-50 dark:bg-primary-950/20 dark:text-primary-400 dark:border-primary-400";
-    }
-    return "text-gray-400 border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-700";
-  };
-
-  const getStatusLineClass = (step: string, currentStatus: string) => {
-    const statuses = ["ORDER_CONFIRMED", "SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"];
-    const stepIdx = statuses.indexOf(step);
-    const normalized = normalizeStatus(currentStatus);
-    const currentIdx = statuses.indexOf(normalized);
-
-    if (normalized === "CANCELLED") {
-      return "bg-red-200 dark:bg-red-900";
-    }
-
-    if (stepIdx < currentIdx) {
-      return "bg-primary-600 dark:bg-primary-500";
-    }
-    return "bg-gray-200 dark:bg-gray-700";
+  const formatStatus = (status: string) => {
+    return status ? status.replace(/_/g, " ") : "UNKNOWN";
   };
 
   const isCancellable = order ? normalizeStatus(order.status) === "ORDER_CONFIRMED" : false;
@@ -287,9 +267,7 @@ export function OrderDetailPage() {
   const taxCost = subtotal * 0.08;
   const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80";
 
-  const formatStatus = (status: string) => {
-    return normalizeStatus(status).replace(/_/g, " ");
-  };
+
 
   let estimatedDeliveryDate = "Invalid Date";
   try {
@@ -402,66 +380,59 @@ export function OrderDetailPage() {
 
       {/* Visual Status Progress Tracker */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6">
-          Order Status Tracking
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-800 pb-4">
+          Order Updates
         </h2>
-        {normalizeStatus(order.status) === "CANCELLED" ? (
+        
+        {isCancelled && (!order.status_history || order.status_history.length === 0) ? (
           <div className="flex items-center gap-3 text-red-600 font-bold bg-red-50 dark:bg-red-950/20 p-4 rounded-xl border border-red-200/50">
-            <svg
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                clipRule="evenodd"
-              />
+            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
             </svg>
             <span>This order has been cancelled.</span>
           </div>
         ) : (
-          <div className="relative flex flex-col sm:flex-row justify-between items-center gap-6 sm:gap-2">
-            {/* Step: Order Confirmed */}
-            <div className="flex flex-col items-center text-center z-10 w-full sm:w-auto">
-              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("ORDER_CONFIRMED", order.status)}`}>
-                1
+          <div className="relative border-l-2 border-gray-200 dark:border-gray-700 ml-4 md:ml-6 mt-4 pb-4">
+            {(!order.status_history || order.status_history.length === 0) && (
+              <div className="relative pl-6 md:pl-8 mb-8">
+                <span className="absolute -left-[9px] top-1 h-4 w-4 rounded-full bg-primary-600 ring-4 ring-white dark:ring-gray-900" />
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1">
+                  <div>
+                    <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">
+                      {formatStatus(order.status)}
+                    </h3>
+                  </div>
+                  <time className="text-xs font-medium text-gray-400 dark:text-gray-500">
+                    {formatDate(order.created_at)}
+                  </time>
+                </div>
               </div>
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Confirmed</span>
-            </div>
-
-            {/* Line: Confirmed -> Shipped */}
-            <div className={`hidden sm:block h-0.5 flex-grow ${getStatusLineClass("ORDER_CONFIRMED", order.status)}`} />
-
-            {/* Step: Shipped */}
-            <div className="flex flex-col items-center text-center z-10 w-full sm:w-auto">
-              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("SHIPPED", order.status)}`}>
-                2
-              </div>
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Shipped</span>
-            </div>
-
-            {/* Line: Shipped -> Out For Delivery */}
-            <div className={`hidden sm:block h-0.5 flex-grow ${getStatusLineClass("SHIPPED", order.status)}`} />
-
-            {/* Step: Out For Delivery */}
-            <div className="flex flex-col items-center text-center z-10 w-full sm:w-auto">
-              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("OUT_FOR_DELIVERY", order.status)}`}>
-                3
-              </div>
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Out for Delivery</span>
-            </div>
-
-            {/* Line: Out For Delivery -> Delivered */}
-            <div className={`hidden sm:block h-0.5 flex-grow ${getStatusLineClass("OUT_FOR_DELIVERY", order.status)}`} />
-
-            {/* Step: Delivered */}
-            <div className="flex flex-col items-center text-center z-10 w-full sm:w-auto">
-              <div className={`h-10 w-10 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all ${getStatusStepClass("DELIVERED", order.status)}`}>
-                4
-              </div>
-              <span className="text-xs font-semibold text-gray-700 dark:text-gray-300 mt-2">Delivered</span>
-            </div>
+            )}
+            {order.status_history?.map((history, idx) => {
+              const isLast = idx === order.status_history.length - 1;
+              const isCancelledNode = history.new_status.includes("CANCELLED") || history.new_status.includes("FAILED");
+              const dotColor = isCancelledNode ? "bg-red-500" : (isLast ? "bg-primary-600" : "bg-gray-400 dark:bg-gray-500");
+              const ringColor = isCancelledNode ? "ring-red-100 dark:ring-red-900/30" : "ring-white dark:ring-gray-900";
+              
+              return (
+                <div key={history.id} className="relative pl-6 md:pl-8 mb-8 last:mb-0">
+                  <span className={`absolute -left-[9px] top-1 h-4 w-4 rounded-full ${dotColor} ring-4 ${ringColor}`} />
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700/50">
+                    <div>
+                      <h3 className={`text-sm font-bold uppercase tracking-wide ${isCancelledNode ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
+                        {formatStatus(history.new_status)}
+                      </h3>
+                      {history.notes && (
+                        <p className="text-sm text-gray-600 mt-2 dark:text-gray-400">{history.notes}</p>
+                      )}
+                    </div>
+                    <time className="text-xs font-medium text-gray-500 dark:text-gray-400 whitespace-nowrap mt-1 sm:mt-0">
+                      {formatDate(history.created_at)}
+                    </time>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -509,6 +480,29 @@ export function OrderDetailPage() {
 
         {/* Info summaries */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Shipment Details Card */}
+          {(order.tracking_id || order.courier) && (
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+              <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-50 dark:border-gray-800">
+                Shipment Details
+              </h3>
+              <div className="space-y-3">
+                {order.courier && (
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Courier Partner</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">{order.courier}</p>
+                  </div>
+                )}
+                {order.tracking_id && (
+                  <div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Tracking ID</p>
+                    <p className="text-sm font-semibold text-primary-600 dark:text-primary-400 mt-0.5 font-mono">{order.tracking_id}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Shipping Info Card */}
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
             <h3 className="text-base font-bold text-gray-900 dark:text-white mb-4 pb-2 border-b border-gray-50 dark:border-gray-800">

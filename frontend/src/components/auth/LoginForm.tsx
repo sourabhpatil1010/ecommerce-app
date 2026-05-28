@@ -30,7 +30,19 @@ export function LoginForm() {
 
       authLogin(access_token, userRes.data);
       if (userRes.data.is_superuser) {
-        navigate("/admin/dashboard", { replace: true });
+        const role = userRes.data.role;
+        if (role === "PRODUCT_ADMIN") {
+          navigate("/admin/product", { replace: true });
+        } else if (role === "SHIPPING_ADMIN") {
+          navigate("/admin/shipping", { replace: true });
+        } else if (role === "DELIVERY_ADMIN") {
+          navigate("/admin/delivery", { replace: true });
+        } else if (role === "SUPER_ADMIN") {
+          navigate("/admin/super", { replace: true });
+        } else {
+          // Fallback safe redirect for unknown admin roles
+          navigate("/admin", { replace: true });
+        }
       } else {
         navigate(from, { replace: true });
       }

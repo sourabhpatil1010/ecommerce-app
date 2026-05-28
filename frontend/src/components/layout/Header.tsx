@@ -137,9 +137,14 @@ export function Header() {
                     >
                       My Orders
                     </Link>
-                    {user?.is_superuser && (
+                    {(user?.is_superuser || user?.role !== "CUSTOMER") && (
                       <Link
-                        to="/admin/dashboard"
+                        to={
+                          user?.role === "PRODUCT_ADMIN" ? "/admin/product/dashboard" :
+                          user?.role === "SHIPPING_ADMIN" ? "/admin/shipping/dashboard" :
+                          user?.role === "DELIVERY_ADMIN" ? "/admin/delivery/dashboard" :
+                          user?.role === "SUPER_ADMIN" ? "/admin/super/dashboard" : "/admin"
+                        }
                         onClick={() => setIsUserDropdownOpen(false)}
                         className="block px-4 py-2 text-sm text-primary-600 dark:text-primary-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-primary-700 dark:hover:text-primary-300 rounded-md transition-colors font-medium border-t border-gray-50 dark:border-gray-800 mt-1 pt-2"
                       >
@@ -294,9 +299,14 @@ export function Header() {
                 >
                   My Orders
                 </Link>
-                {user?.is_superuser && (
+                {(user?.is_superuser || user?.role !== "CUSTOMER") && (
                   <Link
-                    to="/admin/dashboard"
+                    to={
+                      user?.role === "PRODUCT_ADMIN" ? "/admin/product/dashboard" :
+                      user?.role === "SHIPPING_ADMIN" ? "/admin/shipping/dashboard" :
+                      user?.role === "DELIVERY_ADMIN" ? "/admin/delivery/dashboard" :
+                      user?.role === "SUPER_ADMIN" ? "/admin/super/dashboard" : "/admin"
+                    }
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="block text-base font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 py-2 transition-colors border-t border-gray-50 dark:border-gray-800 mt-1 pt-2"
                   >

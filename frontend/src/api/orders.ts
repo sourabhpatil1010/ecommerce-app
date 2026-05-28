@@ -11,8 +11,12 @@ export const getOrders = () => apiClient.get("/orders/");
 export const getOrder = (id: string) => apiClient.get(`/orders/${id}`);
 
 /** GET /orders/all (Admin) */
-export const getAllOrders = (params?: Record<string, unknown>) =>
-  apiClient.get("/orders/all", { params });
+export const getAllOrders = (params?: Record<string, unknown>) => {
+  return apiClient.get("/orders/all", { 
+    params,
+    paramsSerializer: { indexes: null }
+  });
+};
 
 /** PATCH /orders/:id/status (Admin) */
 export const updateOrderStatus = (

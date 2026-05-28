@@ -51,18 +51,36 @@ async def get_current_superuser(
     current_user: User = Depends(get_current_user)
 ) -> User:
     """Dependency: ensure the current user is a superuser."""
-    if not current_user.is_superuser:
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    role_val = getattr(current_user.role, "value", current_user.role) if hasattr(current_user, "role") else ""
+    role_str = str(role_val).strip().upper() if role_val else ""
+    
+    is_super = current_user.is_superuser or (role_str == "SUPER_ADMIN") or (role_str == "ADMIN")
+    
+    logger.warning(f"Superuser check -> Email: {current_user.email}, is_superuser: {current_user.is_superuser}, role: '{role_str}', result: {is_super}")
+    
+    if not is_super:
         raise ForbiddenException(detail="The user does not have enough privileges")
     return current_user
 
 
 def require_roles(roles: list[str]):
     """Dependency generator: check if the current user has any of the required roles."""
+    # Ensure all required roles are uppercase for robust comparison
+    allowed_roles = [r.upper() for r in roles]
+    
     def role_checker(current_user: User = Depends(get_current_active_user)) -> User:
+        role_val = getattr(current_user.role, "value", current_user.role) if hasattr(current_user, "role") else ""
+        current_role_upper = str(role_val).strip().upper() if role_val else ""
+        
         # Superuser always has access
-        if current_user.is_superuser:
+        is_super = current_user.is_superuser or (current_role_upper == "SUPER_ADMIN") or (current_role_upper == "ADMIN")
+        if is_super:
             return current_user
-        if current_user.role not in roles:
+            
+        if current_role_upper not in allowed_roles:
             raise ForbiddenException(detail="The user does not have enough privileges")
         return current_user
     return role_checker

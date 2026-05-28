@@ -22,6 +22,7 @@ import {
   AdminCategoriesPage,
   AdminCategoryFormPage,
   AdminUsersPage,
+  AdminManagementPage,
 } from "@/pages";
 import {
   ProductAdminDashboardPage,
@@ -34,10 +35,24 @@ import { AdminLayout } from "@/components/layout/AdminLayout";
 
 function AdminIndexRedirect() {
   const { user } = useAuth();
-  if (user?.role === "PRODUCT_ADMIN") return <Navigate to="/admin/product" replace />;
-  if (user?.role === "SHIPPING_ADMIN") return <Navigate to="/admin/shipping" replace />;
-  if (user?.role === "DELIVERY_ADMIN") return <Navigate to="/admin/delivery" replace />;
-  return <Navigate to="/admin/super" replace />;
+  if (user?.role === "PRODUCT_ADMIN") return <Navigate to="/admin/product/dashboard" replace />;
+  if (user?.role === "SHIPPING_ADMIN") return <Navigate to="/admin/shipping/dashboard" replace />;
+  if (user?.role === "DELIVERY_ADMIN") return <Navigate to="/admin/delivery/dashboard" replace />;
+  if (user?.role === "SUPER_ADMIN" || (user?.is_superuser && user?.role === "CUSTOMER")) return <Navigate to="/admin/super/dashboard" replace />;
+  return <Navigate to="/" replace />;
+}
+
+function RoleGuard({ allowedRoles, children }: { allowedRoles: string[], children: React.ReactNode }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  
+  // Super Admin bypasses all checks
+  if (user.role === "SUPER_ADMIN" || (user.is_superuser && user.role === "CUSTOMER")) {
+    return <>{children}</>;
+  }
+  
+  if (!allowedRoles.includes(user.role)) return <Navigate to="/admin" replace />;
+  return <>{children}</>;
 }
 
 export function AppRouter() {
@@ -124,17 +139,33 @@ export function AppRouter() {
         }
       >
         <Route index element={<AdminIndexRedirect />} />
-        <Route path="super" element={<AdminDashboardPage />} />
-        <Route path="product" element={<ProductAdminDashboardPage />} />
-        <Route path="shipping" element={<ShippingAdminDashboardPage />} />
-        <Route path="delivery" element={<DeliveryAdminDashboardPage />} />
-        <Route path="products" element={<AdminProductsPage />} />
-        <Route path="products/new" element={<AdminProductFormPage />} />
-        <Route path="products/edit/:id" element={<AdminProductFormPage />} />
-        <Route path="categories" element={<AdminCategoriesPage />} />
-        <Route path="categories/new" element={<AdminCategoryFormPage />} />
-        <Route path="categories/edit/:id" element={<AdminCategoryFormPage />} />
-        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="dashboard" element={<Navigate to="/admin" replace />} />
+        
+        {/* Dashboards */}
+        <Route path="super/dashboard" element={<RoleGuard allowedRoles={["SUPER_ADMIN"]}><AdminDashboardPage /></RoleGuard>} />
+        <Route path="product/dashboard" element={<RoleGuard allowedRoles={["PRODUCT_ADMIN"]}><ProductAdminDashboardPage /></RoleGuard>} />
+        <Route path="shipping/dashboard" element={<RoleGuard allowedRoles={["SHIPPING_ADMIN"]}><ShippingAdminDashboardPage /></RoleGuard>} />
+        <Route path="delivery/dashboard" element={<RoleGuard allowedRoles={["DELIVERY_ADMIN"]}><DeliveryAdminDashboardPage /></RoleGuard>} />
+
+        {/* Fallbacks for old exact paths */}
+        <Route path="super" element={<Navigate to="/admin/super/dashboard" replace />} />
+        <Route path="product" element={<Navigate to="/admin/product/dashboard" replace />} />
+        <Route path="shipping" element={<Navigate to="/admin/shipping/dashboard" replace />} />
+        <Route path="delivery" element={<Navigate to="/admin/delivery/dashboard" replace />} />
+        
+        {/* Product Management */}
+        <Route path="products" element={<RoleGuard allowedRoles={["PRODUCT_ADMIN", "SUPER_ADMIN"]}><AdminProductsPage /></RoleGuard>} />
+        <Route path="products/new" element={<RoleGuard allowedRoles={["PRODUCT_ADMIN", "SUPER_ADMIN"]}><AdminProductFormPage /></RoleGuard>} />
+        <Route path="products/edit/:id" element={<RoleGuard allowedRoles={["PRODUCT_ADMIN", "SUPER_ADMIN"]}><AdminProductFormPage /></RoleGuard>} />
+        
+        {/* Categories */}
+        <Route path="categories" element={<RoleGuard allowedRoles={["SUPER_ADMIN", "PRODUCT_ADMIN"]}><AdminCategoriesPage /></RoleGuard>} />
+        <Route path="categories/new" element={<RoleGuard allowedRoles={["SUPER_ADMIN", "PRODUCT_ADMIN"]}><AdminCategoryFormPage /></RoleGuard>} />
+        <Route path="categories/edit/:id" element={<RoleGuard allowedRoles={["SUPER_ADMIN", "PRODUCT_ADMIN"]}><AdminCategoryFormPage /></RoleGuard>} />
+        
+        {/* Users & Admins */}
+        <Route path="users" element={<RoleGuard allowedRoles={["SUPER_ADMIN"]}><AdminUsersPage /></RoleGuard>} />
+        <Route path="super/admins" element={<RoleGuard allowedRoles={["SUPER_ADMIN"]}><AdminManagementPage /></RoleGuard>} />
       </Route>
     </Routes>
   );

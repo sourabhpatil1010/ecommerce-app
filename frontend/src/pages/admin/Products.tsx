@@ -5,8 +5,11 @@ import { Product } from "@/types";
 import { formatCurrency } from "@/utils/currency";
 import { AlertCircle, Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 export function AdminProductsPage() {
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === "SUPER_ADMIN" || user?.is_superuser;
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,12 +56,14 @@ export function AdminProductsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Product Management</h1>
-        <Link 
-          to="/admin/products/new"
-          className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-        >
-          <Plus className="h-5 w-5 mr-2" /> Add Product
-        </Link>
+        {isSuperAdmin && (
+          <Link 
+            to="/admin/products/new"
+            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <Plus className="h-5 w-5 mr-2" /> Add Product
+          </Link>
+        )}
       </div>
 
       {error && (
@@ -112,12 +117,16 @@ export function AdminProductsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link to={`/admin/products/edit/${product.id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4 inline-block">
-                      <Edit className="h-5 w-5 inline" />
-                    </Link>
-                    <button onClick={() => handleDelete(product.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                      <Trash2 className="h-5 w-5 inline" />
-                    </button>
+                    {isSuperAdmin && (
+                      <>
+                        <Link to={`/admin/products/edit/${product.id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4 inline-block">
+                          <Edit className="h-5 w-5 inline" />
+                        </Link>
+                        <button onClick={() => handleDelete(product.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                          <Trash2 className="h-5 w-5 inline" />
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}

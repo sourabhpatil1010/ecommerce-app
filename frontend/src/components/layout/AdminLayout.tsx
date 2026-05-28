@@ -6,32 +6,39 @@ import {
   Tags, 
   Users,
   LogOut,
-  Home
+  Home,
+  ShieldCheck,
+  Truck,
+  Inbox
 } from "lucide-react";
 
 const getNavItems = (role: string | undefined, isSuperuser: boolean) => {
-  if (isSuperuser || role === "SUPER_ADMIN") {
+  if (role === "SUPER_ADMIN" || (isSuperuser && role === "CUSTOMER")) {
     return [
-      { name: "Dashboard", href: "/admin/super", icon: LayoutDashboard },
+      { name: "Dashboard", href: "/admin/super/dashboard", icon: LayoutDashboard },
       { name: "Products", href: "/admin/products", icon: Package },
       { name: "Categories", href: "/admin/categories", icon: Tags },
       { name: "Users", href: "/admin/users", icon: Users },
+      { name: "Admins", href: "/admin/super/admins", icon: ShieldCheck },
     ];
   }
   if (role === "PRODUCT_ADMIN") {
     return [
-      { name: "Dashboard", href: "/admin/product", icon: LayoutDashboard },
+      { name: "Dashboard", href: "/admin/product/dashboard", icon: LayoutDashboard },
       { name: "Products", href: "/admin/products", icon: Package },
+      { name: "Categories", href: "/admin/categories", icon: Tags },
     ];
   }
   if (role === "SHIPPING_ADMIN") {
     return [
-      { name: "Dashboard", href: "/admin/shipping", icon: LayoutDashboard },
+      { name: "Dashboard", href: "/admin/shipping/dashboard", icon: LayoutDashboard },
+      { name: "Shipping Queue", href: "/admin/shipping/dashboard#queue", icon: Inbox },
     ];
   }
   if (role === "DELIVERY_ADMIN") {
     return [
-      { name: "Dashboard", href: "/admin/delivery", icon: LayoutDashboard },
+      { name: "Dashboard", href: "/admin/delivery/dashboard", icon: LayoutDashboard },
+      { name: "Delivery Queue", href: "/admin/delivery/dashboard#queue", icon: Truck },
     ];
   }
   return [];

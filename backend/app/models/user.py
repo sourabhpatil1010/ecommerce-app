@@ -20,6 +20,8 @@ class Department(str, enum.Enum):
     FASHION = "FASHION"
     GROCERY = "GROCERY"
     FURNITURE = "FURNITURE"
+    BEAUTY = "BEAUTY"
+    HOME_KITCHEN = "HOME_KITCHEN"
 
 
 class User(Base, UUIDMixin, TimestampMixin):

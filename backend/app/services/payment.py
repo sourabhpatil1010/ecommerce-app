@@ -172,7 +172,7 @@ class PaymentService:
         logger.info("Processing successful payment for order %s", payment.order_id)
         order = await self.order_repo.get_by_id(payment.order_id)
         if order:
-            order.status = "PAYMENT_SUCCESS"
+            order.status = "PLACED"
         await self.payment_repo.session.flush()
 
         logger.info(
@@ -225,7 +225,7 @@ class PaymentService:
             payment.status = "succeeded"
             order = await self.order_repo.get_by_id(order_id)
             if order:
-                order.status = "PAYMENT_SUCCESS"
+                order.status = "PLACED"
         else:
             logger.info("Simulating payment failure for order %s", order_id)
             payment.status = "failed"
@@ -341,7 +341,7 @@ class PaymentService:
 
         payment.status = "succeeded"
         logger.info("Processing successful Razorpay payment for order %s", order.id)
-        order.status = "PAYMENT_SUCCESS"
+        order.status = "PLACED"
         await self.payment_repo.session.flush()
         
         logger.info("Razorpay payment verified successfully for order %s", order.id)
@@ -401,7 +401,7 @@ class PaymentService:
             logger.info("Razorpay webhook success for order %s", razorpay_order_id)
             payment.status = "succeeded"
             if order:
-                order.status = "PAYMENT_SUCCESS"
+                order.status = "PLACED"
         elif event == "payment.failed":
             logger.info("Razorpay webhook failure for order %s", razorpay_order_id)
             payment.status = "failed"
@@ -448,7 +448,7 @@ class PaymentService:
 
         # 5. Log COD payment and trigger progression
         logger.info("Created COD payment %s for order %s", payment.id, order_id)
-        order.status = "ORDER_CONFIRMED"
+        order.status = "PLACED"
         await self.order_repo.session.flush()
 
         return {

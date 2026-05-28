@@ -34,6 +34,8 @@ async def list_products(
     """List products with optional filters and pagination."""
     product_service = ProductService(db)
     
+    # Department scoping ONLY applies to PRODUCT_ADMIN.
+    # SHIPPING_ADMIN and DELIVERY_ADMIN see all orders — they are NOT department scoped.
     department = None
     if current_user and current_user.role == "PRODUCT_ADMIN":
         department = current_user.department
@@ -63,32 +65,32 @@ async def get_product(
 @router.post("/", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
 async def create_product(
     product_in: ProductCreate,
-    _: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN"])),
+    current_user: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN"])),
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """Create a new product (admin only)."""
     product_service = ProductService(db)
-    return await product_service.create_product(product_in)
+    return await product_service.create_product(product_in, current_user)
 
 
 @router.put("/{product_id}", response_model=ProductRead)
 async def update_product(
     product_id: uuid.UUID,
     product_in: ProductUpdate,
-    _: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN"])),
+    current_user: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN"])),
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """Update a product (admin only)."""
     product_service = ProductService(db)
-    return await product_service.update_product(product_id, product_in)
+    return await product_service.update_product(product_id, product_in, current_user)
 
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(
     product_id: uuid.UUID,
-    _: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN"])),
+    current_user: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN"])),
     db: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete a product (admin only)."""
     product_service = ProductService(db)
-    await product_service.delete_product(product_id)
+    await product_service.delete_product(product_id, current_user)

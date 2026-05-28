@@ -5,12 +5,14 @@ import { getCategories } from "@/api/categories";
 import { Category } from "@/types";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, Save } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function AdminProductFormPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isEditMode = Boolean(id);
 
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(isEditMode);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -29,8 +31,22 @@ export function AdminProductFormPage() {
     const fetchInitialData = async () => {
       try {
         const catRes = await getCategories();
-        // Assuming API returns array in catRes.data
-        setCategories(catRes.data || []);
+        let fetchedCategories = catRes.data || [];
+        
+        // Lock category dropdown to the admin's assigned department
+        if (user?.role === "PRODUCT_ADMIN" && user?.department) {
+          const adminDept = user.department.trim().toUpperCase();
+          fetchedCategories = fetchedCategories.filter(
+            (c: Category) => (c.department || "").trim().toUpperCase() === adminDept
+          );
+        }
+        
+        setCategories(fetchedCategories);
+
+        // Auto-select the first available category if not in edit mode
+        if (!isEditMode && fetchedCategories.length > 0) {
+          setFormData(prev => ({ ...prev, category_id: fetchedCategories[0].id }));
+        }
 
         if (isEditMode && id) {
           const productRes = await productsApi.getProduct(id);

@@ -14,7 +14,7 @@ class ProductService:
     def __init__(self, session: AsyncSession):
         self.product_repo = ProductRepository(session)
 
-    async def create_product(self, product_in: ProductCreate) -> Product:
+    async def create_product(self, product_in: ProductCreate, current_user=None) -> Product:
         """Create a new product with uniqueness and category checks."""
         import uuid
         from app.models.product import Product
@@ -26,12 +26,22 @@ class ProductService:
         if existing_slug:
             raise ConflictException(detail="Product slug already exists")
 
-        # Validate category exists if provided
+        # Validate category exists if provided (or required for PRODUCT_ADMIN)
+        if not product_in.category_id and current_user and current_user.role == "PRODUCT_ADMIN":
+            from app.core.exceptions import ForbiddenException
+            raise ForbiddenException(detail="PRODUCT_ADMIN must assign a category to the product")
+            
         if product_in.category_id:
             category_repo = CategoryRepository(self.product_repo.session)
             category = await category_repo.get_by_id(product_in.category_id)
             if not category:
                 raise NotFoundException(detail="Category not found")
+                
+            # Department validation for PRODUCT_ADMIN
+            if current_user and current_user.role == "PRODUCT_ADMIN":
+                if category.department and current_user.department and category.department != current_user.department:
+                    from app.core.exceptions import ForbiddenException
+                    raise ForbiddenException(detail="Cannot assign product to a category outside your department")
 
         # Create product
         product = Product(
@@ -71,6 +81,7 @@ class ProductService:
         max_price: float | None = None,
         search: str | None = None,
         is_active: bool | None = None,
+        department: str | None = None,
     ) -> dict:
         """Fetch a paginated response of products with sorting and filters."""
         import math
@@ -91,6 +102,7 @@ class ProductService:
             max_price=max_price,
             search=search,
             is_active=is_active,
+            department=department,
         )
 
         pages = math.ceil(total / per_page) if total > 0 else 0
@@ -104,7 +116,7 @@ class ProductService:
         }
 
     async def update_product(
-        self, product_id: uuid.UUID, product_in: ProductUpdate
+        self, product_id: uuid.UUID, product_in: ProductUpdate, current_user=None
     ) -> Product:
         """Update an existing product checking conflicts and categories."""
         from app.core.exceptions import NotFoundException, ConflictException
@@ -127,6 +139,13 @@ class ProductService:
             category = await category_repo.get_by_id(product_in.category_id)
             if not category:
                 raise NotFoundException(detail="Category not found")
+                
+            # Department validation for PRODUCT_ADMIN
+            if current_user and current_user.role == "PRODUCT_ADMIN":
+                if category.department and current_user.department and category.department != current_user.department:
+                    from app.core.exceptions import ForbiddenException
+                    raise ForbiddenException(detail="Cannot assign product to a category outside your department")
+                    
             product.category_id = product_in.category_id
 
         # Update remaining fields if provided
@@ -145,11 +164,17 @@ class ProductService:
 
         return await self.product_repo.update(product)
 
-    async def delete_product(self, product_id: uuid.UUID) -> None:
+    async def delete_product(self, product_id: uuid.UUID, current_user=None) -> None:
         """Delete a product by ID."""
-        from app.core.exceptions import NotFoundException
+        from app.core.exceptions import NotFoundException, ForbiddenException
         product = await self.product_repo.get_by_id(product_id)
         if not product:
             raise NotFoundException(detail="Product not found")
+            
+        if current_user and current_user.role == "PRODUCT_ADMIN":
+            if product.category and product.category.department and current_user.department:
+                if product.category.department != current_user.department:
+                    raise ForbiddenException(detail="Cannot delete product from a category outside your department")
+                    
         await self.product_repo.delete(product)
 

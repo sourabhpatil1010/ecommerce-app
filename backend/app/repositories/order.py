@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.order import Order, OrderItem
+from app.models.product import Product
 from app.repositories.base import BaseRepository
 
 
@@ -22,7 +23,8 @@ class OrderRepository(BaseRepository[Order]):
             .where(Order.user_id == user_id)
             .order_by(Order.created_at.desc())
             .options(
-                selectinload(Order.items).selectinload(OrderItem.product)
+                selectinload(Order.items).selectinload(OrderItem.product),
+                selectinload(Order.status_history)
             )
         )
         result = await self.session.execute(stmt)
@@ -34,7 +36,8 @@ class OrderRepository(BaseRepository[Order]):
             select(Order)
             .where(Order.id == order_id, Order.user_id == user_id)
             .options(
-                selectinload(Order.items).selectinload(OrderItem.product)
+                selectinload(Order.items).selectinload(OrderItem.product),
+                selectinload(Order.status_history)
             )
         )
         result = await self.session.execute(stmt)
@@ -46,7 +49,8 @@ class OrderRepository(BaseRepository[Order]):
             select(Order)
             .where(Order.id == order_id)
             .options(
-                selectinload(Order.items).selectinload(OrderItem.product)
+                selectinload(Order.items).selectinload(OrderItem.product).selectinload(Product.category),
+                selectinload(Order.status_history)
             )
         )
         result = await self.session.execute(stmt)
@@ -58,7 +62,15 @@ class OrderRepository(BaseRepository[Order]):
         """Fetch all orders (for admin) optionally filtered by department and statuses."""
         stmt = select(Order)
         if department:
-            stmt = stmt.where(Order.department == department)
+            from app.models.product import Product
+            from app.models.category import Category
+            stmt = (
+                stmt.join(OrderItem, Order.id == OrderItem.order_id)
+                .join(Product, OrderItem.product_id == Product.id)
+                .join(Category, Product.category_id == Category.id)
+                .where(Category.department == department)
+                .distinct()
+            )
         if statuses:
             stmt = stmt.where(Order.status.in_(statuses))
             
@@ -67,7 +79,8 @@ class OrderRepository(BaseRepository[Order]):
             .offset(skip)
             .limit(limit)
             .options(
-                selectinload(Order.items).selectinload(OrderItem.product)
+                selectinload(Order.items).selectinload(OrderItem.product),
+                selectinload(Order.status_history)
             )
         )
         result = await self.session.execute(stmt)

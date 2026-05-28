@@ -12,8 +12,8 @@ export function ProductAdminDashboardPage() {
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
-      // Fetch only pending orders for this department
-      const response = await getAllOrders({ statuses: ["CHECKOUT_CREATED", "PAYMENT_SUCCESS"] });
+      // Fetch only pending and confirmed orders for this department
+      const response = await getAllOrders({ statuses: ["PLACED", "CONFIRMED"] });
       setOrders(response.data);
     } catch (err: any) {
       setError(err.response?.data?.detail || "Failed to load orders.");
@@ -28,10 +28,21 @@ export function ProductAdminDashboardPage() {
 
   const handleConfirm = async (orderId: string) => {
     try {
-      await updateOrderStatus(orderId, { status: "ORDER_CONFIRMED" });
-      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+      await updateOrderStatus(orderId, { status: "CONFIRMED" });
+      setOrders((prev) => 
+        prev.map((o) => (o.id === orderId ? { ...o, status: "CONFIRMED" } : o))
+      );
     } catch (err: any) {
       alert(err.response?.data?.detail || "Failed to confirm order");
+    }
+  };
+
+  const handlePack = async (orderId: string) => {
+    try {
+      await updateOrderStatus(orderId, { status: "PACKED" });
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+    } catch (err: any) {
+      alert(err.response?.data?.detail || "Failed to pack order");
     }
   };
 
@@ -68,7 +79,7 @@ export function ProductAdminDashboardPage() {
         <div className="p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
             <Package className="w-5 h-5 mr-2 text-indigo-500" />
-            Pending Orders (Require Confirmation)
+            Pending Orders (Require Confirmation or Packing)
           </h2>
         </div>
         <div className="overflow-x-auto">
@@ -90,7 +101,11 @@ export function ProductAdminDashboardPage() {
                   </td>
                 </tr>
               ) : (
-                orders.map((order) => (
+                orders.map((order) => {
+                  const isPlaced = order.status === "PLACED";
+                  const isConfirmed = order.status === "CONFIRMED";
+                  
+                  return (
                   <tr key={order.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                       {order.id.split("-")[0]}...
@@ -105,23 +120,36 @@ export function ProductAdminDashboardPage() {
                       {order.items.length} item(s)
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                      <button
-                        onClick={() => handleConfirm(order.id)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700"
-                      >
-                        <Check className="w-4 h-4 mr-1" />
-                        Confirm
-                      </button>
-                      <button
-                        onClick={() => handleReject(order.id)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700"
-                      >
-                        <X className="w-4 h-4 mr-1" />
-                        Reject
-                      </button>
+                      {isPlaced && (
+                        <>
+                          <button
+                            onClick={() => handleConfirm(order.id)}
+                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700"
+                          >
+                            <Check className="w-4 h-4 mr-1" />
+                            Confirm
+                          </button>
+                          <button
+                            onClick={() => handleReject(order.id)}
+                            className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700"
+                          >
+                            <X className="w-4 h-4 mr-1" />
+                            Reject
+                          </button>
+                        </>
+                      )}
+                      {isConfirmed && (
+                        <button
+                          onClick={() => handlePack(order.id)}
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700"
+                        >
+                          <Package className="w-4 h-4 mr-1" />
+                          Pack
+                        </button>
+                      )}
                     </td>
                   </tr>
-                ))
+                )})
               )}
             </tbody>
           </table>
