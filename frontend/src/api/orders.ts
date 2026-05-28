@@ -15,6 +15,10 @@ export const getAllOrders = (params?: Record<string, unknown>) =>
   apiClient.get("/orders/all", { params });
 
 /** PATCH /orders/:id/status (Admin) */
+export const updateOrderStatus = (
+  id: string,
+  payload: { status: string; notes?: string; tracking_id?: string; courier?: string }
+) => apiClient.patch(`/orders/${id}/status`, payload);
 
 /** PATCH /orders/:id/cancel */
 export const cancelOrder = (id: string) =>

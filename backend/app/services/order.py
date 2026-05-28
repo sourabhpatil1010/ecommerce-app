@@ -49,12 +49,25 @@ class OrderService:
             total_amount += float(item.unit_price) * item.quantity
 
         from app.models.order import OrderStatus
+        
+        # Determine department from first item
+        department = None
+        if cart.items:
+            first_product = cart.items[0].product
+            if first_product.category_id:
+                from app.repositories.category import CategoryRepository
+                cat_repo = CategoryRepository(self.order_repo.session)
+                cat = await cat_repo.get_by_id(first_product.category_id)
+                if cat:
+                    department = cat.department
+
         # 4. Create Order entity
         order = Order(
             user_id=user_id,
             shipping_address=shipping_address,
             status=OrderStatus.CHECKOUT_CREATED.value,
             total_amount=total_amount,
+            department=department,
             items=order_items
         )
 
@@ -84,18 +97,59 @@ class OrderService:
             raise NotFoundException(detail="Order not found")
         return order
 
-    async def update_status(self, order_id: uuid.UUID, status: str) -> Order:
-        """Update an order's status (admin only)."""
+    async def update_status(
+        self, order_id: uuid.UUID, user: "User", status: str, notes: str | None = None,
+        tracking_id: str | None = None, courier: str | None = None
+    ) -> Order:
+        """Update an order's status with workflow validation and history tracking."""
+        from app.core.exceptions import ForbiddenException
+        from app.models.user import UserRole
+        from app.models.order import OrderStatusHistory
+        
         order = await self.order_repo.get_order_with_items(order_id)
         if not order:
             raise NotFoundException(detail="Order not found")
+            
+        old_status = order.status
+        role = user.role
+        
+        # Validate transitions based on role
+        if not user.is_superuser and role != UserRole.SUPER_ADMIN.value:
+            if role == UserRole.PRODUCT_ADMIN.value:
+                if status not in ["CONFIRMED", "ORDER_CONFIRMED"]:
+                    raise ForbiddenException(detail="PRODUCT_ADMIN can only confirm orders")
+            elif role == UserRole.SHIPPING_ADMIN.value:
+                if status not in ["PACKED", "SHIPPED"]:
+                    raise ForbiddenException(detail="SHIPPING_ADMIN can only pack or ship orders")
+            elif role == UserRole.DELIVERY_ADMIN.value:
+                if status not in ["OUT_FOR_DELIVERY", "DELIVERED", "FAILED", "RETURNED"]:
+                    raise ForbiddenException(detail="DELIVERY_ADMIN can only update delivery statuses")
+            else:
+                 raise ForbiddenException(detail="User does not have permission to update order status")
+                 
         order.status = status
+        if tracking_id:
+            order.tracking_id = tracking_id
+        if courier:
+            order.courier = courier
+        
+        history = OrderStatusHistory(
+            order_id=order.id,
+            old_status=old_status,
+            new_status=status,
+            changed_by=user.id,
+            notes=notes
+        )
+        self.order_repo.session.add(history)
+        
         await self.order_repo.session.flush()
         return order
 
-    async def list_all_orders(self, skip: int = 0, limit: int = 100) -> list[Order]:
-        """List all orders (admin only)."""
-        return await self.order_repo.get_all_orders(skip=skip, limit=limit)
+    async def list_all_orders(
+        self, skip: int = 0, limit: int = 100, department: str | None = None, statuses: list[str] | None = None
+    ) -> list[Order]:
+        """List all orders (admin only), optionally filtered by department and statuses."""
+        return await self.order_repo.get_all_orders(skip=skip, limit=limit, department=department, statuses=statuses)
 
     async def cancel_order(self, order_id: uuid.UUID, user_id: uuid.UUID) -> Order:
         """Cancel an order if it belongs to the user and is in a cancellable state."""

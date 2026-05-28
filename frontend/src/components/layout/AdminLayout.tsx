@@ -9,12 +9,33 @@ import {
   Home
 } from "lucide-react";
 
-const navItems = [
-  { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { name: "Products", href: "/admin/products", icon: Package },
-  { name: "Categories", href: "/admin/categories", icon: Tags },
-  { name: "Users", href: "/admin/users", icon: Users },
-];
+const getNavItems = (role: string | undefined, isSuperuser: boolean) => {
+  if (isSuperuser || role === "SUPER_ADMIN") {
+    return [
+      { name: "Dashboard", href: "/admin/super", icon: LayoutDashboard },
+      { name: "Products", href: "/admin/products", icon: Package },
+      { name: "Categories", href: "/admin/categories", icon: Tags },
+      { name: "Users", href: "/admin/users", icon: Users },
+    ];
+  }
+  if (role === "PRODUCT_ADMIN") {
+    return [
+      { name: "Dashboard", href: "/admin/product", icon: LayoutDashboard },
+      { name: "Products", href: "/admin/products", icon: Package },
+    ];
+  }
+  if (role === "SHIPPING_ADMIN") {
+    return [
+      { name: "Dashboard", href: "/admin/shipping", icon: LayoutDashboard },
+    ];
+  }
+  if (role === "DELIVERY_ADMIN") {
+    return [
+      { name: "Dashboard", href: "/admin/delivery", icon: LayoutDashboard },
+    ];
+  }
+  return [];
+};
 
 export function AdminLayout() {
   const { user, logout } = useAuth();
@@ -26,12 +47,14 @@ export function AdminLayout() {
     navigate("/login");
   };
 
+  const navItems = getNavItems(user?.role, !!user?.is_superuser);
+
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
       {/* Sidebar */}
       <aside className="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:flex md:flex-col">
         <div className="flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700 px-4">
-          <Link to="/admin/dashboard" className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+          <Link to="/admin" className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
             Admin Panel
           </Link>
         </div>

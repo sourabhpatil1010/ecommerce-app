@@ -11,6 +11,7 @@ class CategoryCreate(BaseSchema):
     name: str
     slug: str
     description: str | None = None
+    department: str | None = None
 
 
 class CategoryUpdate(BaseSchema):
@@ -19,6 +20,7 @@ class CategoryUpdate(BaseSchema):
     name: str | None = None
     slug: str | None = None
     description: str | None = None
+    department: str | None = None
 
 
 class CategoryRead(TimestampSchema):
@@ -28,3 +30,4 @@ class CategoryRead(TimestampSchema):
     name: str
     slug: str
     description: str | None
+    department: str | None

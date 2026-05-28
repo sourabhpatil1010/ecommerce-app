@@ -18,6 +18,12 @@ class OrderStatus(str, enum.Enum):
     OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY"
     DELIVERED = "DELIVERED"
     CANCELLED = "CANCELLED"
+    # New Phase 1 Statuses
+    PENDING = "PENDING"
+    CONFIRMED = "CONFIRMED"
+    PACKED = "PACKED"
+    FAILED = "FAILED"
+    RETURNED = "RETURNED"
 
 
 class Order(Base, UUIDMixin, TimestampMixin):
@@ -31,11 +37,15 @@ class Order(Base, UUIDMixin, TimestampMixin):
     status: Mapped[str] = mapped_column(String(50), default=OrderStatus.CHECKOUT_CREATED.value)
     total_amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     shipping_address: Mapped[str | None] = mapped_column(String(500))
+    department: Mapped[str | None] = mapped_column(String(50))
+    tracking_id: Mapped[str | None] = mapped_column(String(100))
+    courier: Mapped[str | None] = mapped_column(String(100))
 
     # Relationships
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
     user = relationship("User")
     payment = relationship("Payment", back_populates="order", uselist=False)
+    status_history = relationship("OrderStatusHistory", back_populates="order", cascade="all, delete-orphan")
 
 
 class OrderItem(Base, UUIDMixin):
@@ -55,3 +65,23 @@ class OrderItem(Base, UUIDMixin):
     # Relationships
     order = relationship("Order", back_populates="items")
     product = relationship("Product")
+
+
+class OrderStatusHistory(Base, UUIDMixin, TimestampMixin):
+    """Tracks changes to an order's status."""
+
+    __tablename__ = "order_status_history"
+
+    order_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("orders.id"), nullable=False
+    )
+    old_status: Mapped[str | None] = mapped_column(String(50))
+    new_status: Mapped[str] = mapped_column(String(50), nullable=False)
+    changed_by: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("users.id")
+    )
+    notes: Mapped[str | None] = mapped_column(String(500))
+
+    # Relationships
+    order = relationship("Order", back_populates="status_history")
+    user = relationship("User")

@@ -49,6 +49,8 @@ class AuthService:
             full_name=user_in.full_name,
             is_active=True,
             is_superuser=True,
+            role=user_in.role.value,
+            department=user_in.department.value if user_in.department else None,
         )
         return await self.user_repo.create(new_user)
 

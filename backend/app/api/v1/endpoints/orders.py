@@ -1,10 +1,10 @@
 import uuid
 from typing import Any
-from fastapi import APIRouter, Depends, status, BackgroundTasks
+from fastapi import APIRouter, Depends, status, BackgroundTasks, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.api.v1.deps import get_current_active_user, get_current_superuser
+from app.api.v1.deps import get_current_active_user, get_current_superuser, require_roles
 from app.models.user import User
 from app.schemas.order import OrderCreate, OrderRead, OrderStatusUpdate
 from app.services.order import OrderService
@@ -48,6 +48,7 @@ def _enrich_order(order: Any, payment: Any = None) -> dict:
         "total_amount": float(order.total_amount),
         "shipping_address": order.shipping_address,
         "items": order.items,
+        "status_history": getattr(order, 'status_history', []),
         "payment_status": payment.status if payment else None,
         "created_at": order.created_at,
         "updated_at": order.updated_at,
@@ -91,13 +92,19 @@ async def list_orders(
 async def list_all_orders(
     skip: int = 0,
     limit: int = 100,
-    _: User = Depends(get_current_superuser),
+    statuses: list[str] | None = Query(None),
+    current_user: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN", "SHIPPING_ADMIN", "DELIVERY_ADMIN"])),
     db: AsyncSession = Depends(get_db),
 ) -> Any:
-    """List all orders (admin only)."""
+    """List all orders (admin only), filtered by department and statuses if applicable."""
     order_service = OrderService(db)
     payment_repo = PaymentRepository(db)
-    orders = await order_service.list_all_orders(skip=skip, limit=limit)
+    
+    department = None
+    if not current_user.is_superuser and current_user.role != "SUPER_ADMIN":
+        department = current_user.department
+
+    orders = await order_service.list_all_orders(skip=skip, limit=limit, department=department, statuses=statuses)
     result = []
     for order in orders:
         payment = await payment_repo.get_by_order_id(order.id)
@@ -115,6 +122,29 @@ async def cancel_order(
     order_service = OrderService(db)
     payment_repo = PaymentRepository(db)
     order = await order_service.cancel_order(order_id, current_user.id)
+    await db.commit()
+    payment = await payment_repo.get_by_order_id(order.id)
+    return _enrich_order(order, payment)
+
+
+@router.patch("/{order_id}/status", response_model=OrderRead)
+async def update_order_status(
+    order_id: uuid.UUID,
+    status_in: OrderStatusUpdate,
+    current_user: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN", "SHIPPING_ADMIN", "DELIVERY_ADMIN"])),
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """Update an order's status (admins only)."""
+    order_service = OrderService(db)
+    payment_repo = PaymentRepository(db)
+    order = await order_service.update_status(
+        order_id, 
+        user=current_user, 
+        status=status_in.status, 
+        notes=status_in.notes,
+        tracking_id=status_in.tracking_id,
+        courier=status_in.courier
+    )
     await db.commit()
     payment = await payment_repo.get_by_order_id(order.id)
     return _enrich_order(order, payment)

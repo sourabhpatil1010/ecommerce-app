@@ -30,6 +30,7 @@ class ProductRepository(BaseRepository[Product]):
         max_price: float | None = None,
         search: str | None = None,
         is_active: bool | None = None,
+        department: str | None = None,
     ) -> tuple[list[Product], int]:
         """Fetch list of products with filters, and return (items, total_count)."""
         import uuid
@@ -61,6 +62,12 @@ class ProductRepository(BaseRepository[Product]):
             )
         if is_active is not None:
             filters.append(Product.is_active == is_active)
+
+        if department is not None:
+            from app.models.category import Category
+            query = query.join(Product.category)
+            count_query = count_query.join(Product.category)
+            filters.append(Category.department == department)
 
         if filters:
             query = query.where(*filters)

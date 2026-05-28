@@ -5,6 +5,8 @@ export interface User {
   full_name: string | null;
   is_active: boolean;
   is_superuser: boolean;
+  role: string;
+  department: string | null;
   created_at: string;
   updated_at: string;
 }

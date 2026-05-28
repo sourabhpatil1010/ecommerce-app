@@ -22,7 +22,7 @@ export function AdminRoute({ children }: AdminRouteProps) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!user?.is_superuser) {
+  if (!user?.is_superuser && user?.role === "CUSTOMER") {
     return <Navigate to="/" replace />;
   }
 

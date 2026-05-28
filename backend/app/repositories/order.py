@@ -52,11 +52,18 @@ class OrderRepository(BaseRepository[Order]):
         result = await self.session.execute(stmt)
         return result.scalars().first()
 
-    async def get_all_orders(self, skip: int = 0, limit: int = 100) -> list[Order]:
-        """Fetch all orders (for admin)."""
+    async def get_all_orders(
+        self, skip: int = 0, limit: int = 100, department: str | None = None, statuses: list[str] | None = None
+    ) -> list[Order]:
+        """Fetch all orders (for admin) optionally filtered by department and statuses."""
+        stmt = select(Order)
+        if department:
+            stmt = stmt.where(Order.department == department)
+        if statuses:
+            stmt = stmt.where(Order.status.in_(statuses))
+            
         stmt = (
-            select(Order)
-            .order_by(Order.created_at.desc())
+            stmt.order_by(Order.created_at.desc())
             .offset(skip)
             .limit(limit)
             .options(

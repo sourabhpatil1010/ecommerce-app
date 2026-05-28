@@ -13,7 +13,7 @@ from app.schemas.product import (
     ProductPaginatedResponse,
 )
 from app.services.product import ProductService
-from app.api.v1.deps import get_current_superuser
+from app.api.v1.deps import get_current_superuser, get_current_user_optional, require_roles
 from app.models.user import User
 
 router = APIRouter()
@@ -28,10 +28,16 @@ async def list_products(
     max_price: float | None = Query(None, ge=0),
     search: str | None = Query(None),
     is_active: bool | None = Query(None),
+    current_user: User | None = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """List products with optional filters and pagination."""
     product_service = ProductService(db)
+    
+    department = None
+    if current_user and current_user.role == "PRODUCT_ADMIN":
+        department = current_user.department
+
     return await product_service.list_products(
         page=page,
         per_page=per_page,
@@ -40,6 +46,7 @@ async def list_products(
         max_price=max_price,
         search=search,
         is_active=is_active,
+        department=department,
     )
 
 
@@ -56,7 +63,7 @@ async def get_product(
 @router.post("/", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
 async def create_product(
     product_in: ProductCreate,
-    _: User = Depends(get_current_superuser),
+    _: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN"])),
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """Create a new product (admin only)."""
@@ -68,7 +75,7 @@ async def create_product(
 async def update_product(
     product_id: uuid.UUID,
     product_in: ProductUpdate,
-    _: User = Depends(get_current_superuser),
+    _: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN"])),
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """Update a product (admin only)."""
@@ -79,7 +86,7 @@ async def update_product(
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_product(
     product_id: uuid.UUID,
-    _: User = Depends(get_current_superuser),
+    _: User = Depends(require_roles(["SUPER_ADMIN", "PRODUCT_ADMIN"])),
     db: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete a product (admin only)."""

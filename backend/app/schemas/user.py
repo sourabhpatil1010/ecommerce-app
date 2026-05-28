@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import EmailStr, Field
 
 from app.schemas.common import BaseSchema, TimestampSchema
+from app.models.user import UserRole, Department
 
 
 class UserCreate(BaseSchema):
@@ -19,6 +20,8 @@ class AdminUserCreate(UserCreate):
     """Schema for creating a new admin user."""
 
     admin_secret: str
+    role: UserRole = UserRole.SUPER_ADMIN
+    department: Department | None = None
 
 
 class UserUpdate(BaseSchema):
@@ -42,6 +45,8 @@ class UserRead(TimestampSchema):
     full_name: str | None
     is_active: bool
     is_superuser: bool
+    role: str
+    department: str | None
 
 
 class UserLogin(BaseSchema):

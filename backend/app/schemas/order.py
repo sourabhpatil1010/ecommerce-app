@@ -23,6 +23,19 @@ class OrderCreate(BaseSchema):
     shipping_address: str
 
 
+class OrderStatusHistoryRead(BaseSchema):
+    """Schema for reading order status history."""
+
+    id: UUID
+    order_id: UUID
+    old_status: str | None
+    new_status: str
+    changed_by: UUID | None
+    notes: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
 class OrderRead(BaseSchema):
     """Schema for reading order data."""
 
@@ -31,7 +44,11 @@ class OrderRead(BaseSchema):
     status: str
     total_amount: float
     shipping_address: str | None
+    department: str | None = None
+    tracking_id: str | None = None
+    courier: str | None = None
     items: list[OrderItemRead] = []
+    status_history: list[OrderStatusHistoryRead] = []
     payment_status: str | None = None
     created_at: datetime
     updated_at: datetime
@@ -41,3 +58,6 @@ class OrderStatusUpdate(BaseSchema):
     """Schema for updating order status."""
 
     status: str
+    notes: str | None = None
+    tracking_id: str | None = None
+    courier: str | None = None
