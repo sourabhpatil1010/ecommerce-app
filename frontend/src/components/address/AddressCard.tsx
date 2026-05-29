@@ -22,22 +22,22 @@ export const AddressCard: React.FC<AddressCardProps> = ({
 }) => {
   return (
     <div
-      className={`relative p-5 rounded-xl border-2 transition-all ${
+      className={`relative p-6 rounded-2xl transition-all duration-200 border-2 ${
         selected
-          ? "border-primary-500 bg-primary-50/30 dark:bg-primary-900/10"
+          ? "border-black bg-gray-50/50 dark:border-white dark:bg-gray-800/80 shadow-md"
           : selectable
-          ? "border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer bg-white dark:bg-gray-900"
-          : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+          ? "border-transparent bg-gray-100 hover:bg-gray-200 cursor-pointer dark:bg-gray-900 dark:hover:bg-gray-800"
+          : "border-transparent bg-gray-100 dark:bg-gray-900"
       }`}
       onClick={() => selectable && onSelect && onSelect(address)}
     >
       {selected && (
-        <div className="absolute -top-3 -right-3 bg-primary-500 text-white p-1 rounded-full shadow-lg">
+        <div className="absolute -top-3 -right-3 bg-black dark:bg-white text-white dark:text-black p-1.5 rounded-full shadow-lg">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-5 h-5"
+            className="w-4 h-4"
           >
             <path
               fillRule="evenodd"
@@ -48,18 +48,18 @@ export const AddressCard: React.FC<AddressCardProps> = ({
         </div>
       )}
 
-      <div className="flex justify-between items-start mb-2">
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-gray-900 dark:text-white text-lg">
+      <div className="flex justify-between items-start mb-3">
+        <div className="flex items-center gap-3">
+          <span className="font-bold text-black dark:text-white text-lg tracking-tight">
             {address.full_name}
           </span>
-          <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-medium rounded-md uppercase tracking-wider">
+          <span className="px-2.5 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-[10px] font-bold rounded-md uppercase tracking-widest shadow-sm">
             {address.address_type}
           </span>
         </div>
         {!selectable && (
           <div className="relative group">
-            <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
+            <button className="text-gray-400 hover:text-black dark:hover:text-white p-1 transition-colors">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -75,16 +75,16 @@ export const AddressCard: React.FC<AddressCardProps> = ({
                 />
               </svg>
             </button>
-            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 py-1">
+            <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10 p-2">
               {onEdit && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onEdit(address);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  className="w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
                 >
-                  Edit
+                  Edit Address
                 </button>
               )}
               {onDelete && (
@@ -93,9 +93,9 @@ export const AddressCard: React.FC<AddressCardProps> = ({
                     e.stopPropagation();
                     onDelete(address.id);
                   }}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                  className="w-full text-left px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors mt-1"
                 >
-                  Delete
+                  Delete Address
                 </button>
               )}
             </div>
@@ -103,32 +103,32 @@ export const AddressCard: React.FC<AddressCardProps> = ({
         )}
       </div>
 
-      <div className="text-gray-600 dark:text-gray-400 text-sm space-y-1 mt-3">
-        <p className="font-medium">{address.phone}</p>
+      <div className="text-gray-500 dark:text-gray-400 text-sm space-y-1.5">
+        <p className="font-semibold text-gray-700 dark:text-gray-300">{address.phone}</p>
         <p className="leading-relaxed">
           {address.address_line}, {address.locality}
         </p>
         <p>
-          {address.city}, {address.state} - <span className="font-semibold">{address.pincode}</span>
+          {address.city}, {address.state} - <span className="font-bold">{address.pincode}</span>
         </p>
-        {address.landmark && <p>Landmark: {address.landmark}</p>}
+        {address.landmark && <p className="text-xs mt-2">Landmark: {address.landmark}</p>}
       </div>
 
       {!selectable && !address.is_default && onSetDefault && (
-        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+        <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-800">
           <button
             onClick={(e) => {
               e.stopPropagation();
               onSetDefault(address.id);
             }}
-            className="text-sm font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+            className="text-xs font-bold uppercase tracking-wider text-black hover:text-gray-500 dark:text-white dark:hover:text-gray-300 transition-colors"
           >
             Set as Default
           </button>
         </div>
       )}
       {!selectable && address.is_default && (
-        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center gap-1 text-sm font-semibold text-green-600 dark:text-green-500">
+        <div className="mt-5 pt-5 border-t border-gray-200 dark:border-gray-800 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-green-600 dark:text-green-500">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
           </svg>

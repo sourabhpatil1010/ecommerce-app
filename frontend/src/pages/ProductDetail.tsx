@@ -2,14 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { productsApi, categoriesApi } from "@/api";
 import { ProductDetailView } from "@/components/product";
-import type { Product } from "@/types";
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-}
+import type { Product, Category } from "@/types";
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -166,7 +159,7 @@ export function ProductDetailPage() {
           </div>
         </div>
       ) : product ? (
-        <ProductDetailView product={product} onEdit={handleOpenEditModal} />
+        <ProductDetailView product={product} categories={categories} onEdit={handleOpenEditModal} />
       ) : null}
 
       {/* ─── Admin Edit Modal ───────────────────────────────── */}

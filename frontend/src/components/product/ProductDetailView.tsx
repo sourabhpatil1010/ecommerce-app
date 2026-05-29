@@ -2,15 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
-import type { Product } from "@/types";
+import type { Product, Category } from "@/types";
 import { formatCurrency } from "@/utils/currency";
 
 interface ProductDetailViewProps {
   product: Product;
+  categories: Category[];
   onEdit?: (product: Product) => void;
 }
 
-export function ProductDetailView({ product, onEdit }: ProductDetailViewProps) {
+export function ProductDetailView({ product, categories, onEdit }: ProductDetailViewProps) {
   const navigate = useNavigate();
   const { addItem, items, updateQuantity } = useCart();
   const { user, isAuthenticated } = useAuth();
@@ -18,7 +19,7 @@ export function ProductDetailView({ product, onEdit }: ProductDetailViewProps) {
   const [added, setAdded] = useState(false);
 
   const isOutOfStock = product.stock <= 0;
-  const isAdmin = user?.is_superuser === true;
+  const isAdmin = user?.is_superuser === true || user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN";
 
   const handleAddToCart = async () => {
     if (isOutOfStock || quantity < 1) return;
@@ -56,43 +57,54 @@ export function ProductDetailView({ product, onEdit }: ProductDetailViewProps) {
 
   const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&q=80";
 
+  // Find Category name
+  const categoryName = categories.find((c) => c.id === product.category_id)?.name || "Uncategorized";
+
   return (
-    <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+    <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
       
-      {/* Product Image Pane */}
-      <div className="relative aspect-square overflow-hidden rounded-2xl border border-gray-200/60 bg-gray-50 shadow-sm dark:border-gray-800 dark:bg-gray-800">
+      {/* Product Image Pane (Larger, minimal) */}
+      <div className="relative aspect-square overflow-hidden rounded-3xl bg-gray-50 dark:bg-gray-900 border-none">
         <img
           src={product.image_url || placeholderImage}
           alt={product.name}
-          className="h-full w-full object-cover object-center"
+          className="h-full w-full object-cover object-center transition-transform duration-700 ease-in-out hover:scale-[1.03]"
         />
+        
+        {/* Modern floating category badge */}
+        <div className="absolute left-6 top-6">
+          <span className="inline-flex items-center rounded-full bg-white/80 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-black shadow-sm backdrop-blur-md dark:bg-black/80 dark:text-white">
+            {categoryName}
+          </span>
+        </div>
+
         {isOutOfStock ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <span className="rounded-xl bg-black/85 px-6 py-3 text-lg font-bold uppercase tracking-widest text-white shadow-xl">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px]">
+            <span className="rounded-full bg-black/90 px-8 py-3 text-sm font-bold uppercase tracking-widest text-white shadow-2xl">
               Out of Stock
             </span>
           </div>
         ) : product.stock < 5 ? (
-          <span className="absolute left-4 top-4 rounded-full bg-amber-500 px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-white shadow-md animate-pulse">
-            Only {product.stock} items left
+          <span className="absolute bottom-6 left-6 rounded-full bg-amber-500/90 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg backdrop-blur-md animate-pulse">
+            Only {product.stock} left
           </span>
         ) : null}
       </div>
 
       {/* Product Details Pane */}
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col justify-center py-4 lg:py-0">
         
-        {/* Category & Status */}
-        <div className="flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 dark:bg-primary-950/40 dark:text-primary-400">
-            Active Catalog Item
+        {/* Status & Admin Edit */}
+        <div className="flex items-center justify-between mb-6">
+          <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+            {product.is_active ? "Active" : "Inactive"}
           </span>
           {isAdmin && (
             <button
               onClick={() => onEdit?.(product)}
-              className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3.5 py-1.5 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-primary-50 hover:text-primary-700 hover:border-primary-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-primary-950/20"
+              className="flex items-center gap-1.5 rounded-full bg-black px-4 py-1.5 text-xs font-bold text-white shadow-sm transition-transform hover:scale-105 dark:bg-white dark:text-black"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-3.5 w-3.5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-3.5 w-3.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
               </svg>
               <span>Edit Details</span>
@@ -100,72 +112,60 @@ export function ProductDetailView({ product, onEdit }: ProductDetailViewProps) {
           )}
         </div>
 
-        <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl dark:text-white">
+        {/* Premium Typography */}
+        <h1 className="text-4xl font-extrabold tracking-tight text-black sm:text-5xl dark:text-white">
           {product.name}
         </h1>
 
-        <p className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
+        <p className="mt-6 text-3xl font-semibold tracking-tight text-black dark:text-white">
           {formatCurrency(product.price)}
         </p>
 
-        <div className="mt-6 border-t border-gray-100 pt-6 dark:border-gray-800">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Description</h3>
-          <p className="mt-3 text-base leading-relaxed text-gray-600 dark:text-gray-300 whitespace-pre-line">
-            {product.description || "No description has been detailed for this product yet. Rest assured, it is made of top quality components."}
+        <div className="mt-8">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">Description</h3>
+          <p className="mt-4 text-base leading-relaxed text-gray-600 dark:text-gray-300 whitespace-pre-line">
+            {product.description || "No detailed description is available for this product. Rest assured, it is made of top-quality materials to meet premium standards."}
           </p>
         </div>
 
-        <div className="mt-8 border-t border-gray-100 pt-6 dark:border-gray-800">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Availability</span>
-            {isOutOfStock ? (
-              <span className="text-sm font-bold text-red-600 dark:text-red-400">Temporarily Sold Out</span>
-            ) : (
-              <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                In Stock ({product.stock} available)
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Quantity and Actions */}
+        {/* Action Area */}
         {!isOutOfStock && (
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:items-center">
             
-            {/* Quantity Selector */}
-            <div className="flex items-center self-start rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800">
+            {/* Minimal Quantity Selector */}
+            <div className="flex h-14 items-center self-start rounded-full bg-gray-100 dark:bg-gray-800">
               <button
                 type="button"
                 onClick={decrementQty}
                 disabled={quantity <= 1}
-                className="flex h-11 w-11 items-center justify-center text-gray-500 transition-colors hover:text-gray-700 disabled:opacity-30 dark:text-gray-400 dark:hover:text-white"
+                className="flex h-full w-14 items-center justify-center text-black transition-colors hover:text-gray-600 disabled:opacity-30 dark:text-white dark:hover:text-gray-300"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
                 </svg>
               </button>
-              <span className="w-10 text-center font-semibold text-gray-900 dark:text-white">
+              <span className="w-8 text-center font-bold text-black dark:text-white">
                 {quantity}
               </span>
               <button
                 type="button"
                 onClick={incrementQty}
                 disabled={quantity >= product.stock}
-                className="flex h-11 w-11 items-center justify-center text-gray-500 transition-colors hover:text-gray-700 disabled:opacity-30 dark:text-gray-400 dark:hover:text-white"
+                className="flex h-full w-14 items-center justify-center text-black transition-colors hover:text-gray-600 disabled:opacity-30 dark:text-white dark:hover:text-gray-300"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
               </button>
             </div>
 
-            {/* Add to Cart CTA */}
+            {/* Apple/Nike style CTA */}
             <button
               onClick={handleAddToCart}
-              className={`flex h-11 flex-grow items-center justify-center gap-2 rounded-lg px-6 font-bold shadow-md transition-all duration-200 ${
+              className={`flex h-14 flex-grow items-center justify-center gap-2 rounded-full px-8 text-sm font-bold transition-all duration-300 ${
                 added
-                  ? "bg-green-600 text-white shadow-green-200/50"
-                  : "bg-primary-600 text-white hover:bg-primary-700 shadow-primary-200/50"
+                  ? "bg-green-500 text-white"
+                  : "bg-black text-white hover:bg-gray-800 hover:scale-[1.02] dark:bg-white dark:text-black dark:hover:bg-gray-200"
               }`}
             >
               {added ? (
@@ -173,14 +173,14 @@ export function ProductDetailView({ product, onEdit }: ProductDetailViewProps) {
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-5 w-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                   </svg>
-                  <span>Added {quantity} to Cart!</span>
+                  <span>Added to Bag!</span>
                 </>
               ) : (
                 <>
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-5 w-5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                   </svg>
-                  <span>Add to Cart</span>
+                  <span>Add to Bag</span>
                 </>
               )}
             </button>
