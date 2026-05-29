@@ -132,9 +132,9 @@ export function CheckoutPaymentPage() {
         </div>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-12 items-start">
+      <div className="grid gap-8 lg:grid-cols-12">
         {/* Main Payment Section */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+        <div className="lg:col-span-7 xl:col-span-8 space-y-6 self-start">
           {/* Payment Method Tabs */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <button

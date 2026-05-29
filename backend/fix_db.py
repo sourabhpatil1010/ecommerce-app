@@ -1,18 +1,15 @@
-import sqlite3
+import asyncio
+from app.database import async_session_factory
+from sqlalchemy import select, update
+from app.models.category import Category
 
-def fix_db():
-    conn = sqlite3.connect('ecommerce.db')
-    cursor = conn.cursor()
-    
-    # Update all orders with legacy statuses
-    cursor.execute("UPDATE orders SET status = 'ORDER_CONFIRMED' WHERE status IN ('pending', 'processing')")
-    cursor.execute("UPDATE orders SET status = 'SHIPPED' WHERE status = 'shipped'")
-    cursor.execute("UPDATE orders SET status = 'DELIVERED' WHERE status = 'delivered'")
-    cursor.execute("UPDATE orders SET status = 'CANCELLED' WHERE status = 'cancelled'")
-    
-    conn.commit()
-    conn.close()
-    print("Database updated successfully.")
+async def fix_db():
+    async with async_session_factory() as session:
+        await session.execute(
+            update(Category).where(Category.name == "Electronics").values(department="Electronics")
+        )
+        await session.commit()
+        print("Updated Electronics department")
 
-if __name__ == '__main__':
-    fix_db()
+if __name__ == "__main__":
+    asyncio.run(fix_db())

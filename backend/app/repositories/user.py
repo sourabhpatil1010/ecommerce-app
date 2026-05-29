@@ -1,6 +1,6 @@
 """User repository."""
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
@@ -16,6 +16,6 @@ class UserRepository(BaseRepository[User]):
     async def get_by_email(self, email: str) -> User | None:
         """Fetch a single user by email."""
         result = await self.session.execute(
-            select(User).where(User.email == email)
+            select(User).where(func.lower(User.email) == func.lower(email))
         )
         return result.scalars().first()

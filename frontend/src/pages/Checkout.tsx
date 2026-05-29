@@ -157,9 +157,9 @@ export function CheckoutPage() {
         </div>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-3 items-start">
+      <div className="grid gap-8 lg:grid-cols-3">
         {/* Shipping Form / Selection */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 self-start">
           <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white pb-4 border-b border-gray-100 dark:border-gray-800">
               Delivery Address

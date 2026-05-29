@@ -56,11 +56,19 @@ class AuthService:
 
     async def authenticate(self, email: str, password: str) -> User:
         """Authenticate user by email and password, checking active flag."""
+        import logging
+        logger = logging.getLogger(__name__)
+        
         user = await self.user_repo.get_by_email(email)
         if not user:
+            logger.error(f"DEBUG_LOGIN: User {email} not found")
             raise UnauthorizedException(detail="Incorrect email or password")
 
-        if not verify_password(password, user.hashed_password):
+        pwd_valid = verify_password(password, user.hashed_password)
+        logger.info(f"DEBUG_LOGIN: verify_password result: {pwd_valid} for {email}")
+        
+        if not pwd_valid:
+            logger.error(f"DEBUG_LOGIN: Password invalid for {email}. Provided password length: {len(password)}. DB hash length: {len(user.hashed_password)}")
             raise UnauthorizedException(detail="Incorrect email or password")
 
         if not user.is_active:

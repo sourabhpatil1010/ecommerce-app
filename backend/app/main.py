@@ -191,9 +191,11 @@ async def seed_data():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan: startup & shutdown hooks."""
-    # Auto-create tables for development
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    print(f"🚀 Active Database URL: {settings.DATABASE_URL}")
+    
+    # We no longer auto-create tables via metadata to avoid bypassing Alembic
+    # async with engine.begin() as conn:
+    #     await conn.run_sync(Base.metadata.create_all)
 
     # Seed data if empty
     try:

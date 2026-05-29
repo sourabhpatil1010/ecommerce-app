@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 export function AdminProductsPage() {
   const { user } = useAuth();
   const isSuperAdmin = user?.role === "SUPER_ADMIN" || user?.is_superuser;
+  const canManageProducts = user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN";
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +20,7 @@ export function AdminProductsPage() {
   const fetchProducts = async () => {
     try {
       setIsLoading(true);
-      const response = await productsApi.getProducts({ page, per_page: 20 });
+      const response = await productsApi.getProducts({ page, per_page: 20, admin_view: true });
       setProducts(response.data.items);
       setTotalPages(response.data.pages);
     } catch (err: any) {
@@ -56,7 +57,7 @@ export function AdminProductsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Product Management</h1>
-        {isSuperAdmin && (
+        {(user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN") && (
           <Link 
             to="/admin/products/new"
             className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
@@ -117,7 +118,7 @@ export function AdminProductsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    {isSuperAdmin && (
+                    {canManageProducts && (
                       <>
                         <Link to={`/admin/products/edit/${product.id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4 inline-block">
                           <Edit className="h-5 w-5 inline" />

@@ -37,7 +37,7 @@ export function RegisterForm() {
       localStorage.setItem("access_token", access_token);
       const userRes = await getMe();
       authLogin(access_token, userRes.data);
-      navigate("/", { replace: true });
+      navigate("/products", { replace: true });
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string } } };
       setError(

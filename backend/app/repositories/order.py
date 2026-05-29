@@ -1,12 +1,13 @@
 """Order repository."""
 
 import uuid
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.order import Order, OrderItem
 from app.models.product import Product
+from app.models.category import Category
 from app.repositories.base import BaseRepository
 
 
@@ -62,26 +63,34 @@ class OrderRepository(BaseRepository[Order]):
         """Fetch all orders (for admin) optionally filtered by department and statuses."""
         stmt = select(Order)
         if department:
-            from app.models.product import Product
-            from app.models.category import Category
             stmt = (
-                stmt.join(OrderItem, Order.id == OrderItem.order_id)
-                .join(Product, OrderItem.product_id == Product.id)
-                .join(Category, Product.category_id == Category.id)
-                .where(Category.department == department)
+                stmt.join(Order.items)
+                .join(OrderItem.product)
+                .join(Product.category)
+                .where(func.upper(Category.department) == func.upper(department))
                 .distinct()
             )
+            
         if statuses:
-            stmt = stmt.where(Order.status.in_(statuses))
+            # Flatten comma-separated strings if any (e.g., ["PLACED,CONFIRMED"] -> ["PLACED", "CONFIRMED"])
+            flat_statuses = []
+            for s in statuses:
+                flat_statuses.extend([x.strip() for x in s.split(",") if x.strip()])
+            stmt = stmt.where(Order.status.in_(flat_statuses))
+            
+        print("====== EXACT QUERY GENERATED IN REPO ======")
+        from sqlalchemy.dialects import postgresql
+        print(stmt.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
+        print("===========================================")
             
         stmt = (
             stmt.order_by(Order.created_at.desc())
             .offset(skip)
             .limit(limit)
             .options(
-                selectinload(Order.items).selectinload(OrderItem.product),
+                selectinload(Order.items).selectinload(OrderItem.product).selectinload(Product.category),
                 selectinload(Order.status_history)
             )
         )
         result = await self.session.execute(stmt)
-        return list(result.scalars().all())
+        return list(result.scalars().unique().all())

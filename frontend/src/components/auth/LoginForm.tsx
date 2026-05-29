@@ -29,23 +29,31 @@ export function LoginForm() {
       const userRes = await getMe();
 
       authLogin(access_token, userRes.data);
-      if (userRes.data.is_superuser) {
+      
+      let target = from;
+      if (from === "/") {
         const role = userRes.data.role;
-        if (role === "PRODUCT_ADMIN") {
-          navigate("/admin/product", { replace: true });
-        } else if (role === "SHIPPING_ADMIN") {
-          navigate("/admin/shipping", { replace: true });
-        } else if (role === "DELIVERY_ADMIN") {
-          navigate("/admin/delivery", { replace: true });
-        } else if (role === "SUPER_ADMIN") {
-          navigate("/admin/super", { replace: true });
-        } else {
-          // Fallback safe redirect for unknown admin roles
-          navigate("/admin", { replace: true });
+        switch (role) {
+          case "SUPER_ADMIN":
+            target = "/admin/super/dashboard";
+            break;
+          case "PRODUCT_ADMIN":
+            target = "/admin/product/dashboard";
+            break;
+          case "SHIPPING_ADMIN":
+            target = "/admin/shipping/dashboard";
+            break;
+          case "DELIVERY_ADMIN":
+            target = "/admin/delivery/dashboard";
+            break;
+          case "CUSTOMER":
+          default:
+            target = "/products";
+            break;
         }
-      } else {
-        navigate(from, { replace: true });
       }
+      
+      navigate(target, { replace: true });
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string } } };
       setError(

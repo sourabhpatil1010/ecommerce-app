@@ -5,7 +5,6 @@ export interface Order {
   status: string;
   total_amount: number;
   shipping_address: string | null;
-  department: string | null;
   tracking_id: string | null;
   courier: string | null;
   items: OrderItem[];

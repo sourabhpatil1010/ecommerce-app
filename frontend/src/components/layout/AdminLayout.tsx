@@ -92,11 +92,11 @@ export function AdminLayout() {
         
         <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <Link
-            to="/"
+            to="/products"
             className="flex items-center px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-2"
           >
             <Home className="h-4 w-4 mr-3" />
-            Back to Store
+            Go to Store
           </Link>
           <button
             onClick={handleLogout}

@@ -50,24 +50,12 @@ class OrderService:
 
         from app.models.order import OrderStatus
         
-        # Determine department from first item
-        department = None
-        if cart.items:
-            first_product = cart.items[0].product
-            if first_product.category_id:
-                from app.repositories.category import CategoryRepository
-                cat_repo = CategoryRepository(self.order_repo.session)
-                cat = await cat_repo.get_by_id(first_product.category_id)
-                if cat:
-                    department = cat.department
-
         # 4. Create Order entity
         order = Order(
             user_id=user_id,
             shipping_address=shipping_address,
             status=OrderStatus.CHECKOUT_CREATED.value,
             total_amount=total_amount,
-            department=department,
             items=order_items
         )
 
@@ -119,8 +107,10 @@ class OrderService:
                 if status not in ["CONFIRMED", "PACKED", "CANCELLED"]:
                     raise ForbiddenException(detail="PRODUCT_ADMIN can only transition to CONFIRMED or PACKED")
                 # Department check: Order must contain at least one product from their department
+                normalized_user_department = user.department.strip().upper().replace(" ", "_")
                 has_department_product = any(
-                    item.product and item.product.category and item.product.category.department == user.department
+                    item.product and item.product.category and item.product.category.department and 
+                    item.product.category.department.strip().upper().replace(" ", "_") == normalized_user_department
                     for item in order.items
                 )
                 if not has_department_product:
@@ -147,6 +137,7 @@ class OrderService:
             changed_by=user.id,
             notes=notes
         )
+        order.status_history.append(history)
         self.order_repo.session.add(history)
         
         await self.order_repo.session.flush()

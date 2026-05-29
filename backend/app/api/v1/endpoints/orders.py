@@ -75,16 +75,28 @@ async def list_all_orders(
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """List all orders (admin only), filtered by department and statuses if applicable."""
+    import logging
+    logger = logging.getLogger("orders_api")
+    logger.setLevel(logging.DEBUG)
+    
     order_service = OrderService(db)
     payment_repo = PaymentRepository(db)
     
     department = None
     role_val = getattr(current_user.role, "value", current_user.role) if hasattr(current_user, "role") else ""
     role_str = str(role_val).strip().upper() if role_val else ""
-    if not current_user.is_superuser and role_str == "PRODUCT_ADMIN":
+    if role_str == "PRODUCT_ADMIN":
         department = current_user.department
 
+    logger.debug(f"DEBUG_DASHBOARD: current_user.email = {current_user.email}")
+    logger.debug(f"DEBUG_DASHBOARD: current_user.role = {role_str}")
+    logger.debug(f"DEBUG_DASHBOARD: current_user.department = {department}")
+    logger.debug(f"DEBUG_DASHBOARD: input statuses = {statuses}")
+
     orders = await order_service.list_all_orders(skip=skip, limit=limit, department=department, statuses=statuses)
+    
+    logger.debug(f"DEBUG_DASHBOARD: number of orders returned = {len(orders)}")
+
     result = []
     for order in orders:
         payment = await payment_repo.get_by_order_id(order.id)

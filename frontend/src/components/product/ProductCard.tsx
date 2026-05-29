@@ -18,7 +18,7 @@ export function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
   const [added, setAdded] = useState(false);
 
   const isOutOfStock = product.stock <= 0;
-  const isAdmin = user?.is_superuser === true;
+  const canManageProducts = user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN";
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -51,7 +51,7 @@ export function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
     <div className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-200/80 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-gray-800 dark:bg-gray-900">
       
       {/* Admin Badges & Actions */}
-      {isAdmin && (
+      {canManageProducts && (
         <div className="absolute right-3 top-3 z-10 flex gap-2">
           <button
             onClick={(e) => {

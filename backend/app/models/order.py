@@ -38,7 +38,6 @@ class Order(Base, UUIDMixin, TimestampMixin):
     status: Mapped[str] = mapped_column(String(50), default=OrderStatus.CHECKOUT_CREATED.value)
     total_amount: Mapped[float] = mapped_column(Numeric(12, 2), nullable=False)
     shipping_address: Mapped[str | None] = mapped_column(String(500))
-    department: Mapped[str | None] = mapped_column(String(50))
     tracking_id: Mapped[str | None] = mapped_column(String(100))
     courier: Mapped[str | None] = mapped_column(String(100))
 

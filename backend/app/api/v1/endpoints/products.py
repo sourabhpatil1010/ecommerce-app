@@ -28,16 +28,17 @@ async def list_products(
     max_price: float | None = Query(None, ge=0),
     search: str | None = Query(None),
     is_active: bool | None = Query(None),
+    admin_view: bool = Query(False),
     current_user: User | None = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ) -> Any:
     """List products with optional filters and pagination."""
     product_service = ProductService(db)
     
-    # Department scoping ONLY applies to PRODUCT_ADMIN.
+    # Department scoping ONLY applies to PRODUCT_ADMIN in admin_view.
     # SHIPPING_ADMIN and DELIVERY_ADMIN see all orders — they are NOT department scoped.
     department = None
-    if current_user and current_user.role == "PRODUCT_ADMIN":
+    if admin_view and current_user and current_user.role == "PRODUCT_ADMIN":
         department = current_user.department
 
     return await product_service.list_products(

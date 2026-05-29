@@ -67,7 +67,8 @@ class ProductRepository(BaseRepository[Product]):
             from app.models.category import Category
             query = query.join(Product.category)
             count_query = count_query.join(Product.category)
-            filters.append(Category.department == department)
+            normalized_dept = department.strip().upper().replace(" ", "_")
+            filters.append(func.replace(func.upper(Category.department), " ", "_") == normalized_dept)
 
         if filters:
             query = query.where(*filters)

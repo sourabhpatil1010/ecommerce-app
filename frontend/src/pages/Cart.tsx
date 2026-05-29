@@ -79,9 +79,9 @@ export function CartPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid gap-8 lg:grid-cols-3 items-start">
+        <div className="grid gap-8 lg:grid-cols-3">
           {/* Cart Items List */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-4 self-start">
             {items.map((item) => (
               <div
                 key={item.id}

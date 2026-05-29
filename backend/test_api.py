@@ -1,33 +1,33 @@
-import asyncio
-import httpx
+import urllib.request
+import json
 
-async def test_api():
-    async with httpx.AsyncClient() as client:
-        # 1. Login
-        resp = await client.post(
-            "http://localhost:8000/api/v1/auth/login",
-            data={"username": "test@example.com", "password": "password123"}
-        )
-        if resp.status_code != 200:
-            print("Login failed:", resp.text)
-            # Try to register
-            resp = await client.post(
-                "http://localhost:8000/api/v1/auth/register",
-                json={"email": "test@example.com", "password": "password123", "full_name": "Test User"}
-            )
-            print("Register:", resp.status_code, resp.text)
-            resp = await client.post(
-                "http://localhost:8000/api/v1/auth/login",
-                data={"username": "test@example.com", "password": "password123"}
-            )
-            
-        token = resp.json().get("access_token")
-        headers = {"Authorization": f"Bearer {token}"}
+url = 'http://localhost:8000/api/v1/auth/token'
+data = json.dumps({'email': 'admin@example.com', 'password': 'AdminSecurePassword123!'}).encode('utf-8')
+req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+
+try:
+    with urllib.request.urlopen(req) as response:
+        token_data = json.loads(response.read().decode())
+        token = token_data['access_token']
+        print('Login successful for admin@example.com')
         
-        # 2. Get orders
-        resp = await client.get("http://localhost:8000/api/v1/orders/", headers=headers)
-        print("GET /orders status:", resp.status_code)
-        print("GET /orders response:", resp.text)
-
-if __name__ == "__main__":
-    asyncio.run(test_api())
+        req2 = urllib.request.Request('http://localhost:8000/api/v1/auth/me', headers={'Authorization': 'Bearer ' + token})
+        with urllib.request.urlopen(req2) as resp2:
+            me_data = json.loads(resp2.read().decode())
+            print('Admin user fetched:', me_data.get('email'))
+            
+        req3 = urllib.request.Request('http://localhost:8000/api/v1/products/')
+        with urllib.request.urlopen(req3) as resp3:
+            prod_data = json.loads(resp3.read().decode())
+            items = prod_data.get('items', [])
+            print('Products found:', len(items))
+            
+        req4 = urllib.request.Request('http://localhost:8000/api/v1/orders/all', headers={'Authorization': 'Bearer ' + token})
+        with urllib.request.urlopen(req4) as resp4:
+            order_data = json.loads(resp4.read().decode())
+            print('Orders found:', len(order_data))
+            
+except Exception as e:
+    print('Test failed:', e)
+    if hasattr(e, 'read'):
+        print(e.read().decode())

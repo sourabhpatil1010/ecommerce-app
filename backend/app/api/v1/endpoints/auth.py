@@ -59,16 +59,27 @@ async def login_json(
     db: AsyncSession = Depends(get_db)
 ) -> Any:
     """Authenticate via JSON body (used by the frontend). Returns JWT token."""
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    logger.info(f"LOGIN TRACE: Attempting login for email: {credentials.email}")
     auth_service = AuthService(db)
-    user = await auth_service.authenticate(
-        email=credentials.email,
-        password=credentials.password
-    )
-    access_token = create_access_token(subject=str(user.id))
-    return {
-        "access_token": access_token,
-        "token_type": "bearer"
-    }
+    try:
+        user = await auth_service.authenticate(
+            email=credentials.email,
+            password=credentials.password
+        )
+        logger.info(f"LOGIN TRACE: User authenticated successfully. Role: {user.role}, Active: {user.is_active}")
+        
+        access_token = create_access_token(subject=str(user.id))
+        logger.info(f"LOGIN TRACE: JWT generation result: SUCCESS")
+        return {
+            "access_token": access_token,
+            "token_type": "bearer"
+        }
+    except Exception as e:
+        logger.error(f"LOGIN TRACE: Login failed with exception: {str(e)}")
+        raise
 
 
 @router.get("/me", response_model=UserRead)

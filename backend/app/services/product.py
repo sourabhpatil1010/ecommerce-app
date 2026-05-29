@@ -37,11 +37,13 @@ class ProductService:
             if not category:
                 raise NotFoundException(detail="Category not found")
                 
-            # Department validation for PRODUCT_ADMIN
             if current_user and current_user.role == "PRODUCT_ADMIN":
-                if category.department and current_user.department and category.department != current_user.department:
-                    from app.core.exceptions import ForbiddenException
-                    raise ForbiddenException(detail="Cannot assign product to a category outside your department")
+                if category.department and current_user.department:
+                    cat_dept = category.department.strip().upper().replace(" ", "_")
+                    user_dept = current_user.department.strip().upper().replace(" ", "_")
+                    if cat_dept != user_dept:
+                        from app.core.exceptions import ForbiddenException
+                        raise ForbiddenException(detail="Cannot assign product to a category outside your department")
 
         # Create product
         product = Product(
@@ -140,11 +142,13 @@ class ProductService:
             if not category:
                 raise NotFoundException(detail="Category not found")
                 
-            # Department validation for PRODUCT_ADMIN
             if current_user and current_user.role == "PRODUCT_ADMIN":
-                if category.department and current_user.department and category.department != current_user.department:
-                    from app.core.exceptions import ForbiddenException
-                    raise ForbiddenException(detail="Cannot assign product to a category outside your department")
+                if category.department and current_user.department:
+                    cat_dept = category.department.strip().upper().replace(" ", "_")
+                    user_dept = current_user.department.strip().upper().replace(" ", "_")
+                    if cat_dept != user_dept:
+                        from app.core.exceptions import ForbiddenException
+                        raise ForbiddenException(detail="Cannot assign product to a category outside your department")
                     
             product.category_id = product_in.category_id
 

@@ -182,7 +182,7 @@ export function ProductsPage() {
             Browse our curated selection of high-quality goods.
           </p>
         </div>
-        {isAdmin && (
+        {(user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN") && (
           <button
             onClick={handleOpenCreateModal}
             className="flex items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-primary-700 transition-colors"
