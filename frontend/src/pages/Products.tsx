@@ -3,19 +3,11 @@ import { useProducts } from "@/hooks/useProducts";
 import { useAuth } from "@/hooks/useAuth";
 import { ProductGrid } from "@/components/product";
 import { categoriesApi, productsApi } from "@/api";
-import type { Product } from "@/types";
+import type { Product, Category } from "@/types";
 import { toast } from "react-hot-toast";
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-}
 
 export function ProductsPage() {
   const { user } = useAuth();
-  const isAdmin = user?.is_superuser === true;
 
   // ─── Filter & Pagination States ──────────────────────────
   const [search, setSearch] = useState("");
@@ -170,22 +162,22 @@ export function ProductsPage() {
   };
 
   return (
-    <div className="container-app py-10">
+    <div className="container-app py-12">
       
       {/* Page Header */}
-      <div className="flex flex-col gap-4 border-b border-gray-200 pb-6 sm:flex-row sm:items-center sm:justify-between dark:border-gray-800">
+      <div className="flex flex-col gap-4 pb-10 sm:flex-row sm:items-end sm:justify-between border-b border-gray-200 dark:border-gray-800">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-            Discover Products
+          <h1 className="text-4xl font-extrabold tracking-tight text-black dark:text-white">
+            Collection
           </h1>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Browse our curated selection of high-quality goods.
+          <p className="mt-2 text-base text-gray-500 dark:text-gray-400">
+            Explore our latest arrivals and premium selections.
           </p>
         </div>
         {(user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN") && (
           <button
             onClick={handleOpenCreateModal}
-            className="flex items-center justify-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:bg-primary-700 transition-colors"
+            className="flex items-center justify-center gap-2 rounded-full bg-black dark:bg-white px-5 py-2.5 text-sm font-medium text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4.5 w-4.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -195,17 +187,17 @@ export function ProductsPage() {
         )}
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+      <div className="mt-10 grid grid-cols-1 gap-x-12 gap-y-10 lg:grid-cols-4">
         
         {/* ─── Sidebar Filters ───────────────────────────────── */}
-        <div className="space-y-6 lg:block">
+        <div className="space-y-8 lg:block">
           
           {/* Search Box */}
-          <div className="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider dark:text-white">
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
               Search
             </h3>
-            <div className="relative mt-3">
+            <div className="relative">
               <input
                 type="text"
                 value={search}
@@ -214,7 +206,7 @@ export function ProductsPage() {
                   setPage(1);
                 }}
                 placeholder="Search products..."
-                className="w-full rounded-lg border border-gray-300 bg-gray-50 py-2 pl-3 pr-10 text-sm focus:border-primary-500 focus:bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                className="w-full rounded-xl border-none bg-gray-100/80 py-3 pl-4 pr-10 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white dark:bg-gray-900/80 dark:text-white outline-none transition-shadow placeholder-gray-500"
               />
               {search && (
                 <button
@@ -222,7 +214,7 @@ export function ProductsPage() {
                     setSearch("");
                     setPage(1);
                   }}
-                  className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-3 text-gray-400 hover:text-black dark:hover:text-white transition-colors"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -233,20 +225,20 @@ export function ProductsPage() {
           </div>
 
           {/* Categories */}
-          <div className="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider dark:text-white">
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
               Categories
             </h3>
-            <div className="mt-3 flex flex-wrap gap-2 lg:flex-col lg:items-stretch">
+            <div className="flex flex-col gap-1">
               <button
                 onClick={() => {
                   setSelectedCategory("");
                   setPage(1);
                 }}
-                className={`rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                className={`rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                   selectedCategory === ""
-                    ? "bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                    ? "font-semibold text-black dark:text-white bg-gray-100 dark:bg-gray-800/50"
+                    : "text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900/50"
                 }`}
               >
                 All Categories
@@ -258,10 +250,10 @@ export function ProductsPage() {
                     setSelectedCategory(cat.id);
                     setPage(1);
                   }}
-                  className={`rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                  className={`rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                     selectedCategory === cat.id
-                      ? "bg-primary-50 text-primary-700 dark:bg-primary-950/30 dark:text-primary-400"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                      ? "font-semibold text-black dark:text-white bg-gray-100 dark:bg-gray-800/50"
+                      : "text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-900/50"
                   }`}
                 >
                   {cat.name}
@@ -271,13 +263,13 @@ export function ProductsPage() {
           </div>
 
           {/* Price Filtering */}
-          <div className="rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider dark:text-white">
+          <div>
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
               Price Range
             </h3>
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              <div className="space-y-3">
-                <label className="text-xs text-gray-400">Min (₹)</label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[10px] uppercase text-gray-400 font-semibold tracking-wider">Min (₹)</label>
                 <input
                   type="number"
                   value={minPrice}
@@ -286,11 +278,11 @@ export function ProductsPage() {
                     setPage(1);
                   }}
                   placeholder="0"
-                  className="mt-1 w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  className="mt-1 w-full rounded-xl border-none bg-gray-100/80 p-3 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white dark:bg-gray-900/80 dark:text-white outline-none transition-shadow"
                 />
               </div>
-              <div className="space-y-3">
-                <label className="text-xs text-gray-400">Max (₹)</label>
+              <div>
+                <label className="text-[10px] uppercase text-gray-400 font-semibold tracking-wider">Max (₹)</label>
                 <input
                   type="number"
                   value={maxPrice}
@@ -299,7 +291,7 @@ export function ProductsPage() {
                     setPage(1);
                   }}
                   placeholder="Any"
-                  className="mt-1 w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  className="mt-1 w-full rounded-xl border-none bg-gray-100/80 p-3 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white dark:bg-gray-900/80 dark:text-white outline-none transition-shadow"
                 />
               </div>
             </div>
@@ -308,9 +300,9 @@ export function ProductsPage() {
           {/* Reset Filters */}
           <button
             onClick={handleResetFilters}
-            className="w-full rounded-lg border border-gray-300 bg-white py-2.5 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            className="w-full rounded-full border border-gray-200 dark:border-gray-800 bg-transparent py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-black dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white"
           >
-            Clear Filters
+            Clear All
           </button>
         </div>
 
@@ -318,16 +310,16 @@ export function ProductsPage() {
         <div className="lg:col-span-3">
           
           {/* Sorting and Summary info */}
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
-              Showing {sortedProducts.length} items
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Showing <span className="text-black dark:text-white font-semibold">{sortedProducts.length}</span> results
             </p>
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Sort by</label>
+            <div className="flex items-center gap-3">
+              <label className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Sort by</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                className="rounded-full border-none bg-gray-100/80 px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-black outline-none dark:bg-gray-900/80 dark:focus:ring-white dark:text-white cursor-pointer transition-shadow"
               >
                 <option value="newest">Newest Arrivals</option>
                 <option value="price-low">Price: Low to High</option>
@@ -337,41 +329,39 @@ export function ProductsPage() {
           </div>
 
           {/* Product Grid Render */}
-          <div className="mt-6">
+          <div>
             {loading ? (
               <div className="flex min-h-[40vh] items-center justify-center">
-                <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-primary-600" />
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-black dark:border-gray-800 dark:border-t-white" />
               </div>
             ) : error ? (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700 dark:border-red-950/40 dark:bg-red-950/10 dark:text-red-400">
-                <p className="font-bold">Error loading catalog</p>
-                <p className="mt-1 text-sm">{error}</p>
+              <div className="rounded-2xl border border-red-200 bg-red-50/50 p-8 text-center text-red-700 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-400">
+                <p className="font-semibold">Unable to load collection</p>
+                <p className="mt-1 text-sm text-red-600/80 dark:text-red-400/80">{error}</p>
                 <button
                   onClick={() => refetch()}
-                  className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-red-700"
+                  className="mt-6 rounded-full bg-red-100 px-5 py-2 text-sm font-semibold text-red-800 transition-colors hover:bg-red-200 dark:bg-red-900/50 dark:text-red-200 dark:hover:bg-red-900"
                 >
                   Try Again
                 </button>
               </div>
             ) : sortedProducts.length === 0 ? (
-              <div className="rounded-2xl border-2 border-dashed border-gray-300 py-16 text-center dark:border-gray-800">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mx-auto h-12 w-12 text-gray-400">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 0 1 2.008 1.24l.885 1.77a2.25 2.25 0 0 0 2.007 1.24h1.98a2.25 2.25 0 0 0 2.007-1.24l.885-1.77a2.25 2.25 0 0 1 2.007-1.24h3.86m-18 0h18" />
-                </svg>
-                <h3 className="mt-4 text-base font-bold text-gray-900 dark:text-white">No products found</h3>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Try adjusting your search criteria or resetting filters.
+              <div className="rounded-3xl border border-dashed border-gray-200 py-24 text-center dark:border-gray-800">
+                <p className="text-lg font-medium text-black dark:text-white">No products found</p>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Try adjusting your search or filters to find what you're looking for.
                 </p>
                 <button
                   onClick={handleResetFilters}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-bold text-white hover:bg-primary-700"
+                  className="mt-6 inline-flex items-center justify-center rounded-full bg-black px-6 py-2.5 text-sm font-medium text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors"
                 >
-                  Reset Filters
+                  Clear Filters
                 </button>
               </div>
             ) : (
               <ProductGrid
                 products={sortedProducts}
+                categories={categories}
                 onEdit={handleOpenEditModal}
                 onDelete={handleDeleteProduct}
               />
@@ -380,38 +370,38 @@ export function ProductsPage() {
 
           {/* Pagination Controls */}
           {!loading && pages > 1 && (
-            <div className="mt-12 flex items-center justify-center gap-2 border-t border-gray-200 pt-6 dark:border-gray-800">
+            <div className="mt-16 flex items-center justify-center gap-2">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                className="flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-white dark:border-gray-800 dark:bg-black dark:text-gray-400 dark:hover:bg-gray-900 dark:disabled:hover:bg-black"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                 </svg>
-                <span>Previous</span>
               </button>
 
-              {Array.from({ length: pages }, (_, idx) => idx + 1).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPage(p)}
-                  className={`rounded-lg px-4 py-2 text-sm font-semibold transition-colors ${
-                    page === p
-                      ? "bg-primary-600 text-white"
-                      : "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  {p}
-                </button>
-              ))}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: pages }, (_, idx) => idx + 1).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`flex items-center justify-center h-10 w-10 rounded-full text-sm font-medium transition-colors ${
+                      page === p
+                        ? "bg-black text-white dark:bg-white dark:text-black"
+                        : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-900"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
 
               <button
                 onClick={() => setPage((p) => Math.min(pages, p + 1))}
                 disabled={page === pages}
-                className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                className="flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-white dark:border-gray-800 dark:bg-black dark:text-gray-400 dark:hover:bg-gray-900 dark:disabled:hover:bg-black"
               >
-                <span>Next</span>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
                 </svg>
@@ -423,17 +413,17 @@ export function ProductsPage() {
 
       {/* ─── Admin Product Management Modal (Create/Edit Form) ── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-gray-950 border border-gray-100 dark:border-gray-800">
             
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-800">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <div className="flex items-center justify-between border-b border-gray-100 px-8 py-6 dark:border-gray-800">
+              <h2 className="text-xl font-bold text-black dark:text-white tracking-tight">
                 {modalMode === "create" ? "Create Product" : "Edit Product"}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-white"
+                className="text-gray-400 hover:text-black dark:hover:text-white transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-6 w-6">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -442,16 +432,16 @@ export function ProductsPage() {
             </div>
 
             {/* Modal Body / Form */}
-            <form onSubmit={handleModalSubmit} className="space-y-4 p-6 overflow-y-auto max-h-[75vh]">
+            <form onSubmit={handleModalSubmit} className="space-y-5 p-8 overflow-y-auto max-h-[75vh]">
               {modalError && (
-                <div className="rounded-lg bg-red-50 p-3.5 text-sm font-semibold text-red-700 dark:bg-red-950/20 dark:text-red-400">
+                <div className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700 dark:bg-red-950/30 dark:text-red-400">
                   {modalError}
                 </div>
               )}
 
               {/* Product Name */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Name</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Name</label>
                 <input
                   type="text"
                   required
@@ -462,60 +452,60 @@ export function ProductsPage() {
                       setFormSlug(generateSlug(e.target.value));
                     }
                   }}
-                  placeholder="e.g. Mechanical Gaming Keyboard"
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="Product name"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 />
               </div>
 
               {/* Slug */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Slug URL</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Slug URL</label>
                 <input
                   type="text"
                   required
                   value={formSlug}
                   onChange={(e) => setFormSlug(generateSlug(e.target.value))}
-                  placeholder="e.g. mechanical-gaming-keyboard"
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="product-slug"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-5">
                 {/* Price */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Price ($)</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Price</label>
                   <input
                     type="number"
                     step="0.01"
                     required
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
-                    placeholder="99.99"
-                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    placeholder="0.00"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                   />
                 </div>
 
                 {/* Stock */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Stock Count</label>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Stock</label>
                   <input
                     type="number"
                     required
                     value={formStock}
                     onChange={(e) => setFormStock(e.target.value)}
-                    placeholder="20"
-                    className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    placeholder="0"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                   />
                 </div>
               </div>
 
               {/* Category Dropdown */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Category</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Category</label>
                 <select
                   value={formCategoryId}
                   onChange={(e) => setFormCategoryId(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 >
                   <option value="">No Category</option>
                   {categories.map((cat) => (
@@ -528,54 +518,54 @@ export function ProductsPage() {
 
               {/* Image URL */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Image URL</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Image URL</label>
                 <input
                   type="url"
                   value={formImageUrl}
                   onChange={(e) => setFormImageUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="https://..."
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Description</label>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1.5">Description</label>
                 <textarea
                   rows={3}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
-                  placeholder="Enter detailed description of the product..."
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="Product description..."
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 />
               </div>
 
               {/* Active Toggle */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3 pt-2">
                 <input
                   type="checkbox"
                   id="formIsActive"
                   checked={formIsActive}
                   onChange={(e) => setFormIsActive(e.target.checked)}
-                  className="h-4.5 w-4.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  className="h-5 w-5 rounded border-gray-300 text-black focus:ring-black dark:border-gray-700 dark:bg-gray-800 dark:checked:bg-white dark:checked:border-transparent cursor-pointer"
                 />
-                <label htmlFor="formIsActive" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                  Visible in customer catalog (Active)
+                <label htmlFor="formIsActive" className="text-sm font-medium text-black dark:text-white cursor-pointer">
+                  Visible in store
                 </label>
               </div>
 
               {/* Form Actions */}
-              <div className="flex justify-end gap-3 border-t border-gray-100 pt-4 dark:border-gray-800">
+              <div className="flex justify-end gap-3 pt-6 pb-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                  className="rounded-full px-6 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="rounded-lg bg-primary-600 px-5 py-2 text-sm font-bold text-white hover:bg-primary-700"
+                  className="rounded-full bg-black px-6 py-2.5 text-sm font-medium text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors"
                 >
                   {modalMode === "create" ? "Add Product" : "Save Changes"}
                 </button>
