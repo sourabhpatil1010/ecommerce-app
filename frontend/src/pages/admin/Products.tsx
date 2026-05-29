@@ -9,7 +9,6 @@ import { useAuth } from "@/hooks/useAuth";
 
 export function AdminProductsPage() {
   const { user } = useAuth();
-  const isSuperAdmin = user?.role === "SUPER_ADMIN" || user?.is_superuser;
   const canManageProducts = user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN";
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);

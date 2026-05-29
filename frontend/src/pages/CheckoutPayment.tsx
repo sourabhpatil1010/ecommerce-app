@@ -118,16 +118,16 @@ export function CheckoutPaymentPage() {
 
   return (
     <div className="container-app py-12 max-w-6xl">
-      {/* Checkout Progress Tracker */}
+      {/* Visual Checkout Progress */}
       <div className="mb-10 max-w-md mx-auto">
-        <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-          <span className="text-primary-600 dark:text-primary-400">1. Shipping</span>
-          <span className="text-primary-600 dark:text-primary-400">2. Payment</span>
-          <span>3. Confirmed</span>
+        <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-gray-400">
+          <span className="text-black dark:text-white">1. Shipping</span>
+          <span className="text-black dark:text-white">2. Payment</span>
+          <span>3. Complete</span>
         </div>
-        <div className="mt-2 flex h-2 gap-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-          <div className="w-1/3 rounded-full bg-primary-600" />
-          <div className="w-1/3 rounded-full bg-primary-600 animate-pulse" />
+        <div className="mt-3 flex h-1 gap-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+          <div className="w-1/3 rounded-full bg-black dark:bg-white" />
+          <div className="w-1/3 rounded-full bg-black dark:bg-white" />
           <div className="w-1/3 rounded-full bg-transparent" />
         </div>
       </div>
@@ -248,34 +248,34 @@ export function CheckoutPaymentPage() {
 
         {/* Sidebar Order Summary */}
         <div className="lg:col-span-5 xl:col-span-4">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm space-y-6">
+          <div className="bg-gray-50 dark:bg-gray-900 border-none rounded-3xl p-8 sticky top-24">
             <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white pb-3 border-b border-gray-100 dark:border-gray-800">
+              <h2 className="text-xl font-bold text-black dark:text-white pb-6 border-b border-gray-200 dark:border-gray-800">
                 Order Summary
-              </h3>
-              <p className="text-xs text-gray-400 mt-1.5 font-mono">ID: {order.id}</p>
+              </h2>
+              <p className="text-[10px] text-gray-400 mt-2 font-mono uppercase tracking-widest">ID: {order.id}</p>
             </div>
 
             {/* Items List */}
-            <div className="divide-y divide-gray-100 dark:divide-gray-800 max-h-[30vh] overflow-y-auto pr-1">
+            <div className="divide-y divide-gray-200 dark:divide-gray-800 max-h-[40vh] overflow-y-auto pr-1 mt-6">
               {order.items.map((item) => (
-                <div key={item.id} className="flex gap-3 py-3 first:pt-0 last:pb-0">
-                  <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
+                <div key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
+                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-2xl bg-white dark:bg-slate-800 border-none">
                     <img
                       src={item.product?.image_url || "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80"}
                       alt={item.product?.name || "Product"}
                       className="h-full w-full object-cover object-center"
                     />
                   </div>
-                  <div className="flex-grow min-w-0">
-                    <h4 className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+                  <div className="flex-grow min-w-0 flex flex-col justify-center">
+                    <h3 className="text-sm font-bold text-black dark:text-white truncate">
                       {item.product?.name}
-                    </h4>
-                    <p className="text-xxs text-gray-500 mt-0.5 dark:text-gray-400">
+                    </h3>
+                    <p className="text-xs font-semibold text-gray-500 mt-1 dark:text-gray-400">
                       Qty: {item.quantity} · {formatCurrency(item.unit_price)}
                     </p>
                   </div>
-                  <span className="text-xs font-bold text-gray-900 dark:text-white">
+                  <span className="text-sm font-extrabold text-black dark:text-white self-center">
                     {formatCurrency(item.unit_price * item.quantity)}
                   </span>
                 </div>
@@ -283,9 +283,9 @@ export function CheckoutPaymentPage() {
             </div>
 
             {/* Shipping Detail */}
-            <div className="pt-4 border-t border-gray-100 dark:border-gray-800 text-xs">
-              <span className="block font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider text-xxs mb-1">
-                Shipping Address
+            <div className="pt-6 border-t border-gray-200 dark:border-gray-800 text-xs">
+              <span className="block font-bold text-black dark:text-white uppercase tracking-widest text-[10px] mb-2">
+                Shipping To
               </span>
               <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
                 {order.shipping_address}
@@ -293,7 +293,7 @@ export function CheckoutPaymentPage() {
             </div>
 
             {/* Pricing Total */}
-            <div className="border-t border-gray-100 dark:border-gray-800 pt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
+            <div className="border-t border-gray-200 dark:border-gray-800 pt-6 mt-6 flex justify-between text-xl font-extrabold text-black dark:text-white">
               <span>Amount Due</span>
               <span>{formatCurrency(order.total_amount)}</span>
             </div>

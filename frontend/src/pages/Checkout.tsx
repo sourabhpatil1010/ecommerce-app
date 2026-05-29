@@ -99,78 +99,76 @@ export function CheckoutPage() {
   if (items.length === 0 && !isSubmitting) {
     return (
       <div className="container-app py-16 flex flex-col items-center justify-center text-center">
-        <div className="h-16 w-16 text-gray-400 mb-4 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+        <div className="h-20 w-20 text-gray-300 dark:text-gray-700 mb-6 flex items-center justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            strokeWidth="1.5"
+            strokeWidth="1.0"
             stroke="currentColor"
-            className="h-8 w-8"
+            className="h-16 w-16"
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.116 60.116 0 0 0-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+              d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-          Your cart is empty
+        <h2 className="text-2xl font-bold text-black dark:text-white mb-3">
+          Your bag is empty
         </h2>
-        <p className="text-gray-500 dark:text-gray-400 mb-8 max-w-md">
-          You must add items to your cart before proceeding to checkout.
+        <p className="text-base text-gray-500 dark:text-gray-400 mb-8 max-w-sm">
+          You must add items to your bag before proceeding to checkout.
         </p>
         <Link
           to="/products"
-          className="rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 shadow transition-all"
+          className="rounded-full bg-black px-8 py-3.5 text-sm font-semibold text-white hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
         >
-          View Products
+          View Collection
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="container-app py-12">
-      <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-8">
-        Checkout
-      </h1>
+    <div className="container-app py-12 max-w-6xl">
+      
+      {/* Visual Checkout Progress */}
+      <div className="mb-10 max-w-md mx-auto">
+        <div className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-gray-400">
+          <span className="text-black dark:text-white">1. Shipping</span>
+          <span>2. Payment</span>
+          <span>3. Complete</span>
+        </div>
+        <div className="mt-3 flex h-1 gap-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+          <div className="w-1/3 rounded-full bg-black dark:bg-white" />
+          <div className="w-1/3 rounded-full bg-transparent" />
+          <div className="w-1/3 rounded-full bg-transparent" />
+        </div>
+      </div>
 
       {error && (
-        <div
-          role="alert"
-          className="mb-8 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/20 dark:border-red-900/50 dark:text-red-400"
-        >
-          <svg
-            className="mt-0.5 h-4 w-4 shrink-0"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span>{error}</span>
+        <div className="mb-8 rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-400 text-center">
+          {error}
         </div>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid gap-12 lg:grid-cols-12">
+        
         {/* Shipping Form / Selection */}
-        <div className="lg:col-span-2 self-start">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white pb-4 border-b border-gray-100 dark:border-gray-800">
-              Delivery Address
-            </h2>
+        <div className="lg:col-span-7 xl:col-span-8 self-start space-y-8">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-black dark:text-white mb-6">
+              Delivery Details
+            </h1>
 
             {loadingAddresses ? (
-              <div className="py-8 flex justify-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary-200 border-t-primary-600"></div>
+              <div className="py-12 flex justify-center">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-black dark:border-gray-800 dark:border-t-white" />
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {addresses.length > 0 && !showAddressForm && (
                   <div className="grid gap-4 sm:grid-cols-2">
                     {addresses.map((addr) => (
@@ -188,9 +186,9 @@ export function CheckoutPage() {
                 {addresses.length > 0 && !showAddressForm && (
                   <button
                     onClick={() => setShowAddressForm(true)}
-                    className="flex items-center gap-2 text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 transition-colors"
+                    className="flex items-center gap-2 text-black dark:text-white font-bold hover:text-gray-600 transition-colors underline underline-offset-4"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                     Add a new address
@@ -198,8 +196,8 @@ export function CheckoutPage() {
                 )}
 
                 {showAddressForm && (
-                  <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-100 dark:border-gray-700">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Add New Address</h3>
+                  <div className="bg-gray-50 dark:bg-gray-900 p-8 rounded-3xl">
+                    <h3 className="text-xl font-bold text-black dark:text-white mb-6">Add New Address</h3>
                     <AddressForm
                       onSubmit={handleAddNewAddress}
                       onCancel={() => setShowAddressForm(false)}
@@ -209,75 +207,65 @@ export function CheckoutPage() {
                 )}
               </div>
             )}
+          </div>
+          
+          {/* Action Row */}
+          <div className="pt-8 flex flex-col-reverse sm:flex-row justify-between items-center gap-4">
+            <Link
+              to="/cart"
+              className="inline-flex items-center gap-1 text-sm font-bold text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+              </svg>
+              Return to Bag
+            </Link>
 
-            <div className="pt-6 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
-              <Link
-                to="/cart"
-                className="inline-flex items-center gap-1 text-sm font-semibold text-gray-500 hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="2.0"
-                  stroke="currentColor"
-                  className="h-4 w-4"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-                  />
-                </svg>
-                Back to Cart
-              </Link>
-
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={isSubmitting || cartLoading || !selectedAddress || showAddressForm}
-                className="flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-primary-200/50 hover:bg-primary-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
-              >
-                {isSubmitting ? (
-                  <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    Placing Order…
-                  </>
-                ) : (
-                  "Deliver Here & Place Order"
-                )}
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isSubmitting || cartLoading || !selectedAddress || showAddressForm}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full bg-black px-8 py-4 text-sm font-bold text-white hover:bg-gray-800 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white dark:border-black/30 dark:border-t-black" />
+                  Processing…
+                </>
+              ) : (
+                "Continue to Payment"
+              )}
+            </button>
           </div>
         </div>
 
-        {/* Order Summary */}
-        <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm space-y-6 sticky top-24">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white pb-3 border-b border-gray-100 dark:border-gray-800">
-              Order Summary
+        {/* Order Summary Sidebar */}
+        <div className="lg:col-span-5 xl:col-span-4">
+          <div className="bg-gray-50 dark:bg-gray-900 border-none rounded-3xl p-8 sticky top-24">
+            <h2 className="text-xl font-bold text-black dark:text-white mb-6">
+              In Your Bag
             </h2>
 
             {/* Cart Items List */}
-            <div className="divide-y divide-gray-100 dark:divide-gray-800 max-h-[30vh] overflow-y-auto pr-1">
+            <div className="divide-y divide-gray-200 dark:divide-gray-800 max-h-[40vh] overflow-y-auto pr-2">
               {items.map((item) => (
-                <div key={item.id} className="flex gap-3 py-3 first:pt-0 last:pb-0">
-                  <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-slate-800">
+                <div key={item.id} className="flex gap-4 py-4 first:pt-0 last:pb-0">
+                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-2xl bg-white dark:bg-slate-800">
                     <img
                       src={item.product?.image_url || placeholderImage}
                       alt={item.product?.name || "Product"}
                       className="h-full w-full object-cover object-center"
                     />
                   </div>
-                  <div className="flex-grow min-w-0">
-                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                  <div className="flex-grow min-w-0 flex flex-col justify-center">
+                    <h3 className="text-sm font-bold text-black dark:text-white truncate">
                       {item.product?.name}
                     </h3>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mt-1">
                       Qty: {item.quantity} · {formatCurrency(item.unit_price)}
                     </p>
                   </div>
-                  <span className="text-sm font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                  <span className="text-sm font-extrabold text-black dark:text-white whitespace-nowrap self-center">
                     {formatCurrency(item.unit_price * item.quantity)}
                   </span>
                 </div>
@@ -285,27 +273,27 @@ export function CheckoutPage() {
             </div>
 
             {/* Pricing Details */}
-            <div className="space-y-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+            <div className="space-y-4 pt-6 mt-6 border-t border-gray-200 dark:border-gray-800">
+              <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
                 <span>Subtotal</span>
-                <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(total)}</span>
+                <span className="text-black dark:text-white">{formatCurrency(total)}</span>
               </div>
 
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
                 <span>Shipping</span>
                 {shippingCost === 0 ? (
-                  <span className="font-semibold text-green-600 dark:text-green-400">Free</span>
+                  <span className="text-green-600 dark:text-green-400 font-bold">Free</span>
                 ) : (
-                  <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(shippingCost)}</span>
+                  <span className="text-black dark:text-white">{formatCurrency(shippingCost)}</span>
                 )}
               </div>
 
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
                 <span>Estimated Tax (8%)</span>
-                <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(taxCost)}</span>
+                <span className="text-black dark:text-white">{formatCurrency(taxCost)}</span>
               </div>
 
-              <div className="border-t border-gray-100 dark:border-gray-800 pt-4 mt-4 flex justify-between text-base font-bold text-gray-950 dark:text-white">
+              <div className="border-t border-gray-200 dark:border-gray-800 pt-6 mt-6 flex justify-between text-xl font-extrabold text-black dark:text-white">
                 <span>Total</span>
                 <span>{formatCurrency(orderTotal)}</span>
               </div>

@@ -1,82 +1,103 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductGrid } from "@/components/product";
+import { categoriesApi } from "@/api";
+import type { Category } from "@/types";
 
 export function HomePage() {
   // Fetch up to 12 products so we can split them into two sections
   const { products, loading, error } = useProducts({ page: 1, per_page: 12 });
+
+  // Fetch categories to pass down for badges
+  const [categories, setCategories] = useState<Category[]>([]);
+  useEffect(() => {
+    categoriesApi.getCategories()
+      .then((res) => setCategories(res.data))
+      .catch((err) => console.error("Error loading categories", err));
+  }, []);
 
   // Split products for different sections
   const featuredProducts = products.slice(0, 4);
   const trendingProducts = products.slice(4, 12);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-12 pt-6">
-      <div className="container-app">
-        {/* Hero Section */}
-        <div className="mb-6 overflow-hidden rounded-sm bg-white shadow-sm dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-          <div className="bg-primary-50 px-8 py-12 text-center dark:bg-primary-900/20 sm:px-16 sm:py-20 lg:py-24">
-            <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl dark:text-white">
-              Welcome to Our Store
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600 dark:text-gray-400">
-              Discover the latest products at unbeatable prices.
-            </p>
-            <div className="mt-8">
-              <Link
-                to="/products"
-                className="inline-flex items-center justify-center rounded-sm bg-primary-600 px-8 py-3 text-sm font-bold text-white shadow hover:bg-primary-700 transition-colors"
-              >
-                Shop Now
-              </Link>
-            </div>
+    <div className="min-h-screen bg-white dark:bg-black pb-16">
+      
+      {/* Modern Hero Section */}
+      <section className="relative overflow-hidden bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+        <div className="container-app py-24 sm:py-32 flex flex-col items-center text-center">
+          <h1 className="text-5xl font-extrabold tracking-tighter text-black dark:text-white sm:text-6xl lg:text-7xl">
+            Redefine your <span className="text-gray-400 dark:text-gray-500">style.</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-500 dark:text-gray-400">
+            Discover the latest collection of premium products. Unbeatable quality, minimalist design.
+          </p>
+          <div className="mt-10">
+            <Link
+              to="/products"
+              className="inline-flex items-center justify-center rounded-full bg-black px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-gray-200 dark:shadow-none hover:bg-gray-800 hover:scale-105 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
+            >
+              Shop Collection
+            </Link>
           </div>
         </div>
+      </section>
 
+      <div className="container-app pt-16">
         {/* Global Loading / Error States */}
         {loading ? (
           <div className="flex min-h-[40vh] items-center justify-center">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-primary-600" />
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-black dark:border-gray-800 dark:border-t-white" />
           </div>
         ) : error ? (
-          <div className="rounded-sm border border-red-200 bg-red-50 p-6 text-center text-red-700 dark:border-red-900/40 dark:bg-red-900/10 dark:text-red-400">
-            <p className="font-bold">Error loading catalog</p>
-            <p className="mt-1 text-sm">{error}</p>
+          <div className="rounded-2xl border border-red-200 bg-red-50/50 p-8 text-center text-red-700 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-400">
+            <p className="font-semibold">Unable to load collection</p>
+            <p className="mt-1 text-sm text-red-600/80 dark:text-red-400/80">{error}</p>
           </div>
         ) : products.length === 0 ? (
-          <div className="rounded-sm border-2 border-dashed border-gray-300 py-16 text-center bg-white dark:bg-gray-900 dark:border-gray-800">
-            <p className="text-gray-500 dark:text-gray-400">No products available at the moment.</p>
+          <div className="rounded-3xl border border-dashed border-gray-200 py-24 text-center dark:border-gray-800 mt-8">
+            <p className="text-lg font-medium text-black dark:text-white">No products available at the moment.</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-20">
+            
             {/* Featured Products Section */}
             {featuredProducts.length > 0 && (
-              <div className="rounded-sm bg-white shadow-sm dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 sm:p-6">
-                <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
-                    Featured Products
+              <section>
+                <div className="mb-8 flex items-end justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
+                  <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white sm:text-3xl">
+                    Featured Collection
                   </h2>
                   <Link
                     to="/products"
-                    className="inline-flex items-center justify-center rounded-sm bg-primary-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-primary-700 transition-colors"
+                    className="hidden sm:inline-flex items-center justify-center rounded-full bg-gray-100 px-5 py-2 text-sm font-medium text-black hover:bg-gray-200 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 transition-colors"
                   >
-                    VIEW ALL
+                    View All
                   </Link>
                 </div>
-                <ProductGrid products={featuredProducts} />
-              </div>
+                <ProductGrid products={featuredProducts} categories={categories} />
+                <div className="mt-8 flex justify-center sm:hidden">
+                  <Link
+                    to="/products"
+                    className="inline-flex w-full items-center justify-center rounded-full bg-gray-100 px-5 py-3 text-sm font-medium text-black hover:bg-gray-200 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 transition-colors"
+                  >
+                    View All Products
+                  </Link>
+                </div>
+              </section>
             )}
 
             {/* Trending Products Section */}
             {trendingProducts.length > 0 && (
-              <div className="rounded-sm bg-white shadow-sm dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-4 sm:p-6">
-                <div className="mb-6 flex items-center justify-between border-b border-gray-100 pb-4 dark:border-gray-800">
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
-                    Trending Right Now
+              <section>
+                <div className="mb-8 border-b border-gray-100 dark:border-gray-800 pb-4">
+                  <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white sm:text-3xl">
+                    Trending Now
                   </h2>
                 </div>
-                <ProductGrid products={trendingProducts} />
-              </div>
+                <ProductGrid products={trendingProducts} categories={categories} />
+              </section>
             )}
           </div>
         )}
