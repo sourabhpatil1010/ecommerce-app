@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useProducts } from "@/hooks/useProducts";
 import { useAuth } from "@/hooks/useAuth";
 import { ProductGrid } from "@/components/product";
@@ -12,12 +13,18 @@ export function ProductsPage() {
   const { user } = useAuth();
 
   // ─── Filter & Pagination States ──────────────────────────
-  const [search, setSearch] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const search = searchParams.get("search") || "";
   const [selectedCategory, setSelectedCategory] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState("newest"); // newest, price-low, price-high
+
+  // Reset page to 1 when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
 
   // Apply query parameters (built reactive filter query)
   const queryParams: Record<string, any> = {
@@ -156,7 +163,10 @@ export function ProductsPage() {
   };
 
   const handleResetFilters = () => {
-    setSearch("");
+    setSearchParams((prev) => {
+      prev.delete("search");
+      return prev;
+    }, { replace: true });
     setSelectedCategory("");
     setMinPrice("");
     setMaxPrice("");
@@ -193,38 +203,6 @@ export function ProductsPage() {
         
         {/* ─── Sidebar Filters ───────────────────────────────── */}
         <div className="space-y-8 lg:block">
-          
-          {/* Search Box */}
-          <div>
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
-              Search
-            </h3>
-            <div className="relative">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-                placeholder="Search products..."
-                className="w-full rounded-xl border-none bg-gray-100/80 py-3 pl-4 pr-10 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white dark:bg-gray-900/80 dark:text-white outline-none transition-shadow placeholder-gray-500"
-              />
-              {search && (
-                <button
-                  onClick={() => {
-                    setSearch("");
-                    setPage(1);
-                  }}
-                  className="absolute right-3 top-3 text-gray-400 hover:text-black dark:hover:text-white transition-colors"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
-          </div>
 
           {/* Categories */}
           <div>

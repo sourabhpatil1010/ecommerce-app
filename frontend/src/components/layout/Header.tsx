@@ -2,6 +2,8 @@ import { useState, useContext } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth, useCart } from "@/hooks";
 import { ThemeContext } from "@/contexts/ThemeContext";
+import { NotificationDropdown } from "./NotificationDropdown";
+import { HeaderSearch } from "./HeaderSearch";
 
 export function Header() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -11,22 +13,11 @@ export function Header() {
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-
   const handleLogout = () => {
     logout();
     setIsUserDropdownOpen(false);
     setIsMobileMenuOpen(false);
     navigate("/login");
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery("");
-      setIsMobileMenuOpen(false);
-    }
   };
 
   const navLinks = [
@@ -60,20 +51,7 @@ export function Header() {
 
         {/* Search Bar (Desktop) */}
         <div className="hidden flex-1 md:flex items-center max-w-md">
-          <form onSubmit={handleSearchSubmit} className="relative w-full group">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400 group-focus-within:text-black dark:group-focus-within:text-white transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-              </svg>
-            </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search products..."
-              className="w-full bg-gray-100/50 dark:bg-gray-900/50 border border-transparent text-sm rounded-full focus:border-gray-300 dark:focus:border-gray-700 focus:bg-white dark:focus:bg-black block pl-9 p-2 transition-all outline-none text-gray-900 dark:text-white placeholder-gray-500"
-            />
-          </form>
+          <HeaderSearch />
         </div>
 
         {/* Action Controls */}
@@ -97,6 +75,26 @@ export function Header() {
               )}
             </button>
           )}
+
+          {isAuthenticated && <NotificationDropdown />}
+
+          {/* Wishlist Icon */}
+          <Link
+            to="/wishlist"
+            className="p-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+            aria-label="View Wishlist"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="h-5 w-5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+          </Link>
 
           {/* Cart Icon & Badge */}
           <Link
@@ -185,7 +183,7 @@ export function Header() {
                         onClick={handleLogout}
                         className="block w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700 dark:hover:text-red-300 rounded-lg transition-colors"
                       >
-                        Sign Out
+                        Log Out
                       </button>
                     </div>
                   </div>
@@ -234,20 +232,7 @@ export function Header() {
           <div className="container-app flex flex-col gap-2 pt-4">
             
             {/* Mobile Search */}
-            <form onSubmit={handleSearchSubmit} className="relative w-full mb-2">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                </svg>
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..."
-                className="w-full bg-gray-100 dark:bg-gray-900 border border-transparent text-sm rounded-full focus:border-gray-300 dark:focus:border-gray-700 block pl-9 p-2.5 outline-none text-gray-900 dark:text-white"
-              />
-            </form>
+            <HeaderSearch isMobile={true} onSearchComplete={() => setIsMobileMenuOpen(false)} />
 
             {navLinks.map((link) => (
               <Link

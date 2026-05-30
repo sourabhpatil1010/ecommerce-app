@@ -8,6 +8,10 @@ export const getProducts = (params?: Record<string, unknown>) =>
 export const getProduct = (id: string) =>
   apiClient.get(`/products/${id}`);
 
+/** GET /products/:id/related */
+export const getRelatedProducts = (id: string) =>
+  apiClient.get(`/products/${id}/related`);
+
 /** POST /products */
 export const createProduct = (data: Record<string, unknown>) =>
   apiClient.post("/products/", data);

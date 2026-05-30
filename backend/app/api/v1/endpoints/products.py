@@ -62,6 +62,32 @@ async def get_product(
     product_service = ProductService(db)
     return await product_service.get_product_by_id(product_id)
 
+@router.get("/{product_id}/related", response_model=list[ProductRead])
+async def get_related_products(
+    product_id: uuid.UUID,
+    limit: int = 4,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """Get related products (same category)."""
+    product_service = ProductService(db)
+    product = await product_service.get_product_by_id(product_id)
+    if not product or not product.category_id:
+        return []
+
+    # Get active products in the same category, excluding this one
+    from sqlalchemy import select
+    from app.models.product import Product
+    result = await db.execute(
+        select(Product)
+        .where(
+            Product.category_id == product.category_id,
+            Product.id != product_id,
+            Product.is_active == True
+        )
+        .limit(limit)
+    )
+    return result.scalars().all()
+
 
 @router.post("/", response_model=ProductRead, status_code=status.HTTP_201_CREATED)
 async def create_product(

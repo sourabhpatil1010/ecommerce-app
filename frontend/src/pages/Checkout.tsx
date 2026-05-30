@@ -8,6 +8,7 @@ import { getAddresses, createAddress } from "@/api/addresses";
 import { AddressCard } from "@/components/address/AddressCard";
 import { AddressForm } from "@/components/address/AddressForm";
 import { Skeleton, EmptyState } from "@/components/common";
+import { couponsApi } from "@/api";
 import toast from "react-hot-toast";
 
 export function CheckoutPage() {
@@ -23,10 +24,24 @@ export function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+
   const shippingThreshold = 4000;
   const shippingCost = total >= shippingThreshold || total === 0 ? 0 : 500;
-  const taxCost = total * 0.08;
-  const orderTotal = total + shippingCost + taxCost;
+  
+  let discountAmount = 0;
+  if (appliedCoupon) {
+    const calculatedDiscount = (total * appliedCoupon.discount_percentage) / 100;
+    discountAmount = appliedCoupon.max_discount_amount 
+      ? Math.min(calculatedDiscount, appliedCoupon.max_discount_amount) 
+      : calculatedDiscount;
+  }
+
+  const subtotalAfterDiscount = Math.max(0, total - discountAmount);
+  const taxCost = subtotalAfterDiscount * 0.08;
+  const orderTotal = subtotalAfterDiscount + shippingCost + taxCost;
 
   const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80";
 
@@ -81,7 +96,7 @@ export function CheckoutPage() {
     const fullShippingAddress = `${selectedAddress.full_name}, ${selectedAddress.address_line}, ${selectedAddress.locality}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}, Phone: ${selectedAddress.phone}`;
 
     try {
-      const res = await createOrder(fullShippingAddress);
+      const res = await createOrder(fullShippingAddress, appliedCoupon?.code);
       // Refresh the cart from backend since it has been cleared
       await fetchCart();
       // Redirect to secure payment checkout page
@@ -95,6 +110,26 @@ export function CheckoutPage() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setValidatingCoupon(true);
+    try {
+      const res = await couponsApi.validateCoupon(couponCode.trim().toUpperCase());
+      setAppliedCoupon(res.data);
+      toast.success("Coupon applied successfully");
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || "Invalid or expired coupon");
+      setAppliedCoupon(null);
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
   };
 
   if (items.length === 0 && !isSubmitting) {
@@ -254,12 +289,50 @@ export function CheckoutPage() {
               ))}
             </div>
 
+            {/* Promo Code */}
+            <div className="pt-6 mt-6 border-t border-gray-200 dark:border-gray-800">
+              <h3 className="text-sm font-bold text-black dark:text-white mb-3">Promo Code</h3>
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3">
+                  <div>
+                    <p className="text-sm font-bold text-green-800 dark:text-green-400">{appliedCoupon.code}</p>
+                    <p className="text-xs text-green-600 dark:text-green-500 mt-0.5">{appliedCoupon.discount_percentage}% off applied</p>
+                  </div>
+                  <button onClick={handleRemoveCoupon} className="text-sm text-gray-500 hover:text-red-500 transition-colors font-medium">Remove</button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder="Enter code"
+                    className="flex-1 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-black dark:focus:border-white focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white transition-all text-black dark:text-white placeholder-gray-400"
+                  />
+                  <button
+                    onClick={handleApplyCoupon}
+                    disabled={!couponCode.trim() || validatingCoupon}
+                    className="bg-black dark:bg-white text-white dark:text-black font-bold text-sm px-6 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50"
+                  >
+                    {validatingCoupon ? "..." : "Apply"}
+                  </button>
+                </div>
+              )}
+            </div>
+
             {/* Pricing Details */}
             <div className="space-y-4 pt-6 mt-6 border-t border-gray-200 dark:border-gray-800">
               <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
                 <span>Subtotal</span>
                 <span className="text-black dark:text-white">{formatCurrency(total)}</span>
               </div>
+
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-sm font-medium text-green-600 dark:text-green-400">
+                  <span>Discount ({appliedCoupon?.code})</span>
+                  <span>-{formatCurrency(discountAmount)}</span>
+                </div>
+              )}
 
               <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
                 <span>Shipping</span>

@@ -23,6 +23,8 @@ import {
   AdminCategoryFormPage,
   AdminUsersPage,
   AdminManagementPage,
+  AdminCouponsPage,
+  WishlistPage,
 } from "@/pages";
 import {
   ProductAdminDashboardPage,
@@ -120,6 +122,14 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="wishlist"
+          element={
+            <ProtectedRoute>
+              <WishlistPage />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Auth Routes */}
         <Route path="login" element={<LoginPage />} />
@@ -166,6 +176,9 @@ export function AppRouter() {
         {/* Users & Admins */}
         <Route path="users" element={<RoleGuard allowedRoles={["SUPER_ADMIN"]}><AdminUsersPage /></RoleGuard>} />
         <Route path="super/admins" element={<RoleGuard allowedRoles={["SUPER_ADMIN"]}><AdminManagementPage /></RoleGuard>} />
+        
+        {/* Coupons */}
+        <Route path="coupons" element={<RoleGuard allowedRoles={["SUPER_ADMIN", "PRODUCT_ADMIN"]}><AdminCouponsPage /></RoleGuard>} />
       </Route>
     </Routes>
   );

@@ -9,7 +9,8 @@ import {
   Home,
   ShieldCheck,
   Truck,
-  Inbox
+  Inbox,
+  Ticket
 } from "lucide-react";
 
 const getNavItems = (role: string | undefined, isSuperuser: boolean) => {
@@ -19,6 +20,7 @@ const getNavItems = (role: string | undefined, isSuperuser: boolean) => {
       { name: "Products", href: "/admin/products", icon: Package },
       { name: "Categories", href: "/admin/categories", icon: Tags },
       { name: "Users", href: "/admin/users", icon: Users },
+      { name: "Coupons", href: "/admin/coupons", icon: Ticket },
       { name: "Admins", href: "/admin/super/admins", icon: ShieldCheck },
     ];
   }
@@ -27,6 +29,7 @@ const getNavItems = (role: string | undefined, isSuperuser: boolean) => {
       { name: "Dashboard", href: "/admin/product/dashboard", icon: LayoutDashboard },
       { name: "Products", href: "/admin/products", icon: Package },
       { name: "Categories", href: "/admin/categories", icon: Tags },
+      { name: "Coupons", href: "/admin/coupons", icon: Ticket },
     ];
   }
   if (role === "SHIPPING_ADMIN") {

@@ -1,8 +1,8 @@
 import { apiClient } from "./client";
 
 /** POST /orders/ */
-export const createOrder = (shippingAddress: string) =>
-  apiClient.post("/orders/", { shipping_address: shippingAddress });
+export const createOrder = (shippingAddress: string, couponCode?: string) =>
+  apiClient.post("/orders/", { shipping_address: shippingAddress, coupon_code: couponCode });
 
 /** GET /orders/ */
 export const getOrders = () => apiClient.get("/orders/");

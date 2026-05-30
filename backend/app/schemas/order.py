@@ -21,6 +21,7 @@ class OrderCreate(BaseSchema):
     """Schema for placing a new order."""
 
     shipping_address: str
+    coupon_code: str | None = None
 
 
 class OrderStatusHistoryRead(BaseSchema):
@@ -43,6 +44,8 @@ class OrderRead(BaseSchema):
     user_id: UUID
     status: str
     total_amount: float
+    discount_amount: float | None = None
+    coupon_code: str | None = None
     shipping_address: str | None
     department: str | None = None
     tracking_id: str | None = None

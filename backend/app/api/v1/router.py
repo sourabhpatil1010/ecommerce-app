@@ -12,6 +12,10 @@ from app.api.v1.endpoints import (
     payments,
     dashboard,
     addresses,
+    reviews,
+    wishlist,
+    coupons,
+    notifications,
 )
 
 api_router = APIRouter()
@@ -25,3 +29,7 @@ api_router.include_router(orders.router, prefix="/orders", tags=["Orders"])
 api_router.include_router(payments.router, prefix="/payments", tags=["Payments"])
 api_router.include_router(dashboard.router, prefix="/dashboard", tags=["Dashboard"])
 api_router.include_router(addresses.router, prefix="/addresses", tags=["Addresses"])
+api_router.include_router(reviews.router, prefix="/reviews", tags=["Reviews"])
+api_router.include_router(wishlist.router, prefix="/wishlist", tags=["Wishlist"])
+api_router.include_router(coupons.router, prefix="/coupons", tags=["Coupons"])
+api_router.include_router(notifications.router, prefix="/notifications", tags=["Notifications"])

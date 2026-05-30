@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { productsApi, categoriesApi } from "@/api";
-import { ProductDetailView } from "@/components/product";
+import { ProductDetailView, ProductReviews, RelatedProducts, RecentlyViewed } from "@/components/product";
 import type { Product, Category } from "@/types";
 import { Skeleton, ErrorState } from "@/components/common";
 
@@ -154,7 +154,12 @@ export function ProductDetailPage() {
           onRetry={() => fetchProductDetails()} 
         />
       ) : product ? (
-        <ProductDetailView product={product} categories={categories} onEdit={handleOpenEditModal} />
+        <div className="mx-auto max-w-7xl">
+          <ProductDetailView product={product} categories={categories} onEdit={handleOpenEditModal} />
+          <RelatedProducts productId={product.id} />
+          <RecentlyViewed currentProductId={product.id} />
+          <ProductReviews productId={product.id} />
+        </div>
       ) : null}
 
       {/* ─── Admin Edit Modal ───────────────────────────────── */}

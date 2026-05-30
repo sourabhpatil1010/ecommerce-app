@@ -61,6 +61,14 @@ const recentActivity = [
   { id: 5, text: 'Refund for order #1015 processed', time: '5 hours ago', icon: RefreshCcw, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20' },
 ];
 
+const ratingData = [
+  { stars: '5 Star', count: 120 },
+  { stars: '4 Star', count: 45 },
+  { stars: '3 Star', count: 15 },
+  { stars: '2 Star', count: 5 },
+  { stars: '1 Star', count: 2 },
+];
+
 const topProducts = [
   { id: '1', name: 'Wireless Noise-Cancelling Headphones', category: 'Electronics', sales: 124, revenue: 12400 },
   { id: '2', name: 'Premium Cotton T-Shirt', category: 'Fashion', sales: 98, revenue: 1960 },
@@ -304,6 +312,29 @@ export function AdminDashboardPage() {
           </div>
         </div>
 
+        {/* Rating Analytics */}
+        <div className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm border border-gray-100 dark:border-gray-800">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Rating Distribution</h3>
+          <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={ratingData} layout="vertical" margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e5e7eb" opacity={0.5} />
+                <XAxis type="number" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} />
+                <YAxis dataKey="stars" type="category" axisLine={false} tickLine={false} tick={{ fill: '#6b7280', fontSize: 12 }} width={50} />
+                <Tooltip 
+                  cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  formatter={(value: any) => [value, 'Reviews']}
+                />
+                <Bar dataKey="count" fill="#fbbf24" radius={[0, 4, 4, 0]} barSize={24} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Activity */}
         <div className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm border border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between mb-6">

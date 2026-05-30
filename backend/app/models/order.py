@@ -40,6 +40,8 @@ class Order(Base, UUIDMixin, TimestampMixin):
     shipping_address: Mapped[str | None] = mapped_column(String(500))
     tracking_id: Mapped[str | None] = mapped_column(String(100))
     courier: Mapped[str | None] = mapped_column(String(100))
+    coupon_code: Mapped[str | None] = mapped_column(String(50))
+    discount_amount: Mapped[float | None] = mapped_column(Numeric(12, 2))
 
     # Relationships
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")

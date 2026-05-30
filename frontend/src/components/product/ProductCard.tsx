@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/hooks/useCart";
 import { useAuth } from "@/hooks/useAuth";
+import { useWishlist } from "@/hooks/useWishlist";
 import type { Product } from "@/types";
 import { formatCurrency } from "@/utils/currency";
 
@@ -16,7 +17,10 @@ export function ProductCard({ product, categoryName, onEdit, onDelete }: Product
   const navigate = useNavigate();
   const { addItem, items, updateQuantity } = useCart();
   const { user, isAuthenticated } = useAuth();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const [added, setAdded] = useState(false);
+
+  const isWishlisted = isInWishlist(product.id);
 
   const isOutOfStock = product.stock <= 0;
   const canManageProducts = user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN";
@@ -107,6 +111,32 @@ export function ProductCard({ product, categoryName, onEdit, onDelete }: Product
             </button>
           </div>
         )}
+
+        {/* Wishlist Toggle Overlay */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!isAuthenticated) {
+              navigate("/login");
+              return;
+            }
+            toggleWishlist(product.id);
+          }}
+          className="absolute right-4 bottom-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-md backdrop-blur-md transition-transform hover:scale-110 opacity-0 group-hover:opacity-100 dark:bg-black/80"
+          title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill={isWishlisted ? "currentColor" : "none"}
+            stroke="currentColor"
+            strokeWidth={1.5}
+            className={`h-5 w-5 ${isWishlisted ? "text-red-500" : "text-gray-600 dark:text-gray-300"}`}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+          </svg>
+        </button>
       </Link>
 
       {/* Product Details */}
