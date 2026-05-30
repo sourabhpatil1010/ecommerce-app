@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { UploadCloud, X, GripVertical } from "lucide-react";
+import { UploadCloud, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface ImageUploadProps {
@@ -103,11 +103,10 @@ export function ImageUpload({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
-          isDragging
+        className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors ${isDragging
             ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20"
             : "border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
-        }`}
+          }`}
       >
         <input
           type="file"
