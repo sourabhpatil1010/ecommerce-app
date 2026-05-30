@@ -7,6 +7,7 @@ import { Address, AddressCreate } from "@/types/address";
 import { getAddresses, createAddress } from "@/api/addresses";
 import { AddressCard } from "@/components/address/AddressCard";
 import { AddressForm } from "@/components/address/AddressForm";
+import { Skeleton, EmptyState } from "@/components/common";
 import toast from "react-hot-toast";
 
 export function CheckoutPage() {
@@ -98,35 +99,14 @@ export function CheckoutPage() {
 
   if (items.length === 0 && !isSubmitting) {
     return (
-      <div className="container-app py-16 flex flex-col items-center justify-center text-center">
-        <div className="h-20 w-20 text-gray-300 dark:text-gray-700 mb-6 flex items-center justify-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.0"
-            stroke="currentColor"
-            className="h-16 w-16"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-            />
-          </svg>
-        </div>
-        <h2 className="text-2xl font-bold text-black dark:text-white mb-3">
-          Your bag is empty
-        </h2>
-        <p className="text-base text-gray-500 dark:text-gray-400 mb-8 max-w-sm">
-          You must add items to your bag before proceeding to checkout.
-        </p>
-        <Link
-          to="/products"
-          className="rounded-full bg-black px-8 py-3.5 text-sm font-semibold text-white hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
-        >
-          View Collection
-        </Link>
+      <div className="container-app py-16">
+        <EmptyState 
+          emoji="🛍️"
+          title="Your bag is empty"
+          description="You must add items to your bag before proceeding to checkout."
+          actionLabel="View Collection"
+          onAction={() => navigate('/products')}
+        />
       </div>
     );
   }
@@ -164,8 +144,9 @@ export function CheckoutPage() {
             </h1>
 
             {loadingAddresses ? (
-              <div className="py-12 flex justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-black dark:border-gray-800 dark:border-t-white" />
+              <div className="grid gap-4 sm:grid-cols-2 animate-in fade-in duration-500">
+                <Skeleton className="h-32 w-full rounded-2xl" />
+                <Skeleton className="h-32 w-full rounded-2xl" />
               </div>
             ) : (
               <div className="space-y-8">
@@ -225,7 +206,7 @@ export function CheckoutPage() {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting || cartLoading || !selectedAddress || showAddressForm}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full bg-black px-8 py-4 text-sm font-bold text-white hover:bg-gray-800 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full bg-black px-8 py-4 text-sm font-bold text-white hover:bg-gray-800 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 disabled:active:scale-100 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
             >
               {isSubmitting ? (
                 <>
@@ -255,6 +236,7 @@ export function CheckoutPage() {
                       src={item.product?.image_url || placeholderImage}
                       alt={item.product?.name || "Product"}
                       className="h-full w-full object-cover object-center"
+                      loading="lazy"
                     />
                   </div>
                   <div className="flex-grow min-w-0 flex flex-col justify-center">

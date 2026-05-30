@@ -4,6 +4,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { ProductGrid } from "@/components/product";
 import { categoriesApi, productsApi } from "@/api";
 import type { Product, Category } from "@/types";
+import { ProductCardSkeleton, EmptyState, ErrorState } from "@/components/common";
+import { SearchX } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 export function ProductsPage() {
@@ -331,33 +333,26 @@ export function ProductsPage() {
           {/* Product Grid Render */}
           <div>
             {loading ? (
-              <div className="flex min-h-[40vh] items-center justify-center">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-black dark:border-gray-800 dark:border-t-white" />
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 animate-in fade-in duration-500">
+                {Array.from({ length: 8 }).map((_, idx) => (
+                  <ProductCardSkeleton key={idx} />
+                ))}
               </div>
             ) : error ? (
-              <div className="rounded-2xl border border-red-200 bg-red-50/50 p-8 text-center text-red-700 dark:border-red-900/30 dark:bg-red-900/10 dark:text-red-400">
-                <p className="font-semibold">Unable to load collection</p>
-                <p className="mt-1 text-sm text-red-600/80 dark:text-red-400/80">{error}</p>
-                <button
-                  onClick={() => refetch()}
-                  className="mt-6 rounded-full bg-red-100 px-5 py-2 text-sm font-semibold text-red-800 transition-colors hover:bg-red-200 dark:bg-red-900/50 dark:text-red-200 dark:hover:bg-red-900"
-                >
-                  Try Again
-                </button>
-              </div>
+              <ErrorState 
+                title="Unable to load collection" 
+                message={error} 
+                onRetry={() => refetch()} 
+                showHome={false} 
+              />
             ) : sortedProducts.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-gray-200 py-24 text-center dark:border-gray-800">
-                <p className="text-lg font-medium text-black dark:text-white">No products found</p>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  Try adjusting your search or filters to find what you're looking for.
-                </p>
-                <button
-                  onClick={handleResetFilters}
-                  className="mt-6 inline-flex items-center justify-center rounded-full bg-black px-6 py-2.5 text-sm font-medium text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors"
-                >
-                  Clear Filters
-                </button>
-              </div>
+              <EmptyState 
+                icon={SearchX} 
+                title="No matching products found" 
+                description="Try adjusting your search or filters to find what you're looking for." 
+                actionLabel="Clear Filters" 
+                onAction={handleResetFilters} 
+              />
             ) : (
               <ProductGrid
                 products={sortedProducts}

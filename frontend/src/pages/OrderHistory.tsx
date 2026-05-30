@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getOrders } from "@/api/orders";
 import { formatCurrency } from "@/utils/currency";
 import { PackageOpen, ChevronRight, ShoppingBag, Truck, CheckCircle2, XCircle, Clock } from "lucide-react";
+import { Skeleton, EmptyState, ErrorState } from "@/components/common";
 
 interface OrderItem {
   id: string;
@@ -107,8 +108,28 @@ export function OrderHistoryPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-100 dark:border-gray-800 border-t-black dark:border-t-white" />
+      <div className="container-app py-16 max-w-5xl animate-in fade-in duration-500">
+        <div className="mb-12">
+          <Skeleton className="h-10 w-48 mb-2" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="grid grid-cols-1 gap-6">
+          {Array.from({ length: 3 }).map((_, idx) => (
+            <div key={idx} className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-3xl p-6 sm:p-8 shadow-sm">
+              <div className="flex justify-between items-center mb-6">
+                <Skeleton className="h-6 w-32 rounded-full" />
+                <Skeleton className="h-10 w-32 rounded-full" />
+              </div>
+              <Skeleton className="h-1.5 w-full max-w-md mb-8 rounded-full" />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-24" />
+                <Skeleton className="h-10 w-24" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -124,30 +145,14 @@ export function OrderHistoryPage() {
         </p>
       </div>
 
-      {error && (
-        <div className="mb-8 rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700 dark:bg-red-950/30 dark:text-red-400">
-          <span>{error}</span>
-        </div>
-      )}
-
-      {orders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] text-center p-8 bg-gray-50/50 dark:bg-gray-900/50 rounded-3xl">
-          <div className="h-20 w-20 text-gray-300 dark:text-gray-700 mb-6 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-full">
-            <ShoppingBag className="h-10 w-10" strokeWidth={1.5} />
-          </div>
-          <h2 className="text-2xl font-bold text-black dark:text-white mb-2">
-            No orders found
-          </h2>
-          <p className="text-sm text-gray-500 max-w-sm mb-8 dark:text-gray-400">
-            You haven't placed any orders yet. Browse our selection and find something you love!
-          </p>
-          <Link
-            to="/products"
-            className="rounded-full bg-black px-8 py-3.5 text-sm font-semibold text-white hover:bg-gray-800 hover:scale-[1.02] transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
-          >
-            Start Shopping
-          </Link>
-        </div>
+      {error ? (
+        <ErrorState title="Failed to load orders" message={error} onRetry={() => window.location.reload()} />
+      ) : orders.length === 0 ? (
+        <EmptyState 
+          icon={ShoppingBag}
+          title="No orders found"
+          description="You haven't placed any orders yet. Browse our selection and find something you love!"
+        />
       ) : (
         <div className="grid grid-cols-1 gap-6">
           {orders.map((order) => {

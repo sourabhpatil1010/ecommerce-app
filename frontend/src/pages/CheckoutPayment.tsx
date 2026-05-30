@@ -265,6 +265,7 @@ export function CheckoutPaymentPage() {
                       src={item.product?.image_url || "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80"}
                       alt={item.product?.name || "Product"}
                       className="h-full w-full object-cover object-center"
+                      loading="lazy"
                     />
                   </div>
                   <div className="flex-grow min-w-0 flex flex-col justify-center">

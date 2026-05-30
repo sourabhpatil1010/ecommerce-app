@@ -69,6 +69,7 @@ export function ProductDetailView({ product, categories, onEdit }: ProductDetail
           src={product.image_url || placeholderImage}
           alt={product.name}
           className="h-full w-full object-cover object-center transition-transform duration-700 ease-in-out hover:scale-[1.03]"
+          loading="lazy"
         />
         
         {/* Modern floating category badge */}
@@ -162,7 +163,7 @@ export function ProductDetailView({ product, categories, onEdit }: ProductDetail
             {/* Apple/Nike style CTA */}
             <button
               onClick={handleAddToCart}
-              className={`flex h-14 flex-grow items-center justify-center gap-2 rounded-full px-8 text-sm font-bold transition-all duration-300 ${
+              className={`flex h-14 flex-grow items-center justify-center gap-2 rounded-full px-8 text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
                 added
                   ? "bg-green-500 text-white"
                   : "bg-black text-white hover:bg-gray-800 hover:scale-[1.02] dark:bg-white dark:text-black dark:hover:bg-gray-200"

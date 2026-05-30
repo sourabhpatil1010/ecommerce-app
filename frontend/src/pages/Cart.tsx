@@ -96,6 +96,7 @@ export function CartPage() {
                     src={item.product?.image_url || placeholderImage}
                     alt={item.product?.name || "Product Image"}
                     className="h-full w-full object-cover object-center"
+                    loading="lazy"
                   />
                 </Link>
 

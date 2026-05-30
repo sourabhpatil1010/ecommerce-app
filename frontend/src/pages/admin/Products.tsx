@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import { productsApi } from "@/api";
 import { Product } from "@/types";
 import { formatCurrency } from "@/utils/currency";
-import { AlertCircle, Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { TableRowSkeleton, EmptyState, ErrorState } from "@/components/common";
+import { PackageX } from "lucide-react";
 
 export function AdminProductsPage() {
   const { user } = useAuth();
@@ -46,8 +48,13 @@ export function AdminProductsPage() {
 
   if (isLoading && products.length === 0) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-indigo-600"></div>
+      <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Product Management</h1>
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden p-6">
+          {Array.from({ length: 5 }).map((_, i) => <TableRowSkeleton key={i} columns={5} />)}
+        </div>
       </div>
     );
   }
@@ -66,13 +73,9 @@ export function AdminProductsPage() {
         )}
       </div>
 
-      {error && (
-        <div className="rounded-lg bg-red-50 p-4 flex items-center text-red-800">
-          <AlertCircle className="h-5 w-5 mr-2" />
-          {error}
-        </div>
-      )}
-
+      {error ? (
+        <ErrorState title="Failed to load products" message={error} onRetry={fetchProducts} showHome={false} />
+      ) : (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -91,7 +94,7 @@ export function AdminProductsPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       {product.image_url ? (
-                        <img className="h-10 w-10 rounded object-cover" src={product.image_url} alt="" />
+                        <img className="h-10 w-10 rounded object-cover" src={product.image_url} alt="" loading="lazy" />
                       ) : (
                         <div className="h-10 w-10 rounded bg-gray-200 dark:bg-gray-700"></div>
                       )}
@@ -132,8 +135,12 @@ export function AdminProductsPage() {
               ))}
               {products.length === 0 && !isLoading && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
-                    No products found.
+                  <td colSpan={5}>
+                    <EmptyState 
+                      icon={PackageX} 
+                      title="No products found" 
+                      description="You have not added any products yet."
+                    />
                   </td>
                 </tr>
               )}
@@ -150,6 +157,7 @@ export function AdminProductsPage() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

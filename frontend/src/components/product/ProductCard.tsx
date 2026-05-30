@@ -128,9 +128,9 @@ export function ProductCard({ product, categoryName, onEdit, onDelete }: Product
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className={`w-full flex items-center justify-center gap-2 rounded-full py-2.5 text-sm font-semibold transition-all duration-300 ${
+            className={`w-full flex items-center justify-center gap-2 rounded-full py-2.5 text-sm font-semibold transition-all duration-300 active:scale-[0.98] ${
               isOutOfStock
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-500"
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-500 active:scale-100"
                 : added
                 ? "bg-green-500 text-white"
                 : "bg-black text-white hover:bg-gray-800 hover:shadow-lg dark:bg-white dark:text-black dark:hover:bg-gray-200"

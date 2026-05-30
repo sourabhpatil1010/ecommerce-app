@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { productsApi, categoriesApi } from "@/api";
 import { ProductDetailView } from "@/components/product";
 import type { Product, Category } from "@/types";
+import { Skeleton, ErrorState } from "@/components/common";
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -133,31 +133,26 @@ export function ProductDetailPage() {
 
       {/* Main Content Pane */}
       {loading ? (
-        <div className="flex min-h-[50vh] items-center justify-center">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 dark:border-gray-800 border-t-primary-600 dark:border-t-primary-500" />
-        </div>
-      ) : error ? (
-        <div className="mx-auto max-w-lg rounded-2xl border border-red-200 bg-red-50 p-6 text-center text-red-700 dark:border-red-950/40 dark:bg-red-950/10 dark:text-red-400">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mx-auto h-12 w-12 text-red-500">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-          </svg>
-          <h2 className="mt-4 text-lg font-bold">Product Details Failed</h2>
-          <p className="mt-2 text-sm">{error}</p>
-          <div className="mt-6 flex justify-center gap-4">
-            <button
-              onClick={() => fetchProductDetails()}
-              className="rounded-lg bg-red-600 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-red-700"
-            >
-              Try Again
-            </button>
-            <button
-              onClick={() => navigate("/products")}
-              className="rounded-lg border border-red-300 bg-white px-4 py-2 text-xs font-bold text-red-700 transition-colors hover:bg-red-100 dark:bg-slate-900"
-            >
-              Back to Catalog
-            </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 animate-in fade-in duration-500">
+          <Skeleton className="w-full aspect-square rounded-3xl" />
+          <div className="flex flex-col gap-6 py-6">
+            <Skeleton className="h-6 w-1/4" />
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-8 w-1/3" />
+            <div className="space-y-3 mt-6">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+            <Skeleton className="h-14 w-full mt-8 rounded-full" />
           </div>
         </div>
+      ) : error ? (
+        <ErrorState 
+          title="Product Details Failed" 
+          message={error} 
+          onRetry={() => fetchProductDetails()} 
+        />
       ) : product ? (
         <ProductDetailView product={product} categories={categories} onEdit={handleOpenEditModal} />
       ) : null}

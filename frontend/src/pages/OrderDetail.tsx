@@ -429,6 +429,7 @@ export function OrderDetailPage() {
                       src={item.product?.image_url || placeholderImage}
                       alt={item.product?.name || "Product"}
                       className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
                     />
                   </div>
                   <div className="flex-grow flex flex-col justify-center">
