@@ -51,6 +51,7 @@ export function ProductCard({ product, categoryName, onEdit, onDelete }: Product
   };
 
   const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80";
+  const displayImage = product.images?.[0]?.image_url || product.image_url || placeholderImage;
 
   return (
     <div className="group flex flex-col relative transition-transform duration-300 hover:-translate-y-1">
@@ -58,7 +59,7 @@ export function ProductCard({ product, categoryName, onEdit, onDelete }: Product
       {/* Image Container */}
       <Link to={`/products/${product.id}`} className="relative block w-full aspect-square overflow-hidden bg-gray-100 dark:bg-gray-900 rounded-2xl mb-4 group-hover:shadow-2xl transition-all duration-300">
         <img
-          src={product.image_url || placeholderImage}
+          src={displayImage}
           alt={product.name}
           className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
           loading="lazy"

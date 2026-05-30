@@ -2,8 +2,10 @@
 
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.product import Product
+from app.models.product_image import ProductImage
 from app.schemas.product import ProductCreate, ProductUpdate
 from app.repositories.product import ProductRepository
 
@@ -12,6 +14,7 @@ class ProductService:
     """Business logic for product operations."""
 
     def __init__(self, session: AsyncSession):
+        self.session = session
         self.product_repo = ProductRepository(session)
 
     async def create_product(self, product_in: ProductCreate, current_user=None) -> Product:
@@ -55,12 +58,33 @@ class ProductService:
             image_url=product_in.image_url,
             category_id=product_in.category_id,
         )
-        return await self.product_repo.create(product)
+        product = await self.product_repo.create(product)
+
+        # Create associated images
+        if product_in.images:
+            for idx, img_url in enumerate(product_in.images):
+                image = ProductImage(
+                    product_id=product.id,
+                    image_url=img_url,
+                    display_order=idx,
+                )
+                self.session.add(image)
+            await self.session.flush()
+            await self.session.refresh(product)
+
+        return product
 
     async def get_product_by_id(self, product_id: uuid.UUID) -> Product:
         """Retrieve a product by ID, raising 404 if not found."""
+        from sqlalchemy import select
         from app.core.exceptions import NotFoundException
-        product = await self.product_repo.get_by_id(product_id)
+
+        result = await self.session.execute(
+            select(Product)
+            .options(selectinload(Product.images))
+            .where(Product.id == product_id)
+        )
+        product = result.scalar_one_or_none()
         if not product:
             raise NotFoundException(detail="Product not found")
         return product
@@ -121,12 +145,11 @@ class ProductService:
         self, product_id: uuid.UUID, product_in: ProductUpdate, current_user=None
     ) -> Product:
         """Update an existing product checking conflicts and categories."""
+        from sqlalchemy import select, delete
         from app.core.exceptions import NotFoundException, ConflictException
         from app.repositories.category import CategoryRepository
 
-        product = await self.product_repo.get_by_id(product_id)
-        if not product:
-            raise NotFoundException(detail="Product not found")
+        product = await self.get_product_by_id(product_id)
 
         # Check slug uniqueness if changed
         if product_in.slug is not None and product_in.slug != product.slug:
@@ -166,7 +189,28 @@ class ProductService:
         if product_in.is_active is not None:
             product.is_active = product_in.is_active
 
-        return await self.product_repo.update(product)
+        # Update images if provided (replace strategy)
+        if product_in.images is not None:
+            # Delete existing images
+            await self.session.execute(
+                delete(ProductImage).where(ProductImage.product_id == product_id)
+            )
+            # Create new images
+            for idx, img_url in enumerate(product_in.images):
+                image = ProductImage(
+                    product_id=product_id,
+                    image_url=img_url,
+                    display_order=idx,
+                )
+                self.session.add(image)
+
+        product = await self.product_repo.update(product)
+
+        # Re-load images after replacement
+        if product_in.images is not None:
+            await self.session.refresh(product)
+
+        return product
 
     async def delete_product(self, product_id: uuid.UUID, current_user=None) -> None:
         """Delete a product by ID."""
@@ -181,4 +225,3 @@ class ProductService:
                     raise ForbiddenException(detail="Cannot delete product from a category outside your department")
                     
         await self.product_repo.delete(product)
-

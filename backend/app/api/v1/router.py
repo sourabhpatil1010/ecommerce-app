@@ -16,6 +16,7 @@ from app.api.v1.endpoints import (
     wishlist,
     coupons,
     notifications,
+    uploads,
 )
 
 api_router = APIRouter()
@@ -33,3 +34,4 @@ api_router.include_router(reviews.router, prefix="/reviews", tags=["Reviews"])
 api_router.include_router(wishlist.router, prefix="/wishlist", tags=["Wishlist"])
 api_router.include_router(coupons.router, prefix="/coupons", tags=["Coupons"])
 api_router.include_router(notifications.router, prefix="/notifications", tags=["Notifications"])
+api_router.include_router(uploads.router, prefix="/uploads", tags=["Uploads"])

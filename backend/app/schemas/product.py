@@ -5,6 +5,14 @@ from uuid import UUID
 from app.schemas.common import BaseSchema, TimestampSchema, PaginatedResponse
 
 
+class ProductImageRead(BaseSchema):
+    """Schema for reading product image data."""
+
+    id: UUID
+    image_url: str
+    display_order: int
+
+
 class ProductCreate(BaseSchema):
     """Schema for creating a product."""
 
@@ -15,6 +23,7 @@ class ProductCreate(BaseSchema):
     stock: int = 0
     image_url: str | None = None
     category_id: UUID | None = None
+    images: list[str] = []
 
 
 class ProductUpdate(BaseSchema):
@@ -28,6 +37,7 @@ class ProductUpdate(BaseSchema):
     image_url: str | None = None
     category_id: UUID | None = None
     is_active: bool | None = None
+    images: list[str] | None = None
 
 
 class ProductRead(TimestampSchema):
@@ -42,10 +52,10 @@ class ProductRead(TimestampSchema):
     image_url: str | None
     is_active: bool
     category_id: UUID | None
+    images: list[ProductImageRead] = []
 
 
 class ProductPaginatedResponse(PaginatedResponse):
     """Paginated list of products."""
 
     items: list[ProductRead]
-

@@ -1,6 +1,7 @@
 """Product repository."""
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models.product import Product
 from app.repositories.base import BaseRepository
@@ -16,7 +17,9 @@ class ProductRepository(BaseRepository[Product]):
         """Fetch a single product by slug."""
         from sqlalchemy import select
         result = await self.session.execute(
-            select(Product).where(Product.slug == slug)
+            select(Product)
+            .options(selectinload(Product.images))
+            .where(Product.slug == slug)
         )
         return result.scalar_one_or_none()
 
@@ -79,6 +82,7 @@ class ProductRepository(BaseRepository[Product]):
         total = count_result.scalar_one()
 
         # Execute paginated items query ordered by created_at desc
+        query = query.options(selectinload(Product.images))
         query = query.order_by(Product.created_at.desc()).offset(skip).limit(limit)
         result = await self.session.execute(query)
         items = list(result.scalars().all())

@@ -5,12 +5,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import os
 from app.config import settings
 from app.api.v1.router import api_router
 from app.models.base import Base
 from app.database import engine
 from app.core.logging import setup_logging
 from app.core.middleware import RequestLoggingMiddleware
+from fastapi.staticfiles import StaticFiles
 
 # Initialize logging configuration
 setup_logging()
@@ -22,6 +24,7 @@ async def seed_data():
     from app.database import async_session_factory
     from app.models.category import Category
     from app.models.product import Product
+    from app.models.product_image import ProductImage
     from app.models.user import User
     from app.core.security import hash_password
 
@@ -69,6 +72,55 @@ async def seed_data():
             select(func.count()).select_from(Product)
         )
         product_count = product_count_result.scalar_one()
+
+        # Define product image mappings (slug -> list of image URLs)
+        product_images_map = {
+            "wireless-noise-canceling-headphones": [
+                "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
+                "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&q=80",
+                "https://images.unsplash.com/photo-1487215078519-e21cc028cb29?w=800&q=80",
+            ],
+            "smart-fitness-watch-pro": [
+                "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
+                "https://images.unsplash.com/photo-1546868871-af0de0ae72be?w=800&q=80",
+                "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&q=80",
+            ],
+            "mechanical-gaming-keyboard": [
+                "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&q=80",
+                "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=800&q=80",
+            ],
+            "4k-ultra-hd-action-camera": [
+                "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&q=80",
+                "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=800&q=80",
+            ],
+            "classic-leather-jacket": [
+                "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&q=80",
+                "https://images.unsplash.com/photo-1520975954732-35dd22299614?w=800&q=80",
+                "https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?w=800&q=80",
+            ],
+            "minimalist-canvas-backpack": [
+                "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800&q=80",
+                "https://images.unsplash.com/photo-1581605405669-fcdf81165571?w=800&q=80",
+                "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&q=80",
+            ],
+            "cotton-crewneck-t-shirt": [
+                "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80",
+                "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800&q=80",
+            ],
+            "stainless-steel-espresso-machine": [
+                "https://images.unsplash.com/photo-1517256064527-09c53b2d0c6f?w=800&q=80",
+                "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=80",
+            ],
+            "cast-iron-dutch-oven": [
+                "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?w=800&q=80",
+                "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&q=80",
+            ],
+            "ergonomic-office-chair": [
+                "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?w=800&q=80",
+                "https://images.unsplash.com/photo-1580480055273-228ff5388ef8?w=800&q=80",
+                "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=800&q=80",
+            ],
+        }
 
         if product_count < 10 and cat_map:
             # We define exactly 10 realistic products
@@ -182,10 +234,28 @@ async def seed_data():
             existing_slugs = await session.execute(select(Product.slug))
             existing_slugs_set = {row[0] for row in existing_slugs.all()}
 
+            newly_added_slugs = []
             for prod in products:
                 if prod.category_id is not None and prod.slug not in existing_slugs_set:
                     session.add(prod)
+                    newly_added_slugs.append(prod.slug)
             await session.commit()
+
+            # Seed product images for newly added products
+            if newly_added_slugs:
+                for slug in newly_added_slugs:
+                    prod_result = await session.execute(
+                        select(Product).where(Product.slug == slug)
+                    )
+                    prod_obj = prod_result.scalar_one_or_none()
+                    if prod_obj and slug in product_images_map:
+                        for idx, img_url in enumerate(product_images_map[slug]):
+                            session.add(ProductImage(
+                                product_id=prod_obj.id,
+                                image_url=img_url,
+                                display_order=idx,
+                            ))
+                await session.commit()
 
 
 @asynccontextmanager
@@ -215,6 +285,10 @@ app = FastAPI(
     redoc_url="/redoc",
     lifespan=lifespan,
 )
+
+# Ensure uploads directory exists
+os.makedirs(os.path.join(os.getcwd(), "uploads"), exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 # ─── Middleware ────────────────────────────────────────
 app.add_middleware(RequestLoggingMiddleware)

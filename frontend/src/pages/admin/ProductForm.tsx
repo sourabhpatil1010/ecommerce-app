@@ -6,6 +6,8 @@ import { Category } from "@/types";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, Save } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { ImageUpload } from "@/components/admin/ImageUpload";
+import { uploadsApi } from "@/api";
 
 export function AdminProductFormPage() {
   const { id } = useParams<{ id: string }>();
@@ -22,11 +24,12 @@ export function AdminProductFormPage() {
     description: "",
     price: "",
     stock: "",
-    image_url: "",
     category_id: "",
     is_active: true,
   });
 
+  const [formImages, setFormImages] = useState<string[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -56,10 +59,15 @@ export function AdminProductFormPage() {
             description: product.description || "",
             price: product.price?.toString() || "0",
             stock: product.stock?.toString() || "0",
-            image_url: product.image_url || "",
             category_id: product.category_id || "",
             is_active: product.is_active ?? true,
           });
+          // Populate images from the product's images array
+          const existingImages = product.images?.map((img: { image_url: string }) => img.image_url) || [];
+          if (existingImages.length === 0 && product.image_url) {
+            existingImages.push(product.image_url);
+          }
+          setFormImages(existingImages);
         }
       } catch (err: any) {
         toast.error("Failed to load data: " + (err.response?.data?.detail || "Unknown error"));
@@ -103,17 +111,17 @@ export function AdminProductFormPage() {
       return;
     }
 
-    if (formData.image_url) {
-      try {
-        new URL(formData.image_url);
-      } catch (e) {
-        toast.error("Invalid image URL");
-        return;
-      }
-    }
-
     try {
       setIsLoading(true);
+      
+      let uploadedUrls: string[] = [];
+      if (newFiles.length > 0) {
+        const uploadRes = await uploadsApi.uploadProductImages(newFiles);
+        uploadedUrls = uploadRes.data;
+      }
+      
+      // Combine existing and newly uploaded images
+      const allImages = [...formImages, ...uploadedUrls];
       const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
       
       const payload = {
@@ -122,9 +130,10 @@ export function AdminProductFormPage() {
         description: formData.description || null,
         price: priceNum,
         stock: stockNum,
-        image_url: formData.image_url || null,
+        image_url: allImages[0] || null,
         category_id: formData.category_id || null,
         is_active: formData.is_active,
+        images: allImages,
       };
 
       if (isEditMode && id) {
@@ -262,18 +271,22 @@ export function AdminProductFormPage() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Image URL
+            {/* ─── Multiple Image Uploads ────────────────────────── */}
+            <div className="col-span-1 md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Product Images
               </label>
-              <input
-                type="url"
-                name="image_url"
-                value={formData.image_url}
-                onChange={handleChange}
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white p-2 border"
-                placeholder="https://example.com/image.png"
+              <ImageUpload
+                existingImages={formImages}
+                onExistingImagesChange={setFormImages}
+                newFiles={newFiles}
+                onNewFilesChange={setNewFiles}
+                maxFiles={10}
+                maxSizeMB={5}
               />
+              <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                The first image will be used as the primary display image.
+              </p>
             </div>
             
             <div className="col-span-1 md:col-span-2 flex items-center mt-2">

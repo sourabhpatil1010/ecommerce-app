@@ -11,4 +11,5 @@ export * as reviewsApi from "./reviews";
 export * as wishlistApi from "./wishlist";
 export * as couponsApi from "./coupons";
 export * as notificationsApi from "./notifications";
+export * as uploadsApi from "./uploads";
 

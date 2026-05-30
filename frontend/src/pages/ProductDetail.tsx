@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { productsApi, categoriesApi } from "@/api";
+import { productsApi, categoriesApi, uploadsApi } from "@/api";
 import { ProductDetailView, ProductReviews, RelatedProducts, RecentlyViewed } from "@/components/product";
 import type { Product, Category } from "@/types";
 import { Skeleton, ErrorState } from "@/components/common";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -42,7 +43,8 @@ export function ProductDetailPage() {
   const [formSlug, setFormSlug] = useState("");
   const [formPrice, setFormPrice] = useState("");
   const [formStock, setFormStock] = useState("");
-  const [formImageUrl, setFormImageUrl] = useState("");
+  const [formImages, setFormImages] = useState<string[]>([]);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
   const [formCategoryId, setFormCategoryId] = useState("");
   const [formDescription, setFormDescription] = useState("");
   const [formIsActive, setFormIsActive] = useState(true);
@@ -68,7 +70,14 @@ export function ProductDetailPage() {
     setFormSlug(product.slug);
     setFormPrice(product.price.toString());
     setFormStock(product.stock.toString());
-    setFormImageUrl(product.image_url || "");
+    
+    // Populate images from product.images array, falling back to image_url
+    const existingImages = product.images?.map((img) => img.image_url) || [];
+    if (existingImages.length === 0 && product.image_url) {
+      existingImages.push(product.image_url);
+    }
+    setFormImages(existingImages);
+    setNewFiles([]);
     setFormCategoryId(product.category_id || "");
     setFormDescription(product.description || "");
     setFormIsActive(product.is_active);
@@ -93,18 +102,26 @@ export function ProductDetailPage() {
       return;
     }
 
-    const payload = {
-      name: formName,
-      slug: formSlug || generateSlug(formName),
-      price: priceNum,
-      stock: stockNum,
-      image_url: formImageUrl.trim() || null,
-      category_id: formCategoryId || null,
-      description: formDescription.trim() || null,
-      is_active: formIsActive,
-    };
-
     try {
+      let uploadedUrls: string[] = [];
+      if (newFiles.length > 0) {
+        const uploadRes = await uploadsApi.uploadProductImages(newFiles);
+        uploadedUrls = uploadRes.data;
+      }
+      
+      const allImages = [...formImages, ...uploadedUrls];
+
+      const payload = {
+        name: formName,
+        slug: formSlug || generateSlug(formName),
+        price: priceNum,
+        stock: stockNum,
+        image_url: allImages[0] || null,
+        category_id: formCategoryId || null,
+        description: formDescription.trim() || null,
+        is_active: formIsActive,
+        images: allImages,
+      };
       await productsApi.updateProduct(product.id, payload);
       setIsModalOpen(false);
       fetchProductDetails(); // Refresh details page on success
@@ -256,15 +273,18 @@ export function ProductDetailPage() {
                 </select>
               </div>
 
-              {/* Image URL */}
+              {/* ─── Multiple Image Uploads ────────────────────── */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Image URL</label>
-                <input
-                  type="url"
-                  value={formImageUrl}
-                  onChange={(e) => setFormImageUrl(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Product Images
+                </label>
+                <ImageUpload
+                  existingImages={formImages}
+                  onExistingImagesChange={setFormImages}
+                  newFiles={newFiles}
+                  onNewFilesChange={setNewFiles}
+                  maxFiles={10}
+                  maxSizeMB={5}
                 />
               </div>
 

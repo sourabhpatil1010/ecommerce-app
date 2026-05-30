@@ -76,9 +76,11 @@ async def get_related_products(
 
     # Get active products in the same category, excluding this one
     from sqlalchemy import select
+    from sqlalchemy.orm import selectinload
     from app.models.product import Product
     result = await db.execute(
         select(Product)
+        .options(selectinload(Product.images))
         .where(
             Product.category_id == product.category_id,
             Product.id != product_id,

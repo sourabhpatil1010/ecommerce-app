@@ -19,11 +19,21 @@ export function ProductDetailView({ product, categories, onEdit }: ProductDetail
   const { isInWishlist, toggleWishlist } = useWishlist();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const isWishlisted = isInWishlist(product.id);
 
   const isOutOfStock = product.stock <= 0;
   const isAdmin = user?.is_superuser === true || user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN";
+
+  // Build the images array: prefer product.images, fall back to image_url, then placeholder
+  const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&q=80";
+  const imageUrls: string[] =
+    product.images && product.images.length > 0
+      ? product.images.map((img) => img.image_url)
+      : product.image_url
+        ? [product.image_url]
+        : [placeholderImage];
 
   const handleAddToCart = async () => {
     if (isOutOfStock || quantity < 1) return;
@@ -59,44 +69,78 @@ export function ProductDetailView({ product, categories, onEdit }: ProductDetail
     }
   };
 
-  const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&q=80";
-
   // Find Category name
   const categoryName = categories.find((c) => c.id === product.category_id)?.name || "Uncategorized";
 
   return (
     <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
       
-      {/* Product Image Pane (Larger, minimal) */}
-      <div className="relative aspect-square overflow-hidden rounded-3xl bg-gray-50 dark:bg-gray-900 border-none">
-        <img
-          src={product.image_url || placeholderImage}
-          alt={product.name}
-          className="h-full w-full object-cover object-center transition-transform duration-700 ease-in-out hover:scale-[1.03]"
-          loading="lazy"
-        />
+      {/* ─── Image Gallery ──────────────────────────────────── */}
+      <div className="flex flex-col-reverse gap-4 lg:flex-row">
         
-        {/* Modern floating category badge */}
-        <div className="absolute left-6 top-6">
-          <span className="inline-flex items-center rounded-full bg-white/80 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-black shadow-sm backdrop-blur-md dark:bg-black/80 dark:text-white">
-            {categoryName}
-          </span>
-        </div>
+        {/* Thumbnails — horizontal on mobile, vertical on desktop */}
+        {imageUrls.length > 1 && (
+          <div className="flex gap-3 overflow-x-auto pb-2 lg:flex-col lg:overflow-x-visible lg:overflow-y-auto lg:pb-0 lg:max-h-[600px] scrollbar-thin">
+            {imageUrls.map((url, idx) => (
+              <button
+                key={idx}
+                onClick={() => setSelectedImageIndex(idx)}
+                className={`relative flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:opacity-100 ${
+                  idx === selectedImageIndex
+                    ? "border-black dark:border-white ring-2 ring-black/10 dark:ring-white/10 opacity-100"
+                    : "border-transparent opacity-60 hover:border-gray-300 dark:hover:border-gray-600"
+                }`}
+              >
+                <img
+                  src={url}
+                  alt={`${product.name} - View ${idx + 1}`}
+                  className="h-full w-full object-cover object-center"
+                  loading="lazy"
+                />
+              </button>
+            ))}
+          </div>
+        )}
 
-        {isOutOfStock ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px]">
-            <span className="rounded-full bg-black/90 px-8 py-3 text-sm font-bold uppercase tracking-widest text-white shadow-2xl">
-              Out of Stock
+        {/* Main Image */}
+        <div className="relative flex-1 aspect-square overflow-hidden rounded-3xl bg-gray-50 dark:bg-gray-900 border-none">
+          <img
+            key={selectedImageIndex}
+            src={imageUrls[selectedImageIndex]}
+            alt={product.name}
+            className="h-full w-full object-cover object-center transition-all duration-500 ease-in-out hover:scale-[1.03] animate-fade-in"
+            loading="lazy"
+          />
+          
+          {/* Modern floating category badge */}
+          <div className="absolute left-6 top-6">
+            <span className="inline-flex items-center rounded-full bg-white/80 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-black shadow-sm backdrop-blur-md dark:bg-black/80 dark:text-white">
+              {categoryName}
             </span>
           </div>
-        ) : product.stock < 5 ? (
-          <span className="absolute bottom-6 left-6 rounded-full bg-amber-500/90 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg backdrop-blur-md animate-pulse">
-            Only {product.stock} left
-          </span>
-        ) : null}
+
+          {isOutOfStock ? (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px]">
+              <span className="rounded-full bg-black/90 px-8 py-3 text-sm font-bold uppercase tracking-widest text-white shadow-2xl">
+                Out of Stock
+              </span>
+            </div>
+          ) : product.stock < 5 ? (
+            <span className="absolute bottom-6 left-6 rounded-full bg-amber-500/90 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-lg backdrop-blur-md animate-pulse">
+              Only {product.stock} left
+            </span>
+          ) : null}
+
+          {/* Image counter badge */}
+          {imageUrls.length > 1 && (
+            <div className="absolute bottom-6 right-6 rounded-full bg-black/60 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-md">
+              {selectedImageIndex + 1} / {imageUrls.length}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Product Details Pane */}
+      {/* ─── Product Details Pane ────────────────────────────── */}
       <div className="flex flex-col justify-center py-4 lg:py-0">
         
         {/* Status & Admin Edit */}

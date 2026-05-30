@@ -27,3 +27,10 @@ class Product(Base, UUIDMixin, TimestampMixin):
 
     # Relationships
     category = relationship("Category", back_populates="products")
+    images = relationship(
+        "ProductImage",
+        back_populates="product",
+        cascade="all, delete-orphan",
+        order_by="ProductImage.display_order",
+        lazy="selectin",
+    )
