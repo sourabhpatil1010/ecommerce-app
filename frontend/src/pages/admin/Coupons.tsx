@@ -87,6 +87,7 @@ export function AdminCouponsPage() {
             });
             setShowModal(true);
           }}
+          data-testid="admin-add-coupon-btn"
           className="flex items-center gap-2 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
         >
           <Plus className="h-4 w-4" />
@@ -125,7 +126,7 @@ export function AdminCouponsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button onClick={() => openEdit(c)} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                      <button onClick={() => openEdit(c)} data-testid={`admin-edit-coupon-${c.id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
                         <Edit className="h-4 w-4" />
                       </button>
                     </td>
@@ -151,6 +152,7 @@ export function AdminCouponsPage() {
                   disabled={!!editingId}
                   value={formData.code}
                   onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                  data-testid="coupon-code-input"
                   className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white dark:focus:ring-white disabled:opacity-50"
                 />
               </div>
@@ -164,6 +166,7 @@ export function AdminCouponsPage() {
                     required
                     value={formData.discount_percentage}
                     onChange={e => setFormData({ ...formData, discount_percentage: Number(e.target.value) })}
+                    data-testid="coupon-discount-input"
                     className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black dark:border-gray-700 dark:bg-black dark:text-white dark:focus:border-white dark:focus:ring-white"
                   />
                 </div>
@@ -224,6 +227,7 @@ export function AdminCouponsPage() {
                 </button>
                 <button
                   type="submit"
+                  data-testid="coupon-save-btn"
                   className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
                 >
                   Save Coupon

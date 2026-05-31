@@ -92,6 +92,7 @@ export function ProfilePage() {
         <div className="mb-8">
           <Link
             to="/profile/addresses"
+            data-testid="manage-addresses-link"
             className="flex items-center justify-between rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 shadow-sm hover:border-primary-300 dark:hover:border-primary-700 transition-colors group"
           >
             <div className="flex items-center gap-4">
@@ -169,6 +170,7 @@ export function ProfilePage() {
                 autoComplete="name"
                 placeholder="Jane Doe"
                 disabled={isSaving}
+                data-testid="profile-name-input"
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
               />
             </div>
@@ -189,6 +191,7 @@ export function ProfilePage() {
                 required
                 autoComplete="email"
                 disabled={isSaving}
+                data-testid="profile-email-input"
                 className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
               />
             </div>
@@ -211,6 +214,7 @@ export function ProfilePage() {
               id="profile-save"
               type="submit"
               disabled={isSaving}
+              data-testid="profile-save-btn"
               className="flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isSaving ? (

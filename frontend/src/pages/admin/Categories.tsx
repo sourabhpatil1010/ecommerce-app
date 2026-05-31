@@ -56,6 +56,7 @@ export function AdminCategoriesPage() {
         {isSuperAdmin && (
           <button
             onClick={() => navigate("/admin/categories/new")}
+            data-testid="admin-add-category-btn"
             className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
           >
             <Plus className="h-5 w-5 mr-2" /> Add Category
@@ -98,11 +99,12 @@ export function AdminCategoriesPage() {
                       <>
                         <button
                           onClick={() => navigate(`/admin/categories/edit/${category.id}`)}
+                          data-testid={`admin-edit-category-${category.id}`}
                           className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4"
                         >
                           <Edit className="h-5 w-5 inline" />
                         </button>
-                        <button onClick={() => handleDelete(category.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                        <button onClick={() => handleDelete(category.id)} data-testid={`admin-delete-category-${category.id}`} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                           <Trash2 className="h-5 w-5 inline" />
                         </button>
                       </>

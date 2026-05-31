@@ -73,6 +73,7 @@ export function CartPage() {
           </p>
           <Link
             to="/products"
+            data-testid="empty-cart-start-shopping-btn"
             className="rounded-full bg-black px-8 py-3.5 text-sm font-semibold text-white hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
           >
             Start Shopping
@@ -106,6 +107,7 @@ export function CartPage() {
                     <div className="flex justify-between items-start gap-4">
                       <Link
                         to={`/products/${item.product_id}`}
+                        data-testid={`cart-item-link-${item.product_id}`}
                         className="font-bold text-black dark:text-white text-lg hover:text-gray-600 dark:hover:text-gray-300 line-clamp-2"
                       >
                         {item.product?.name}
@@ -131,6 +133,7 @@ export function CartPage() {
                         type="button"
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         disabled={item.quantity <= 1 || cartLoading}
+                        data-testid={`cart-item-decrement-${item.product_id}`}
                         className="flex h-8 w-8 items-center justify-center text-black rounded-full transition-colors hover:bg-gray-200 disabled:opacity-30 dark:text-white dark:hover:bg-gray-700"
                         aria-label="Decrease quantity"
                       >
@@ -138,13 +141,14 @@ export function CartPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
                         </svg>
                       </button>
-                      <span className="w-8 text-center font-bold text-sm text-black dark:text-white">
+                      <span className="w-8 text-center font-bold text-sm text-black dark:text-white" data-testid={`cart-item-quantity-${item.product_id}`}>
                         {item.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         disabled={(item.product && item.quantity >= item.product.stock) || cartLoading}
+                        data-testid={`cart-item-increment-${item.product_id}`}
                         className="flex h-8 w-8 items-center justify-center text-black rounded-full transition-colors hover:bg-gray-200 disabled:opacity-30 dark:text-white dark:hover:bg-gray-700"
                         aria-label="Increase quantity"
                       >
@@ -159,6 +163,7 @@ export function CartPage() {
                       type="button"
                       onClick={() => removeItem(item.id)}
                       disabled={cartLoading}
+                      data-testid={`cart-item-remove-${item.product_id}`}
                       className="text-sm font-semibold text-gray-400 hover:text-black transition-colors flex items-center gap-1.5 dark:text-gray-500 dark:hover:text-white underline underline-offset-4"
                     >
                       Remove
@@ -178,6 +183,7 @@ export function CartPage() {
             <div className="flex justify-between items-center pt-4 px-4 sm:px-0">
               <Link
                 to="/products"
+                data-testid="continue-shopping-btn"
                 className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
@@ -190,6 +196,7 @@ export function CartPage() {
                 type="button"
                 onClick={clearCart}
                 disabled={cartLoading}
+                data-testid="clear-cart-btn"
                 className="text-sm font-semibold text-gray-400 hover:text-red-600 transition-colors dark:text-gray-500 dark:hover:text-red-400"
               >
                 Clear Bag
@@ -246,6 +253,7 @@ export function CartPage() {
 
               <Link
                 to="/checkout"
+                data-testid="proceed-to-checkout-btn"
                 className="mt-10 w-full flex items-center justify-center rounded-full bg-black py-4 text-sm font-bold text-white hover:bg-gray-800 hover:scale-[1.02] transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
               >
                 Proceed to Checkout

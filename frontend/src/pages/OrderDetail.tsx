@@ -97,6 +97,7 @@ function CancelModal({
     <div
       className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/40 backdrop-blur-sm"
       onClick={(e) => { if (e.target === e.currentTarget && !isLoading) onClose(); }}
+      data-testid="cancel-order-modal"
     >
       <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800 w-full max-w-md mx-4 overflow-hidden">
         <div className="px-8 pt-8 pb-6 text-center">
@@ -116,6 +117,7 @@ function CancelModal({
           <button
             onClick={onConfirm}
             disabled={isLoading}
+            data-testid="cancel-confirm-btn"
             className="w-full rounded-full bg-red-600 px-4 py-3.5 text-sm font-bold text-white hover:bg-red-700 transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
           >
             {isLoading ? (
@@ -130,6 +132,7 @@ function CancelModal({
           <button
             onClick={onClose}
             disabled={isLoading}
+            data-testid="cancel-keep-btn"
             className="w-full rounded-full bg-gray-100 dark:bg-gray-800 px-4 py-3.5 text-sm font-bold text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
           >
             Keep Order
@@ -304,6 +307,7 @@ export function OrderDetailPage() {
         <div>
           <Link
             to="/orders"
+            data-testid="back-to-orders-link"
             className="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors mb-6"
           >
             <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
@@ -326,6 +330,7 @@ export function OrderDetailPage() {
         {isCancellable && (
           <button
             onClick={() => setShowCancelModal(true)}
+            data-testid="cancel-order-btn"
             className="px-6 py-2.5 rounded-full border-2 border-red-100 text-red-600 text-sm font-bold hover:bg-red-50 hover:border-red-200 transition-colors dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30"
           >
             Cancel Order

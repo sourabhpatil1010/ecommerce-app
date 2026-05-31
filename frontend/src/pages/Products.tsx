@@ -189,6 +189,7 @@ export function ProductsPage() {
         {(user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN") && (
           <button
             onClick={handleOpenCreateModal}
+            data-testid="add-product-btn"
             className="flex items-center justify-center gap-2 rounded-full bg-black dark:bg-white px-5 py-2.5 text-sm font-medium text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4.5 w-4.5">
@@ -215,6 +216,7 @@ export function ProductsPage() {
                   setSelectedCategory("");
                   setPage(1);
                 }}
+                data-testid="filter-all-categories"
                 className={`rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                   selectedCategory === ""
                     ? "font-semibold text-black dark:text-white bg-gray-100 dark:bg-gray-800/50"
@@ -230,6 +232,7 @@ export function ProductsPage() {
                     setSelectedCategory(cat.id);
                     setPage(1);
                   }}
+                  data-testid={`filter-category-${cat.id}`}
                   className={`rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                     selectedCategory === cat.id
                       ? "font-semibold text-black dark:text-white bg-gray-100 dark:bg-gray-800/50"
@@ -258,6 +261,7 @@ export function ProductsPage() {
                     setPage(1);
                   }}
                   placeholder="0"
+                  data-testid="min-price-input"
                   className="mt-1 w-full rounded-xl border-none bg-gray-100/80 p-3 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white dark:bg-gray-900/80 dark:text-white outline-none transition-shadow"
                 />
               </div>
@@ -271,6 +275,7 @@ export function ProductsPage() {
                     setPage(1);
                   }}
                   placeholder="Any"
+                  data-testid="max-price-input"
                   className="mt-1 w-full rounded-xl border-none bg-gray-100/80 p-3 text-sm focus:ring-2 focus:ring-black dark:focus:ring-white dark:bg-gray-900/80 dark:text-white outline-none transition-shadow"
                 />
               </div>
@@ -280,6 +285,7 @@ export function ProductsPage() {
           {/* Reset Filters */}
           <button
             onClick={handleResetFilters}
+            data-testid="clear-filters-btn"
             className="w-full rounded-full border border-gray-200 dark:border-gray-800 bg-transparent py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-black dark:text-gray-400 dark:hover:bg-gray-900 dark:hover:text-white"
           >
             Clear All
@@ -299,6 +305,7 @@ export function ProductsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
+                data-testid="sort-dropdown"
                 className="rounded-full border-none bg-gray-100/80 px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-black outline-none dark:bg-gray-900/80 dark:focus:ring-white dark:text-white cursor-pointer transition-shadow"
               >
                 <option value="newest">Newest Arrivals</option>
@@ -347,6 +354,7 @@ export function ProductsPage() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
+                data-testid="prev-page-btn"
                 className="flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-white dark:border-gray-800 dark:bg-black dark:text-gray-400 dark:hover:bg-gray-900 dark:disabled:hover:bg-black"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
@@ -359,6 +367,7 @@ export function ProductsPage() {
                   <button
                     key={p}
                     onClick={() => setPage(p)}
+                    data-testid={`page-btn-${p}`}
                     className={`flex items-center justify-center h-10 w-10 rounded-full text-sm font-medium transition-colors ${
                       page === p
                         ? "bg-black text-white dark:bg-white dark:text-black"
@@ -373,6 +382,7 @@ export function ProductsPage() {
               <button
                 onClick={() => setPage((p) => Math.min(pages, p + 1))}
                 disabled={page === pages}
+                data-testid="next-page-btn"
                 className="flex items-center justify-center h-10 w-10 rounded-full border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-white dark:border-gray-800 dark:bg-black dark:text-gray-400 dark:hover:bg-gray-900 dark:disabled:hover:bg-black"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-4 w-4">
@@ -386,7 +396,7 @@ export function ProductsPage() {
 
       {/* ─── Admin Product Management Modal (Create/Edit Form) ── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in" data-testid="product-modal">
           <div className="relative w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl dark:bg-gray-950 border border-gray-100 dark:border-gray-800">
             
             {/* Modal Header */}
@@ -426,6 +436,7 @@ export function ProductsPage() {
                     }
                   }}
                   placeholder="Product name"
+                  data-testid="product-name-input"
                   className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 />
               </div>
@@ -439,6 +450,7 @@ export function ProductsPage() {
                   value={formSlug}
                   onChange={(e) => setFormSlug(generateSlug(e.target.value))}
                   placeholder="product-slug"
+                  data-testid="product-slug-input"
                   className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 />
               </div>
@@ -454,6 +466,7 @@ export function ProductsPage() {
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
                     placeholder="0.00"
+                    data-testid="product-price-input"
                     className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                   />
                 </div>
@@ -467,6 +480,7 @@ export function ProductsPage() {
                     value={formStock}
                     onChange={(e) => setFormStock(e.target.value)}
                     placeholder="0"
+                    data-testid="product-stock-input"
                     className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                   />
                 </div>
@@ -478,6 +492,7 @@ export function ProductsPage() {
                 <select
                   value={formCategoryId}
                   onChange={(e) => setFormCategoryId(e.target.value)}
+                  data-testid="product-category-select"
                   className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 >
                   <option value="">No Category</option>
@@ -497,6 +512,7 @@ export function ProductsPage() {
                   value={formImageUrl}
                   onChange={(e) => setFormImageUrl(e.target.value)}
                   placeholder="https://..."
+                  data-testid="product-image-input"
                   className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 />
               </div>
@@ -509,6 +525,7 @@ export function ProductsPage() {
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="Product description..."
+                  data-testid="product-description-input"
                   className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none transition-shadow dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:focus:border-white dark:focus:ring-white"
                 />
               </div>
@@ -520,6 +537,7 @@ export function ProductsPage() {
                   id="formIsActive"
                   checked={formIsActive}
                   onChange={(e) => setFormIsActive(e.target.checked)}
+                  data-testid="product-active-checkbox"
                   className="h-5 w-5 rounded border-gray-300 text-black focus:ring-black dark:border-gray-700 dark:bg-gray-800 dark:checked:bg-white dark:checked:border-transparent cursor-pointer"
                 />
                 <label htmlFor="formIsActive" className="text-sm font-medium text-black dark:text-white cursor-pointer">
@@ -532,12 +550,14 @@ export function ProductsPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
+                  data-testid="cancel-modal-btn"
                   className="rounded-full px-6 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
+                  data-testid="submit-modal-btn"
                   className="rounded-full bg-black px-6 py-2.5 text-sm font-medium text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 transition-colors"
                 >
                   {modalMode === "create" ? "Add Product" : "Save Changes"}

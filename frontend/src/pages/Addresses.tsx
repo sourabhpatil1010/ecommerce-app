@@ -99,7 +99,7 @@ export function AddressesPage() {
   return (
     <div className="container-app py-12 max-w-4xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <Link to="/profile" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+        <Link to="/profile" data-testid="return-to-profile-link" className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
           </svg>
@@ -131,6 +131,7 @@ export function AddressesPage() {
         <div className="space-y-6">
           <button
             onClick={handleAddNew}
+            data-testid="add-new-address-btn-large"
             className="w-full flex items-center justify-center gap-2 p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl text-primary-600 dark:text-primary-500 font-semibold hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/10 transition-all group"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 group-hover:scale-110 transition-transform">

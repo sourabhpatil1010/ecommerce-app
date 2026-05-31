@@ -49,6 +49,7 @@ export function NotificationDropdown() {
           setIsOpen(!isOpen);
           if (!isOpen) fetchNotifications();
         }}
+        data-testid="notification-btn"
         className="p-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 relative"
         aria-label="View Notifications"
       >
@@ -79,6 +80,7 @@ export function NotificationDropdown() {
                 {notifications.map((n) => (
                   <div
                     key={n.id}
+                    data-testid="notification-item"
                     className={`p-4 transition-colors ${n.is_read ? 'bg-white dark:bg-black opacity-70' : 'bg-blue-50/30 dark:bg-blue-900/10 hover:bg-gray-50 dark:hover:bg-gray-900'}`}
                   >
                     <div className="flex gap-3">
@@ -97,6 +99,7 @@ export function NotificationDropdown() {
                       {!n.is_read && (
                         <button
                           onClick={() => handleMarkAsRead(n.id)}
+                          data-testid="mark-read-btn"
                           className="shrink-0 text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline self-start"
                         >
                           Mark read

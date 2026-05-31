@@ -144,6 +144,7 @@ export function CheckoutPaymentPage() {
             <button
               type="button"
               onClick={() => setPaymentMethod('stripe')}
+              data-testid="payment-method-stripe"
               className={`flex flex-col items-start gap-2.5 rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
                 paymentMethod === 'stripe'
                   ? 'border-primary-600 bg-primary-50/20 dark:bg-primary-950/10'
@@ -170,6 +171,7 @@ export function CheckoutPaymentPage() {
             <button
               type="button"
               onClick={() => setPaymentMethod('razorpay')}
+              data-testid="payment-method-razorpay"
               className={`flex flex-col items-start gap-2.5 rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
                 paymentMethod === 'razorpay'
                   ? 'border-primary-600 bg-primary-50/20 dark:bg-primary-950/10'
@@ -197,6 +199,7 @@ export function CheckoutPaymentPage() {
             <button
               type="button"
               onClick={() => setPaymentMethod('cod')}
+              data-testid="payment-method-cod"
               className={`flex flex-col items-start gap-2.5 rounded-2xl border-2 p-4 text-left transition-all duration-200 ${
                 paymentMethod === 'cod'
                   ? 'border-primary-600 bg-primary-50/20 dark:bg-primary-950/10'
@@ -609,6 +612,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
               value={cardHolder}
               onChange={(e) => setCardHolder(e.target.value)}
               placeholder="Jane Doe"
+              data-testid="simulate-cardholder-input"
               className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             />
           </div>
@@ -623,6 +627,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
               value={cardNumber}
               onChange={(e) => handleCardNumberChange(e.target.value)}
               placeholder="4111 1111 1111 1111"
+              data-testid="simulate-card-number-input"
               className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             />
           </div>
@@ -637,6 +642,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
               value={expiry}
               onChange={(e) => setExpiry(e.target.value.substring(0, 5))}
               placeholder="MM/YY"
+              data-testid="simulate-expiry-input"
               className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             />
           </div>
@@ -651,6 +657,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
               value={cvv}
               onChange={(e) => setCvv(e.target.value.substring(0, 4))}
               placeholder="123"
+              data-testid="simulate-cvv-input"
               className="w-full rounded-lg border border-gray-300 bg-white dark:border-gray-700 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
             />
           </div>
@@ -661,6 +668,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
           <button
             type="button"
             onClick={() => handleSimulatePayment(true)}
+            data-testid="simulate-success-btn"
             className="flex items-center justify-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-green-200/50 hover:shadow-lg transition-all"
           >
             Simulate Success Payment
@@ -668,6 +676,7 @@ function SimulatedPaymentForm({ order }: { order: Order }) {
           <button
             type="button"
             onClick={() => handleSimulatePayment(false)}
+            data-testid="simulate-failure-btn"
             className="flex items-center justify-center gap-2 rounded-xl bg-red-600 hover:bg-red-700 px-6 py-3.5 text-sm font-semibold text-white shadow-md shadow-red-200/50 hover:shadow-lg transition-all"
           >
             Simulate Failure Payment

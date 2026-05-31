@@ -85,6 +85,7 @@ export function ProductDetailView({ product, categories, onEdit }: ProductDetail
               <button
                 key={idx}
                 onClick={() => setSelectedImageIndex(idx)}
+                data-testid={`thumbnail-btn-${idx}`}
                 className={`relative flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 hover:opacity-100 ${
                   idx === selectedImageIndex
                     ? "border-black dark:border-white ring-2 ring-black/10 dark:ring-white/10 opacity-100"
@@ -151,6 +152,7 @@ export function ProductDetailView({ product, categories, onEdit }: ProductDetail
           {isAdmin && (
             <button
               onClick={() => onEdit?.(product)}
+              data-testid="edit-details-btn"
               className="flex items-center gap-1.5 rounded-full bg-black px-4 py-1.5 text-xs font-bold text-white shadow-sm transition-transform hover:scale-105 dark:bg-white dark:text-black"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.0} stroke="currentColor" className="h-3.5 w-3.5">
@@ -187,19 +189,21 @@ export function ProductDetailView({ product, categories, onEdit }: ProductDetail
                 type="button"
                 onClick={decrementQty}
                 disabled={quantity <= 1}
+                data-testid="decrement-qty-btn"
                 className="flex h-full w-14 items-center justify-center text-black transition-colors hover:text-gray-600 disabled:opacity-30 dark:text-white dark:hover:text-gray-300"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
                 </svg>
               </button>
-              <span className="w-8 text-center font-bold text-black dark:text-white">
+              <span className="w-8 text-center font-bold text-black dark:text-white" data-testid="quantity-display">
                 {quantity}
               </span>
               <button
                 type="button"
                 onClick={incrementQty}
                 disabled={quantity >= product.stock}
+                data-testid="increment-qty-btn"
                 className="flex h-full w-14 items-center justify-center text-black transition-colors hover:text-gray-600 disabled:opacity-30 dark:text-white dark:hover:text-gray-300"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
@@ -219,6 +223,7 @@ export function ProductDetailView({ product, categories, onEdit }: ProductDetail
               }}
               className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700 active:scale-95"
               title={isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+              data-testid="wishlist-btn"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -235,6 +240,7 @@ export function ProductDetailView({ product, categories, onEdit }: ProductDetail
             {/* Apple/Nike style CTA */}
             <button
               onClick={handleAddToCart}
+              data-testid="add-to-cart-btn"
               className={`flex h-14 flex-grow items-center justify-center gap-2 rounded-full px-8 text-sm font-bold transition-all duration-300 active:scale-[0.98] ${
                 added
                   ? "bg-green-500 text-white"

@@ -110,6 +110,7 @@ export function AdminUsersPage() {
                     {!user.is_superuser && (
                       <button
                         onClick={() => toggleUserStatus(user.id, user.is_active)}
+                        data-testid={`admin-toggle-user-${user.id}`}
                         className={`inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                           user.is_active 
                             ? "text-red-700 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40" 

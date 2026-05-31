@@ -178,6 +178,7 @@ export function OrderHistoryPage() {
                   </div>
                   <Link
                     to={`/orders/${order.id}`}
+                    data-testid={`view-order-${order.id}`}
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-gray-50 dark:bg-gray-800 px-5 py-2.5 text-sm font-bold text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors w-full sm:w-auto"
                   >
                     View Details

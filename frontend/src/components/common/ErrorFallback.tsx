@@ -3,7 +3,7 @@ import { Button } from "./Button";
 
 export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center p-6 text-center">
+    <div className="flex min-h-[400px] flex-col items-center justify-center p-6 text-center" data-testid="error-fallback">
       <div className="mb-4 rounded-full bg-red-100 p-3">
         <svg
           className="h-8 w-8 text-red-600"
@@ -25,7 +25,7 @@ export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
       <p className="mb-6 max-w-md text-gray-600 dark:text-gray-400">
         {(error as any).message || "An unexpected error occurred."}
       </p>
-      <Button onClick={resetErrorBoundary} variant="primary">
+      <Button onClick={resetErrorBoundary} variant="primary" data-testid="try-again-btn">
         Try again
       </Button>
     </div>

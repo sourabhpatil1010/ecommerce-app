@@ -66,6 +66,7 @@ export function AdminProductsPage() {
         {(user?.role === "SUPER_ADMIN" || user?.role === "PRODUCT_ADMIN") && (
           <Link 
             to="/admin/products/new"
+            data-testid="admin-add-product-btn"
             className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
           >
             <Plus className="h-5 w-5 mr-2" /> Add Product
@@ -122,10 +123,10 @@ export function AdminProductsPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     {canManageProducts && (
                       <>
-                        <Link to={`/admin/products/edit/${product.id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4 inline-block">
+                        <Link to={`/admin/products/edit/${product.id}`} data-testid={`admin-edit-product-${product.id}`} className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4 inline-block">
                           <Edit className="h-5 w-5 inline" />
                         </Link>
-                        <button onClick={() => handleDelete(product.id)} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                        <button onClick={() => handleDelete(product.id)} data-testid={`admin-delete-product-${product.id}`} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
                           <Trash2 className="h-5 w-5 inline" />
                         </button>
                       </>

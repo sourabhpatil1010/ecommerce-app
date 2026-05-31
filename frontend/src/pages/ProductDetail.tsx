@@ -181,7 +181,7 @@ export function ProductDetailPage() {
 
       {/* ─── Admin Edit Modal ───────────────────────────────── */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" data-testid="edit-product-modal">
           <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
             
             {/* Modal Header */}
@@ -213,6 +213,7 @@ export function ProductDetailPage() {
                   required
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
+                  data-testid="edit-product-name"
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
@@ -225,6 +226,7 @@ export function ProductDetailPage() {
                   required
                   value={formSlug}
                   onChange={(e) => setFormSlug(generateSlug(e.target.value))}
+                  data-testid="edit-product-slug"
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
@@ -239,6 +241,7 @@ export function ProductDetailPage() {
                     required
                     value={formPrice}
                     onChange={(e) => setFormPrice(e.target.value)}
+                    data-testid="edit-product-price"
                     className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
@@ -251,6 +254,7 @@ export function ProductDetailPage() {
                     required
                     value={formStock}
                     onChange={(e) => setFormStock(e.target.value)}
+                    data-testid="edit-product-stock"
                     className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
@@ -262,6 +266,7 @@ export function ProductDetailPage() {
                 <select
                   value={formCategoryId}
                   onChange={(e) => setFormCategoryId(e.target.value)}
+                  data-testid="edit-product-category"
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 >
                   <option value="">No Category</option>
@@ -295,6 +300,7 @@ export function ProductDetailPage() {
                   rows={3}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
+                  data-testid="edit-product-description"
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3.5 py-2 text-sm focus:border-primary-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                 />
               </div>
@@ -306,6 +312,7 @@ export function ProductDetailPage() {
                   id="formIsActive"
                   checked={formIsActive}
                   onChange={(e) => setFormIsActive(e.target.checked)}
+                  data-testid="edit-product-active"
                   className="h-4.5 w-4.5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
                 <label htmlFor="formIsActive" className="text-sm font-semibold text-gray-700 dark:text-gray-300">
@@ -318,12 +325,14 @@ export function ProductDetailPage() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
+                  data-testid="edit-cancel-btn"
                   className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
+                  data-testid="edit-submit-btn"
                   className="rounded-lg bg-primary-600 px-5 py-2 text-sm font-bold text-white hover:bg-primary-700"
                 >
                   Save Changes

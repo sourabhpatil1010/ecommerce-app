@@ -104,6 +104,7 @@ export function HeaderSearch({ isMobile = false, onSearchComplete }: HeaderSearc
           onChange={handleSearchChange}
           onFocus={() => { if (query.trim().length >= 2) setShowSuggestions(true); }}
           placeholder="Search products..."
+          data-testid="search-input"
           className={`w-full bg-gray-100/50 dark:bg-gray-900/50 border border-transparent text-sm rounded-full focus:border-gray-300 dark:focus:border-gray-700 focus:bg-white dark:focus:bg-black block pl-9 p-2 transition-all outline-none text-gray-900 dark:text-white placeholder-gray-500 ${isMobile ? 'py-2.5 bg-gray-100 dark:bg-gray-900' : ''}`}
         />
       </form>
@@ -119,6 +120,7 @@ export function HeaderSearch({ isMobile = false, onSearchComplete }: HeaderSearc
                 <li key={item.id}>
                   <button
                     onClick={() => handleSuggestionClick(item.id)}
+                    data-testid="search-suggestion-item"
                     className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                   >
                     {item.image_url ? (
@@ -136,6 +138,7 @@ export function HeaderSearch({ isMobile = false, onSearchComplete }: HeaderSearc
               <li>
                 <button
                   onClick={handleSearchSubmit}
+                  data-testid="search-see-all-btn"
                   className="w-full text-center px-4 py-3 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                 >
                   See all results for "{query}"

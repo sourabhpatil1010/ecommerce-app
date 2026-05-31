@@ -56,6 +56,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             value={formData.full_name}
             onChange={handleChange}
             required
+            data-testid="address-fullname-input"
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white transition-shadow"
           />
         </div>
@@ -69,6 +70,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             value={formData.phone}
             onChange={handleChange}
             required
+            data-testid="address-phone-input"
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white transition-shadow"
           />
         </div>
@@ -82,6 +84,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             value={formData.pincode}
             onChange={handleChange}
             required
+            data-testid="address-pincode-input"
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white transition-shadow"
           />
         </div>
@@ -95,6 +98,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             value={formData.locality}
             onChange={handleChange}
             required
+            data-testid="address-locality-input"
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white transition-shadow"
           />
         </div>
@@ -108,6 +112,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             onChange={handleChange}
             required
             rows={3}
+            data-testid="address-line-input"
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white transition-shadow resize-none"
           />
         </div>
@@ -121,6 +126,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             value={formData.city}
             onChange={handleChange}
             required
+            data-testid="address-city-input"
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white transition-shadow"
           />
         </div>
@@ -134,6 +140,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             value={formData.state}
             onChange={handleChange}
             required
+            data-testid="address-state-input"
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white transition-shadow"
           />
         </div>
@@ -146,6 +153,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             name="landmark"
             value={formData.landmark}
             onChange={handleChange}
+            data-testid="address-landmark-input"
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white transition-shadow"
           />
         </div>
@@ -158,6 +166,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
             name="alternate_phone"
             value={formData.alternate_phone}
             onChange={handleChange}
+            data-testid="address-alternate-phone-input"
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-2.5 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:text-white transition-shadow"
           />
         </div>
@@ -175,6 +184,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
               value="Home"
               checked={formData.address_type === "Home"}
               onChange={handleChange}
+              data-testid="address-type-home"
               className="text-primary-600 focus:ring-primary-500"
             />
             <span className="text-sm text-gray-800 dark:text-gray-200">Home (All day delivery)</span>
@@ -186,6 +196,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
               value="Work"
               checked={formData.address_type === "Work"}
               onChange={handleChange}
+              data-testid="address-type-work"
               className="text-primary-600 focus:ring-primary-500"
             />
             <span className="text-sm text-gray-800 dark:text-gray-200">Work (Delivery between 10 AM - 5 PM)</span>
@@ -201,6 +212,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
               name="is_default"
               checked={formData.is_default}
               onChange={handleChange}
+              data-testid="address-is-default"
               className="rounded text-primary-600 focus:ring-primary-500 h-4 w-4"
             />
             <span className="text-sm text-gray-800 dark:text-gray-200 font-medium">Make this my default address</span>
@@ -213,6 +225,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
           type="button"
           onClick={onCancel}
           disabled={isLoading}
+          data-testid="address-cancel-btn"
           className="flex-1 px-6 py-3 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
         >
           Cancel
@@ -220,6 +233,7 @@ export const AddressForm: React.FC<AddressFormProps> = ({
         <button
           type="submit"
           disabled={isLoading}
+          data-testid="address-submit-btn"
           className="flex-1 px-6 py-3 rounded-xl bg-primary-600 text-white font-semibold hover:bg-primary-700 shadow-md shadow-primary-500/20 transition-all disabled:opacity-50 flex justify-center items-center gap-2"
         >
           {isLoading && <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />}

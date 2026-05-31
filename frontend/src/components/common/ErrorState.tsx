@@ -18,7 +18,7 @@ export const ErrorState = ({
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center animate-in fade-in zoom-in-95 duration-300">
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center animate-in fade-in zoom-in-95 duration-300" data-testid="error-state">
       <div className="w-16 h-16 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mb-6 text-red-500">
         <AlertCircle className="w-8 h-8" strokeWidth={2} />
       </div>
@@ -28,13 +28,13 @@ export const ErrorState = ({
       </p>
       <div className="flex items-center gap-4">
         {onRetry && (
-          <Button onClick={onRetry} variant="outline" className="rounded-full gap-2 hover:bg-gray-50 dark:hover:bg-gray-800">
+          <Button onClick={onRetry} variant="outline" className="rounded-full gap-2 hover:bg-gray-50 dark:hover:bg-gray-800" data-testid="retry-btn">
             <RefreshCcw className="w-4 h-4" />
             Try Again
           </Button>
         )}
         {showHome && (
-          <Button onClick={() => navigate('/')} className="rounded-full gap-2">
+          <Button onClick={() => navigate('/')} className="rounded-full gap-2" data-testid="home-btn">
             <Home className="w-4 h-4" />
             Go Home
           </Button>

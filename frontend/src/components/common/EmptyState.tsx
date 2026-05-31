@@ -19,7 +19,7 @@ export const EmptyState = ({
   emoji
 }: EmptyStateProps) => {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center animate-in fade-in duration-500">
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center animate-in fade-in duration-500" data-testid="empty-state">
       <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mb-6 shadow-sm">
         {emoji ? (
           <span className="text-4xl">{emoji}</span>
@@ -32,7 +32,7 @@ export const EmptyState = ({
         {description}
       </p>
       {actionLabel && onAction && (
-        <Button onClick={onAction} className="rounded-full px-8 shadow-sm hover:-translate-y-0.5 transition-transform">
+        <Button onClick={onAction} className="rounded-full px-8 shadow-sm hover:-translate-y-0.5 transition-transform" data-testid="empty-state-action-btn">
           {actionLabel}
         </Button>
       )}

@@ -208,6 +208,7 @@ export function CheckoutPage() {
                 {addresses.length > 0 && !showAddressForm && (
                   <button
                     onClick={() => setShowAddressForm(true)}
+                    data-testid="add-new-address-btn"
                     className="flex items-center gap-2 text-black dark:text-white font-bold hover:text-gray-600 transition-colors underline underline-offset-4"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
@@ -235,6 +236,7 @@ export function CheckoutPage() {
           <div className="pt-8 flex flex-col-reverse sm:flex-row justify-between items-center gap-4">
             <Link
               to="/cart"
+              data-testid="return-to-bag-link"
               className="inline-flex items-center gap-1 text-sm font-bold text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="h-4 w-4">
@@ -247,6 +249,7 @@ export function CheckoutPage() {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting || cartLoading || !selectedAddress || showAddressForm}
+              data-testid="continue-payment-btn"
               className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full bg-black px-8 py-4 text-sm font-bold text-white hover:bg-gray-800 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 disabled:active:scale-100 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
             >
               {isSubmitting ? (
@@ -304,7 +307,7 @@ export function CheckoutPage() {
                     <p className="text-sm font-bold text-green-800 dark:text-green-400">{appliedCoupon.code}</p>
                     <p className="text-xs text-green-600 dark:text-green-500 mt-0.5">{appliedCoupon.discount_percentage}% off applied</p>
                   </div>
-                  <button onClick={handleRemoveCoupon} className="text-sm text-gray-500 hover:text-red-500 transition-colors font-medium">Remove</button>
+                  <button onClick={handleRemoveCoupon} data-testid="remove-coupon-btn" className="text-sm text-gray-500 hover:text-red-500 transition-colors font-medium">Remove</button>
                 </div>
               ) : (
                 <div className="flex gap-2">
@@ -313,11 +316,13 @@ export function CheckoutPage() {
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     placeholder="Enter code"
+                    data-testid="coupon-code-input"
                     className="flex-1 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:border-black dark:focus:border-white focus:outline-none focus:ring-1 focus:ring-black dark:focus:ring-white transition-all text-black dark:text-white placeholder-gray-400"
                   />
                   <button
                     onClick={handleApplyCoupon}
                     disabled={!couponCode.trim() || validatingCoupon}
+                    data-testid="apply-coupon-btn"
                     className="bg-black dark:bg-white text-white dark:text-black font-bold text-sm px-6 rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors disabled:opacity-50"
                   >
                     {validatingCoupon ? "..." : "Apply"}

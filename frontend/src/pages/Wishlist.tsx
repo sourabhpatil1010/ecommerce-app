@@ -93,7 +93,7 @@ export function WishlistPage() {
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 animate-in fade-in duration-500">
           {items.map((item) => (
-            <div key={item.id} className="group relative flex flex-col rounded-2xl bg-white dark:bg-gray-950 p-4 shadow-sm border border-gray-100 dark:border-gray-800 transition-all hover:shadow-lg hover:-translate-y-1">
+            <div key={item.id} data-testid={`wishlist-item-${item.product.id}`} className="group relative flex flex-col rounded-2xl bg-white dark:bg-gray-950 p-4 shadow-sm border border-gray-100 dark:border-gray-800 transition-all hover:shadow-lg hover:-translate-y-1">
               <Link to={`/product/${item.product.id}`} className="relative block overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-900 aspect-square">
                 <img
                   src={item.product.image_url || "/placeholder.jpg"}
@@ -106,6 +106,7 @@ export function WishlistPage() {
 
               <button
                 onClick={() => handleRemove(item.product_id)}
+                data-testid={`wishlist-remove-${item.product.id}`}
                 className="absolute top-6 right-6 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 dark:bg-black/80 backdrop-blur text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50 transition-colors shadow-sm"
                 title="Remove from wishlist"
               >
@@ -132,6 +133,7 @@ export function WishlistPage() {
                 <button
                   onClick={() => addItem(item.product.id, 1)}
                   disabled={!item.product.is_active || item.product.stock <= 0}
+                  data-testid={`wishlist-add-to-bag-${item.product.id}`}
                   className="mt-4 flex items-center justify-center gap-2 w-full rounded-xl bg-black dark:bg-white py-2.5 text-sm font-medium text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <ShoppingBag className="h-4 w-4" />

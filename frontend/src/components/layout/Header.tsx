@@ -36,13 +36,13 @@ export function Header() {
         
         {/* Logo & Desktop Nav */}
         <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-tighter text-black dark:text-white transition hover:opacity-80">
+          <Link to="/" data-testid="header-logo" className="flex items-center gap-2 text-xl font-bold tracking-tighter text-black dark:text-white transition hover:opacity-80">
             Store.
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
             {navLinks.map((link) => (
-              <NavLink key={link.to} to={link.to} className={getLinkClass}>
+              <NavLink key={link.to} to={link.to} data-testid={`nav-link-${link.label.toLowerCase()}`} className={getLinkClass}>
                 {link.label}
               </NavLink>
             ))}
@@ -61,6 +61,7 @@ export function Header() {
           {themeContext && (
             <button
               onClick={themeContext.toggleTheme}
+              data-testid="theme-toggle-btn"
               className="p-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors focus:outline-none rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
               aria-label="Toggle Theme"
             >
@@ -81,6 +82,7 @@ export function Header() {
           {/* Wishlist Icon */}
           <Link
             to="/wishlist"
+            data-testid="wishlist-btn"
             className="p-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
             aria-label="View Wishlist"
           >
@@ -99,6 +101,7 @@ export function Header() {
           {/* Cart Icon & Badge */}
           <Link
             to="/cart"
+            data-testid="cart-btn"
             className="relative p-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
             aria-label="View Cart"
           >
@@ -122,6 +125,7 @@ export function Header() {
             <div className="relative">
               <button
                 onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                data-testid="profile-btn"
                 className="flex items-center gap-2 focus:outline-none ml-1"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs font-medium text-black dark:text-white hover:border-gray-300 dark:hover:border-gray-600 transition-colors">
@@ -148,6 +152,7 @@ export function Header() {
                       <Link
                         to="/profile"
                         onClick={() => setIsUserDropdownOpen(false)}
+                        data-testid="dropdown-profile"
                         className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-black dark:hover:text-white rounded-lg transition-colors"
                       >
                         Profile
@@ -155,6 +160,7 @@ export function Header() {
                       <Link
                         to="/orders"
                         onClick={() => setIsUserDropdownOpen(false)}
+                        data-testid="dropdown-orders"
                         className="block px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 hover:text-black dark:hover:text-white rounded-lg transition-colors"
                       >
                         My Orders
@@ -171,6 +177,7 @@ export function Header() {
                             user?.role === "SUPER_ADMIN" ? "/admin/super/dashboard" : "/admin"
                           }
                           onClick={() => setIsUserDropdownOpen(false)}
+                          data-testid="dropdown-admin"
                           className="block px-3 py-2 text-sm text-black dark:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-lg transition-colors font-medium"
                         >
                           Admin Dashboard
@@ -181,6 +188,7 @@ export function Header() {
                     <div className="mt-1 pt-1 border-t border-gray-100 dark:border-gray-800">
                       <button
                         onClick={handleLogout}
+                        data-testid="dropdown-logout"
                         className="block w-full text-left px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 hover:text-red-700 dark:hover:text-red-300 rounded-lg transition-colors"
                       >
                         Log Out
@@ -194,12 +202,14 @@ export function Header() {
             <div className="hidden sm:flex items-center gap-3">
               <Link
                 to="/login"
+                data-testid="header-login-link"
                 className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
               >
                 Log In
               </Link>
               <Link
                 to="/register"
+                data-testid="header-register-link"
                 className="rounded-full bg-black dark:bg-white px-4 py-1.5 text-sm font-medium text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
               >
                 Sign Up
@@ -210,6 +220,7 @@ export function Header() {
           {/* Hamburger Menu Toggle (Mobile) */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            data-testid="mobile-menu-toggle-btn"
             className="md:hidden p-2 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white focus:outline-none rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
             aria-label="Toggle Menu"
           >

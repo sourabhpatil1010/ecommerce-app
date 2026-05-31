@@ -72,6 +72,7 @@ export function LoginForm() {
       {error && (
         <div
           role="alert"
+          data-testid="login-error"
           className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-700 dark:text-red-400"
         >
           <svg
@@ -106,6 +107,7 @@ export function LoginForm() {
           autoComplete="email"
           placeholder="you@example.com"
           disabled={isLoading}
+          data-testid="email-input"
           className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
         />
       </div>
@@ -127,6 +129,7 @@ export function LoginForm() {
           autoComplete="current-password"
           placeholder="••••••••"
           disabled={isLoading}
+          data-testid="password-input"
           className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-50"
         />
       </div>
@@ -135,6 +138,7 @@ export function LoginForm() {
       <button
         id="login-submit"
         type="submit"
+        data-testid="login-btn"
         disabled={isLoading}
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed"
       >
@@ -152,6 +156,7 @@ export function LoginForm() {
         Don't have an account?{" "}
         <Link
           to="/register"
+          data-testid="register-link"
           className="font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 hover:underline"
         >
           Sign up

@@ -98,6 +98,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                         type="button"
                         key={star}
                         onClick={() => setRating(star)}
+                        data-testid={`rating-star-${star}`}
                         className="focus:outline-none transition-transform hover:scale-110"
                       >
                         <Star
@@ -113,6 +114,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                     rows={4}
                     value={reviewText}
                     onChange={(e) => setReviewText(e.target.value)}
+                    data-testid="review-textarea"
                     className="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm focus:border-black focus:ring-1 focus:ring-black dark:text-white outline-none transition-all resize-none"
                     placeholder="Share your thoughts about this product..."
                   />
@@ -120,6 +122,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                 <button
                   type="submit"
                   disabled={isSubmitting}
+                  data-testid="submit-review-btn"
                   className="w-full rounded-xl bg-black px-4 py-3 text-sm font-bold text-white transition-all hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 disabled:opacity-50"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Review'}
@@ -183,6 +186,7 @@ export function ProductReviews({ productId }: ProductReviewsProps) {
                   {(user?.id === review.user_id || user?.is_superuser) && (
                     <button
                       onClick={() => handleDelete(review.id)}
+                      data-testid={`delete-review-btn-${review.id}`}
                       className="mt-4 text-xs font-medium text-red-500 hover:text-red-600 hover:underline"
                     >
                       Delete

@@ -30,6 +30,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
           : "border-transparent bg-gray-100 dark:bg-gray-900"
       }`}
       onClick={() => selectable && onSelect && onSelect(address)}
+      data-testid={`address-card-${address.id}`}
     >
       {selected && (
         <div className="absolute -top-3 -right-3 bg-black dark:bg-white text-white dark:text-black p-1.5 rounded-full shadow-lg">
@@ -82,6 +83,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
                     e.stopPropagation();
                     onEdit(address);
                   }}
+                  data-testid={`edit-address-btn-${address.id}`}
                   className="w-full text-left px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors"
                 >
                   Edit Address
@@ -93,6 +95,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
                     e.stopPropagation();
                     onDelete(address.id);
                   }}
+                  data-testid={`delete-address-btn-${address.id}`}
                   className="w-full text-left px-4 py-2 text-sm font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors mt-1"
                 >
                   Delete Address
@@ -121,6 +124,7 @@ export const AddressCard: React.FC<AddressCardProps> = ({
               e.stopPropagation();
               onSetDefault(address.id);
             }}
+            data-testid={`set-default-address-btn-${address.id}`}
             className="text-xs font-bold uppercase tracking-wider text-black hover:text-gray-500 dark:text-white dark:hover:text-gray-300 transition-colors"
           >
             Set as Default

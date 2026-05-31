@@ -25,7 +25,7 @@ export function HomePage() {
     <div className="min-h-screen bg-white dark:bg-black pb-16">
       
       {/* Modern Hero Section */}
-      <section className="relative overflow-hidden bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+      <section data-testid="hero-section" className="relative overflow-hidden bg-gray-50 dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
         <div className="container-app py-24 sm:py-32 flex flex-col items-center text-center">
           <h1 className="text-5xl font-extrabold tracking-tighter text-black dark:text-white sm:text-6xl lg:text-7xl">
             Redefine your <span className="text-gray-400 dark:text-gray-500">style.</span>
@@ -36,6 +36,7 @@ export function HomePage() {
           <div className="mt-10">
             <Link
               to="/products"
+              data-testid="hero-shop-btn"
               className="inline-flex items-center justify-center rounded-full bg-black px-8 py-3.5 text-sm font-semibold text-white shadow-lg shadow-gray-200 dark:shadow-none hover:bg-gray-800 hover:scale-105 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
             >
               Shop Collection
@@ -64,13 +65,14 @@ export function HomePage() {
             
             {/* Featured Products Section */}
             {featuredProducts.length > 0 && (
-              <section>
+              <section data-testid="featured-section">
                 <div className="mb-8 flex items-end justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
                   <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white sm:text-3xl">
                     Featured Collection
                   </h2>
                   <Link
                     to="/products"
+                    data-testid="featured-view-all-btn"
                     className="hidden sm:inline-flex items-center justify-center rounded-full bg-gray-100 px-5 py-2 text-sm font-medium text-black hover:bg-gray-200 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 transition-colors"
                   >
                     View All
@@ -80,6 +82,7 @@ export function HomePage() {
                 <div className="mt-8 flex justify-center sm:hidden">
                   <Link
                     to="/products"
+                    data-testid="mobile-view-all-btn"
                     className="inline-flex w-full items-center justify-center rounded-full bg-gray-100 px-5 py-3 text-sm font-medium text-black hover:bg-gray-200 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 transition-colors"
                   >
                     View All Products
@@ -90,7 +93,7 @@ export function HomePage() {
 
             {/* Trending Products Section */}
             {trendingProducts.length > 0 && (
-              <section>
+              <section data-testid="trending-section">
                 <div className="mb-8 border-b border-gray-100 dark:border-gray-800 pb-4">
                   <h2 className="text-2xl font-bold tracking-tight text-black dark:text-white sm:text-3xl">
                     Trending Now

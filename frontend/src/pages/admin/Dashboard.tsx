@@ -131,7 +131,7 @@ export function AdminDashboardPage() {
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">Overview</h1>
           <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1">Metrics and performance for your store</p>
         </div>
-        <button className="hidden sm:flex items-center gap-2 rounded-lg bg-black dark:bg-white px-4 py-2 text-sm font-semibold text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
+        <button data-testid="admin-download-report-btn" className="hidden sm:flex items-center gap-2 rounded-lg bg-black dark:bg-white px-4 py-2 text-sm font-semibold text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
           <Activity className="h-4 w-4" />
           Download Report
         </button>
