@@ -6,6 +6,10 @@ import { formatCurrency } from "@/utils/currency";
 interface Order {
   id: string;
   total_amount: number;
+  discount_amount: number | null;
+  coupon_code: string | null;
+  shipping_cost: number | null;
+  tax_amount: number | null;
   shipping_address: string;
   created_at: string;
 }

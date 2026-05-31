@@ -22,6 +22,9 @@ class OrderCreate(BaseSchema):
 
     shipping_address: str
     coupon_code: str | None = None
+    discount_amount: float = 0
+    shipping_cost: float = 0
+    tax_amount: float = 0
 
 
 class OrderStatusHistoryRead(BaseSchema):
@@ -46,6 +49,8 @@ class OrderRead(BaseSchema):
     total_amount: float
     discount_amount: float | None = None
     coupon_code: str | None = None
+    shipping_cost: float | None = None
+    tax_amount: float | None = None
     shipping_address: str | None
     department: str | None = None
     tracking_id: str | None = None

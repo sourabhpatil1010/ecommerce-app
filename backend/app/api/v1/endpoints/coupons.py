@@ -115,6 +115,7 @@ async def validate_coupon(
 
     return {
         "valid": True,
+        "code": coupon.code,
         "discount_percentage": float(coupon.discount_percentage),
         "max_discount_amount": float(coupon.max_discount_amount) if coupon.max_discount_amount else None
     }

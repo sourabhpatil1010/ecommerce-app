@@ -96,7 +96,13 @@ export function CheckoutPage() {
     const fullShippingAddress = `${selectedAddress.full_name}, ${selectedAddress.address_line}, ${selectedAddress.locality}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}, Phone: ${selectedAddress.phone}`;
 
     try {
-      const res = await createOrder(fullShippingAddress, appliedCoupon?.code);
+      const res = await createOrder(
+        fullShippingAddress,
+        appliedCoupon?.code,
+        discountAmount,
+        shippingCost,
+        taxCost,
+      );
       // Refresh the cart from backend since it has been cleared
       await fetchCart();
       // Redirect to secure payment checkout page

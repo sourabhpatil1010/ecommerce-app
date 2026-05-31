@@ -24,6 +24,10 @@ def _enrich_order(order: Any, payment: Any = None) -> dict:
         "user_id": order.user_id,
         "status": computed_status,
         "total_amount": float(order.total_amount),
+        "discount_amount": float(order.discount_amount) if order.discount_amount else None,
+        "coupon_code": order.coupon_code,
+        "shipping_cost": float(order.shipping_cost) if order.shipping_cost else None,
+        "tax_amount": float(order.tax_amount) if order.tax_amount else None,
         "shipping_address": order.shipping_address,
         "items": order.items,
         "status_history": getattr(order, 'status_history', []),
@@ -42,7 +46,14 @@ async def create_order(
 ) -> Any:
     """Create a new order from the current cart."""
     order_service = OrderService(db)
-    order = await order_service.create_order(current_user.id, order_in.shipping_address)
+    order = await order_service.create_order(
+        user_id=current_user.id,
+        shipping_address=order_in.shipping_address,
+        coupon_code=order_in.coupon_code,
+        discount_amount=order_in.discount_amount,
+        shipping_cost=order_in.shipping_cost,
+        tax_amount=order_in.tax_amount,
+    )
     
     # Manually commit to ensure order is persisted
     await db.commit()

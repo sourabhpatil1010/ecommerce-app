@@ -15,7 +15,15 @@ class OrderService:
     def __init__(self, session: AsyncSession):
         self.order_repo = OrderRepository(session)
 
-    async def create_order(self, user_id: uuid.UUID, shipping_address: str) -> Order:
+    async def create_order(
+        self,
+        user_id: uuid.UUID,
+        shipping_address: str,
+        coupon_code: str | None = None,
+        discount_amount: float = 0,
+        shipping_cost: float = 0,
+        tax_amount: float = 0,
+    ) -> Order:
         """Create a new order from the user's current cart, validating stock and clearing the cart."""
         # 1. Fetch cart using CartService
         from app.services.cart import CartService
@@ -28,7 +36,7 @@ class OrderService:
 
         # 3. Check stock for each item, decrement stock, and prepare order items
         order_items = []
-        total_amount = 0.0
+        subtotal = 0.0
 
         for item in cart.items:
             product = item.product
@@ -46,23 +54,30 @@ class OrderService:
                 unit_price=item.unit_price
             )
             order_items.append(order_item)
-            total_amount += float(item.unit_price) * item.quantity
+            subtotal += float(item.unit_price) * item.quantity
 
         from app.models.order import OrderStatus
         
-        # 4. Create Order entity
+        # 4. Calculate final total: subtotal - discount + shipping + tax
+        total_amount = subtotal - discount_amount + shipping_cost + tax_amount
+
+        # 5. Create Order entity with full pricing breakdown
         order = Order(
             user_id=user_id,
             shipping_address=shipping_address,
             status=OrderStatus.CHECKOUT_CREATED.value,
             total_amount=total_amount,
+            coupon_code=coupon_code,
+            discount_amount=discount_amount,
+            shipping_cost=shipping_cost,
+            tax_amount=tax_amount,
             items=order_items
         )
 
-        # 5. Persist order
+        # 6. Persist order
         await self.order_repo.create(order)
 
-        # 6. Clear cart
+        # 7. Clear cart
         await cart_service.clear_cart(user_id)
 
         # Flush session to register all database changes (BaseRepository.create calls flush but we make sure)

@@ -24,6 +24,10 @@ interface Order {
   user_id: string;
   status: string;
   total_amount: number;
+  discount_amount: number | null;
+  coupon_code: string | null;
+  shipping_cost: number | null;
+  tax_amount: number | null;
   shipping_address: string;
   tracking_id: string | null;
   courier: string | null;
@@ -244,9 +248,9 @@ export function OrderDetailPage() {
   }
 
   const subtotal = order.items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0);
-  const shippingThreshold = 4000;
-  const shippingCost = subtotal >= shippingThreshold || subtotal === 0 ? 0 : 500;
-  const taxCost = subtotal * 0.08;
+  const discountAmount = order.discount_amount ?? 0;
+  const shippingCost = order.shipping_cost ?? 0;
+  const taxCost = order.tax_amount ?? 0;
   const placeholderImage = "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500&q=80";
 
   let estimatedDeliveryDate = "Invalid Date";
@@ -469,6 +473,14 @@ export function OrderDetailPage() {
                 <span>Subtotal</span>
                 <span className="text-black dark:text-white">{formatCurrency(subtotal)}</span>
               </div>
+
+              {discountAmount > 0 && (
+                <div className="flex justify-between text-sm font-medium text-green-600 dark:text-green-400">
+                  <span>Discount{order.coupon_code ? ` (${order.coupon_code})` : ''}</span>
+                  <span>-{formatCurrency(discountAmount)}</span>
+                </div>
+              )}
+
               <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
                 <span>Shipping</span>
                 {shippingCost === 0 ? (
@@ -478,7 +490,7 @@ export function OrderDetailPage() {
                 )}
               </div>
               <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
-                <span>Estimated Tax (8%)</span>
+                <span>Tax</span>
                 <span className="text-black dark:text-white">{formatCurrency(taxCost)}</span>
               </div>
             </div>

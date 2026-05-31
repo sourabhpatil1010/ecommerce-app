@@ -33,6 +33,10 @@ interface Order {
   user_id: string;
   status: string;
   total_amount: number;
+  discount_amount: number | null;
+  coupon_code: string | null;
+  shipping_cost: number | null;
+  tax_amount: number | null;
   shipping_address: string;
   items: OrderItem[];
   created_at: string;
@@ -293,10 +297,38 @@ export function CheckoutPaymentPage() {
               </p>
             </div>
 
-            {/* Pricing Total */}
-            <div className="border-t border-gray-200 dark:border-gray-800 pt-6 mt-6 flex justify-between text-xl font-extrabold text-black dark:text-white">
-              <span>Amount Due</span>
-              <span>{formatCurrency(order.total_amount)}</span>
+            {/* Pricing Breakdown */}
+            <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-800">
+              <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
+                <span>Subtotal</span>
+                <span className="text-black dark:text-white">{formatCurrency(order.items.reduce((sum, item) => sum + item.unit_price * item.quantity, 0))}</span>
+              </div>
+
+              {(order.discount_amount ?? 0) > 0 && (
+                <div className="flex justify-between text-sm font-medium text-green-600 dark:text-green-400">
+                  <span>Discount{order.coupon_code ? ` (${order.coupon_code})` : ''}</span>
+                  <span>-{formatCurrency(order.discount_amount!)}</span>
+                </div>
+              )}
+
+              <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
+                <span>Shipping</span>
+                {(order.shipping_cost ?? 0) === 0 ? (
+                  <span className="text-green-600 dark:text-green-400 font-bold">Free</span>
+                ) : (
+                  <span className="text-black dark:text-white">{formatCurrency(order.shipping_cost!)}</span>
+                )}
+              </div>
+
+              <div className="flex justify-between text-sm font-medium text-gray-600 dark:text-gray-400">
+                <span>Tax</span>
+                <span className="text-black dark:text-white">{formatCurrency(order.tax_amount ?? 0)}</span>
+              </div>
+
+              <div className="border-t border-gray-200 dark:border-gray-800 pt-6 mt-2 flex justify-between text-xl font-extrabold text-black dark:text-white">
+                <span>Amount Due</span>
+                <span>{formatCurrency(order.total_amount)}</span>
+              </div>
             </div>
           </div>
         </div>

@@ -42,6 +42,8 @@ class Order(Base, UUIDMixin, TimestampMixin):
     courier: Mapped[str | None] = mapped_column(String(100))
     coupon_code: Mapped[str | None] = mapped_column(String(50))
     discount_amount: Mapped[float | None] = mapped_column(Numeric(12, 2))
+    shipping_cost: Mapped[float | None] = mapped_column(Numeric(12, 2), default=0)
+    tax_amount: Mapped[float | None] = mapped_column(Numeric(12, 2), default=0)
 
     # Relationships
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
