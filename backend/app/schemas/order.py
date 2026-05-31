@@ -58,6 +58,7 @@ class OrderRead(BaseSchema):
     items: list[OrderItemRead] = []
     status_history: list[OrderStatusHistoryRead] = []
     payment_status: str | None = None
+    payment_provider: str | None = None
     created_at: datetime
     updated_at: datetime
 

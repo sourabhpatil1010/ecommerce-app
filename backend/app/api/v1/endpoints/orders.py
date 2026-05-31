@@ -32,6 +32,7 @@ def _enrich_order(order: Any, payment: Any = None) -> dict:
         "items": order.items,
         "status_history": getattr(order, 'status_history', []),
         "payment_status": payment.status if payment else None,
+        "payment_provider": payment.provider if payment else None,
         "created_at": order.created_at,
         "updated_at": order.updated_at,
     }
